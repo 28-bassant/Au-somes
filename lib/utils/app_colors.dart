@@ -8,7 +8,8 @@ class AppColors{
   static const Color pastelPink = Color (0xFFF5CBCB);
   static const Color lightPastelBlue = Color (0xFFBBDCE5);
   static const Color backgroundColor = Color (0xFFFAF7F3);
-  static const Color whiteColor = Color (0xFFFFFF);
+  static const Color whiteColor = Color (0xFFFFFFFF);
+  static const Color redColor = Color (0xFFBC3018);
   static const Color trasparentColor = Colors.transparent;
 
 }
