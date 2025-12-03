@@ -50,4 +50,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get create_one => 'Create one';
+
+  @override
+  String get or => 'OR';
+
+  @override
+  String get login_google => 'Login With Google';
+
+  @override
+  String get forget_password => 'Forget Password?';
 }

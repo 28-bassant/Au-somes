@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     Future.delayed(Duration(seconds: 4), () {
       //todo: Navigate to login screen
-      Navigator.pushReplacementNamed(context, AppRoutes.registerScreenRouteName);
+      Navigator.pushReplacementNamed(context, AppRoutes.loginScreenRouteName);
     });
   }
 

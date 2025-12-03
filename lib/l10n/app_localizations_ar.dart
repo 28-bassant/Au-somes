@@ -49,4 +49,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get create_one => 'أنشئ حساباً';
+
+  @override
+  String get or => 'او';
+
+  @override
+  String get login_google => 'تسجيل الدخول عبر جوجل';
+
+  @override
+  String get forget_password => 'نسيت كلمة المرور؟';
 }

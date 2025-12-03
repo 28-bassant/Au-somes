@@ -11,5 +11,5 @@ class AppColors{
   static const Color whiteColor = Color (0xFFFFFFFF);
   static const Color redColor = Color (0xFFBC3018);
   static const Color trasparentColor = Colors.transparent;
-
+  static const Color blackColor = Colors.black;
 }

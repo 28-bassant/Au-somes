@@ -9,6 +9,11 @@ class AppStyles{
     fontWeight: FontWeight.bold,
     color: AppColors.softBlue
   );
+  static TextStyle bold20SoftBlue = GoogleFonts.glory(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      color: AppColors.softBlue
+  );
   static TextStyle bold16SoftBlue = GoogleFonts.glory(
     fontSize: 16,
     fontWeight: FontWeight.bold,
@@ -45,6 +50,11 @@ static TextStyle medium16Red = GoogleFonts.glory(
     fontSize: 16,
     fontWeight: FontWeight.w500,
     color: AppColors.redColor
+  );
+  static TextStyle medium20Black = GoogleFonts.glory(
+      fontSize: 20,
+      fontWeight: FontWeight.w500,
+      color: AppColors.blackColor
   );
 
 }
