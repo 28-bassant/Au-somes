@@ -22,6 +22,8 @@ class CustomTextFormField extends StatefulWidget {
   int? maxLines;
   TextStyle? textStyle;
   double? borderRadius;
+  String? hintText;
+  TextStyle? hintStyle;
 
   CustomTextFormField({
     this.filledColor,
@@ -32,8 +34,9 @@ class CustomTextFormField extends StatefulWidget {
     this.labelStyle,
     this.prefixIcon,
     this.suffixIcon,
-    this.controller,
-
+    this.controller
+  ,this.hintText
+  ,this.hintStyle,
     this.validator,
     this.keyboardType,
     this.obscureText = false,
@@ -69,9 +72,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         fillColor: widget.filledColor ?? AppColors.trasparentColor,
         filled: true,
         labelText: widget.labelText,
-
-        labelStyle:
-        widget.labelStyle ?? AppStyles.semiBold20SoftBlue,
+        hintText: widget.hintText,
+        hintStyle:widget.hintStyle ?? AppStyles.semiBold20SoftBlue ,
+        labelStyle: widget.labelStyle ?? AppStyles.semiBold20SoftBlue,
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.suffixIcon,
 

@@ -100,9 +100,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(height: height * .01),
                             Row(mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text(AppLocalizations.of(context)!
-                                    .forget_password
-                                    , style: AppStyles.bold20SoftBlue),
+                                InkWell(
+                                  onTap:     () {
+                                    //todo: Navigate to forget password screen
+                                    Navigator.pushNamed(context,
+                                        AppRoutes.forgetPasswordScreen1RouteName);
+                                      },
+                                    child: Text(AppLocalizations.of(context)!.forget_passwordd
+                                      , style: AppStyles.bold20SoftBlue),),
                               ],
                             ),
                             SizedBox(height: height * .02),

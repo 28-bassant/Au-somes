@@ -28,6 +28,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get password => 'Password';
 
   @override
+  String get new_password => 'New Password';
+
+  @override
   String get confirm_password => 'Confirm Password';
 
   @override
@@ -58,5 +61,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_google => 'Login With Google';
 
   @override
-  String get forget_password => 'Forget Password?';
+  String get forget_passwordd => 'Forget Password?';
+
+  @override
+  String get forget_password => 'Forget Password';
+
+  @override
+  String get email_associated_with_account =>
+      'Enter your email address associated with your account.';
+
+  @override
+  String get send_email => 'Send Email';
+
+  @override
+  String get enter_verification_code => 'Enter verification code';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get change_password => 'Change Password';
 }
