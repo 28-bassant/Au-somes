@@ -27,6 +27,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get password => 'كلمة المرور';
 
   @override
+  String get new_password => 'كلمة المرور الجديدة';
+
+  @override
   String get confirm_password => 'تأكيد كلمة المرور';
 
   @override
@@ -74,4 +77,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get verify => 'تحقق';
+
+  @override
+  String get change_password => 'تغيير كلمة المرور';
 }

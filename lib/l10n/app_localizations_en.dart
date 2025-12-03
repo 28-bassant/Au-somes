@@ -28,6 +28,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get password => 'Password';
 
   @override
+  String get new_password => 'New Password';
+
+  @override
   String get confirm_password => 'Confirm Password';
 
   @override
@@ -75,4 +78,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verify => 'Verify';
+
+  @override
+  String get change_password => 'Change Password';
 }

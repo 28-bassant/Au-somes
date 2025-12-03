@@ -5,6 +5,7 @@
   "age": "العمر",
   "parent_email": "البريد الإلكتروني لولي الأمر",
   "password": "كلمة المرور",
+  "new_password": "كلمة المرور الجديدة",
   "confirm_password": "تأكيد كلمة المرور",
   "email": "البريد الإلكتروني",
   "welcome_back": "مرحباً بعودتك!",
@@ -20,6 +21,7 @@
    "email_associated_with_account":"أدخل عنوان بريدك الإلكتروني المرتبط بحسابك.",
    "send_email":"إرسال البريد الإلكتروني",
     "enter_verification_code":"أدخل رمز التحقق",
-     "verify":"تحقق"
+     "verify":"تحقق",
+      "change_password":"تغيير كلمة المرور"
 
 }

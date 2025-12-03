@@ -35,52 +35,54 @@ class ForgetPasswordScreen1 extends StatelessWidget{
      ),
          body: Padding(
            padding: EdgeInsets.symmetric(horizontal: width*.04,vertical: height*.02),
-           child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: height*.02),
-           Row(mainAxisAlignment: MainAxisAlignment.center,
-             children: [
-               Image(image:AssetImage(AppAssets.forgetPasswordImage)),
-             ],
-           ),
-           SizedBox(height: height*.04,),
-           Text(AppLocalizations.of(context)!.email_associated_with_account,style: AppStyles.bold24SoftBlue,)
-           ,SizedBox(height: height*.02)
-             ,Form(key: formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+           child: SingleChildScrollView(
+             child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
                       SizedBox(height: height*.02),
-                        CustomTextFormField(
-                            controller: emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            hintText:AppLocalizations.of(context)!.email ,
-                            validator: AppValidators.validateEmail,
-                          prefixIcon:
-                        Image(image: AssetImage(AppAssets.emailIcon)),
-                          )
-                        ,SizedBox(height: height*.04),
-                      SizedBox(
-                        width: double.infinity,
-                        child: CustomElevatedButton(
-                          text: AppLocalizations.of(context)!.send_email,
-                          textStyle: AppStyles.bold22White,
-                          onPressed: () {
-                            if (formKey.currentState?.validate() == true) {
-                              Navigator.pushNamed(context, AppRoutes.forgetPasswordScreen2RouteName);
-                            }
-
-                          },
-                        )),
-                      ],
-                    ),
+             Row(mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 Image(image:AssetImage(AppAssets.forgetPasswordImage)),
+               ],
              ),
-                ],
-              ),
+             SizedBox(height: height*.04,),
+             Text(AppLocalizations.of(context)!.email_associated_with_account,style: AppStyles.bold24SoftBlue,)
+             ,SizedBox(height: height*.02)
+               ,Form(key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                        SizedBox(height: height*.02),
+                          CustomTextFormField(
+                              controller: emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              hintText:AppLocalizations.of(context)!.email ,
+                              validator: AppValidators.validateEmail,
+                            prefixIcon:
+                          Image(image: AssetImage(AppAssets.emailIcon)),
+                            )
+                          ,SizedBox(height: height*.04),
+                        SizedBox(
+                          width: double.infinity,
+                          child: CustomElevatedButton(
+                            text: AppLocalizations.of(context)!.send_email,
+                            textStyle: AppStyles.bold22White,
+                            onPressed: () {
+                              if (formKey.currentState?.validate() == true) {
+                                Navigator.pushNamed(context, AppRoutes.forgetPasswordScreen2RouteName);
+                              }
+             
+                            },
+                          )),
+                        ],
+                      ),
+               ),
+                  ],
+                ),
+           ),
          ),
    );
   }
 
-  
+
 }
