@@ -194,11 +194,41 @@ abstract class AppLocalizations {
   /// **'Login With Google'**
   String get login_google;
 
-  /// No description provided for @forget_password.
+  /// No description provided for @forget_passwordd.
   ///
   /// In en, this message translates to:
   /// **'Forget Password?'**
+  String get forget_passwordd;
+
+  /// No description provided for @forget_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget Password'**
   String get forget_password;
+
+  /// No description provided for @email_associated_with_account.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address associated with your account.'**
+  String get email_associated_with_account;
+
+  /// No description provided for @send_email.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Email'**
+  String get send_email;
+
+  /// No description provided for @enter_verification_code.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter verification code'**
+  String get enter_verification_code;
+
+  /// No description provided for @verify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
 }
 
 class _AppLocalizationsDelegate

@@ -16,5 +16,11 @@
   "create_one": "Create one",
   "or":"OR",
   "login_google": "Login With Google",
-  "forget_password": "Forget Password?"
+  "forget_passwordd": "Forget Password?",
+  "forget_password": "Forget Password",
+  "email_associated_with_account":"Enter your email address associated with your account.",
+  "send_email":"Send Email",
+  "enter_verification_code":"Enter verification code",
+  "verify":"Verify"
+
 }

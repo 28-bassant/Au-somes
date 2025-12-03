@@ -1,5 +1,7 @@
 import 'package:au_somes/providers/app_language_provider.dart';
 import 'package:au_somes/splash_screen/splash_screen.dart';
+import 'package:au_somes/ui/auth/forget_password/forged_password_screen1.dart';
+import 'package:au_somes/ui/auth/forget_password/forget_password_screen2.dart';
 import 'package:au_somes/ui/auth/login_screen/login_screen.dart';
 import 'package:au_somes/ui/auth/register_screen/register_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
@@ -36,7 +38,8 @@ class MyApp extends StatelessWidget{
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),
         AppRoutes.registerScreenRouteName : (context) => RegisterScreen(),
-
+        AppRoutes.forgetPasswordScreen1RouteName:(context)=>ForgetPasswordScreen1(),
+        AppRoutes.forgetPasswordScreen2RouteName:(context)=>ForgetPasswordScreen2()
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

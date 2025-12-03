@@ -7,6 +7,10 @@ class AppTheme{
     scaffoldBackgroundColor: AppColors.backgroundColor,
     appBarTheme: AppBarTheme(
       backgroundColor: AppColors.backgroundColor,
+        iconTheme: IconThemeData(
+          color: AppColors.softBlue,
+
+        )
 
     )
   );
