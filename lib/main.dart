@@ -34,8 +34,9 @@ class MyApp extends StatelessWidget{
       initialRoute: AppRoutes.splashScreenRouteName,
       routes:  {
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),
-        AppRoutes.registerScreenRouteName : (context) => RegisterScreen(),
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),
+        AppRoutes.registerScreenRouteName : (context) => RegisterScreen(),
+
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

@@ -12,5 +12,8 @@
   "register": "إنشاء حساب",
   "dont_have_account": "ليس لديك حساب؟ ",
   "already_have_an_account": "لديك حساب بالفعل ؟ ",
-  "create_one": "أنشئ حساباً"
+  "create_one": "أنشئ حساباً",
+  "or":"او",
+  "login_google": "تسجيل الدخول عبر جوجل",
+   "forget_password": "نسيت كلمة المرور؟"
 }

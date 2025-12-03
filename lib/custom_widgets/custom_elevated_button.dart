@@ -15,6 +15,15 @@ class CustomElevatedButton extends StatelessWidget {
   Widget? iconWidget;
   MainAxisAlignment mainAxisAlignment;
   double? borderReadius;
+  IconData? suffixIconName;
+  double space ;
+  String? text2;
+  bool istext2;
+  Color? suffixIconColor;
+  String? iconName;
+  num iconPadding;
+
+
 
   CustomElevatedButton({
     super.key,
@@ -26,7 +35,16 @@ class CustomElevatedButton extends StatelessWidget {
     this.isIcon = false,
     this.iconWidget,
     this.mainAxisAlignment = MainAxisAlignment.start,
-    this.borderReadius
+    this.borderReadius,
+    this.suffixIconColor=AppColors.softBlue,
+    this.space =.01,
+    this.suffixIconName,
+    this.text2,
+    this.istext2=false,
+    this.iconPadding=0,
+    this.iconName
+
+
   });
 
   @override
@@ -41,27 +59,32 @@ class CustomElevatedButton extends StatelessWidget {
         ),
         backgroundColor: MaterialStateProperty.all(backgroundColor),
         side: MaterialStateProperty.all(
-          BorderSide(color: borderColor, width: 1),
+          BorderSide(color: borderColor, width: 2.5),
         ),
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderReadius ?? 16)),
         ),
       ),
       child: isIcon
-      ? Row(
-          mainAxisAlignment: mainAxisAlignment,
-          children: [
-            iconWidget!,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: width * .02),
-              child: Text(
-                text,
-                style: textStyle ?? AppStyles.bold24SoftBlue,
-              ),
-            ),
-          ],
-        )
-          : Text(text, style: textStyle ?? AppStyles.bold22White),
+      ? Row(mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding:  EdgeInsets.symmetric(horizontal: width*iconPadding),
+            child: Image(image: AssetImage(iconName!)),
+          ),
+          SizedBox(width: width*.04,),
+          istext2?
+          Column(crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(text!,style:textStyle ?? AppStyles.bold24SoftBlue,),
+              Text(text2??'',style: AppStyles.medium20Black,),
+            ],
+          ):Text(text!,style:textStyle ?? AppStyles.medium20Black ,),
+          SizedBox(width: width* space )
+          ,Icon(suffixIconName,color: suffixIconColor)
+        ],):
+           Text(text, style: textStyle ?? AppStyles.bold22White),
     );
   }
 }
+

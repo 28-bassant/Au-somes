@@ -12,12 +12,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  var formKey = GlobalKey<FormState>();
   TextEditingController childNameController = TextEditingController();
   TextEditingController ageController = TextEditingController();
   TextEditingController parentEmailController = TextEditingController();
+
   TextEditingController passwordController = TextEditingController();
+
   TextEditingController confirmPasswordController = TextEditingController();
+
+  bool obscure=true;
+
   @override
   Widget build(BuildContext context) {
     var languageProvider = Provider.of<AppLanguageProvider>(context);
@@ -51,27 +62,41 @@ class RegisterScreen extends StatelessWidget {
               ),
               SizedBox(height: height * 0.04),
               Form(
+                key: formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(AppLocalizations.of(context)!.child_name, style: AppStyles.semiBold20SoftBlue),
                     CustomTextFormField(
                       controller: childNameController,
+                      validator: AppValidators.validateFullName,
                     ),
                     SizedBox(height: height * .01),
                     Text(AppLocalizations.of(context)!.age, style: AppStyles.semiBold20SoftBlue),
                     CustomTextFormField(
                       controller: ageController,
+
                     ),
                     SizedBox(height: height * .01),
                     Text(AppLocalizations.of(context)!.parent_email, style: AppStyles.semiBold20SoftBlue),
                     CustomTextFormField(
                       controller: parentEmailController,
+                        validator: AppValidators.validateEmail
                     ),
                     SizedBox(height: height * .01),
                     Text(AppLocalizations.of(context)!.password, style: AppStyles.semiBold20SoftBlue),
                     CustomTextFormField(
                       controller: passwordController,
+                        validator: AppValidators.validatePassword,
+                        keyboardType:TextInputType.visiblePassword ,
+                        suffixIcon: IconButton(onPressed: (){
+                          obscure =!obscure;
+                          setState(() {
+                          });
+                        }
+                        ,icon:Icon(obscure? Icons.visibility_off:Icons.visibility,
+                              color: AppColors.softBlue,)),
+                        obscureText:obscure
                     ),
                     SizedBox(height: height * .01),
                     Text(
@@ -80,6 +105,17 @@ class RegisterScreen extends StatelessWidget {
                     ),
                     CustomTextFormField(
                       controller: confirmPasswordController,
+                        keyboardType:TextInputType.visiblePassword ,
+                        validator: (value) =>
+                            AppValidators.validateConfirmPassword(value, passwordController.text),
+                        suffixIcon: IconButton(onPressed: (){
+                          obscure =!obscure;
+                          setState(() {
+                          });
+                        }
+                        ,icon:Icon(obscure? Icons.visibility_off:Icons.visibility,
+                              color: AppColors.softBlue,)),
+                        obscureText:obscure
                     ),
                     SizedBox(height: height * .02),
                     SizedBox(
@@ -105,8 +141,9 @@ class RegisterScreen extends StatelessWidget {
                             },
                             child: Text(AppLocalizations.of(context)!.login,style: AppStyles.extraBold16SoftBlue,)),
                       ],
-                    )
-                    
+                    ),
+                    SizedBox(height: height * .04)
+
 
                   ],
                 ),
@@ -119,6 +156,7 @@ class RegisterScreen extends StatelessWidget {
   }
 
   void Register(){
+    if (formKey.currentState?.validate() == true) {}
 
   }
 }

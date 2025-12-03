@@ -8,14 +8,14 @@ import '../utils/app_colors.dart';
 
 typedef OnValidator = String? Function(String?)?;
 
-class CustomTextFormField extends StatelessWidget {
+class CustomTextFormField extends StatefulWidget {
   Color? filledColor;
   Color? borderColor;
   String? labelText;
   TextStyle? labelStyle;
   Widget? prefixIcon;
   Widget? suffixIcon;
-  OnValidator onValidator;
+  String? Function(String?)? validator;
   TextInputType? keyboardType;
   TextEditingController? controller;
   bool obscureText;
@@ -33,7 +33,8 @@ class CustomTextFormField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.controller,
-    this.onValidator,
+
+    this.validator,
     this.keyboardType,
     this.obscureText = false,
     this.textStyle,
@@ -41,6 +42,11 @@ class CustomTextFormField extends StatelessWidget {
 
   });
 
+  @override
+  State<CustomTextFormField> createState() => _CustomTextFormFieldState();
+}
+
+class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -55,33 +61,33 @@ class CustomTextFormField extends StatelessWidget {
         ),
         enabledBorder: builtTextFieldBorder(
             borderColor:
-            borderColor ?? AppColors.softBlue,
+            widget.borderColor ?? AppColors.softBlue,
         ),
         focusedBorder: builtTextFieldBorder(borderColor: AppColors.softBlue),
         errorBorder: builtTextFieldBorder(borderColor: AppColors.redColor),
         errorStyle: AppStyles.medium16Red.copyWith(color: AppColors.redColor),
-        fillColor: filledColor ?? AppColors.trasparentColor,
+        fillColor: widget.filledColor ?? AppColors.trasparentColor,
         filled: true,
-        labelText: labelText,
+        labelText: widget.labelText,
 
         labelStyle:
-        labelStyle ?? AppStyles.semiBold20SoftBlue,
-        prefixIcon: prefixIcon,
-        suffixIcon: suffixIcon,
+        widget.labelStyle ?? AppStyles.semiBold20SoftBlue,
+        prefixIcon: widget.prefixIcon,
+        suffixIcon: widget.suffixIcon,
 
       ),
-      controller: controller,
-      maxLines: maxLines ?? 1,
-      style:textStyle ?? AppStyles.semiBold20SoftBlue,
-      validator: onValidator,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
+      controller: widget.controller,
+      maxLines: widget.maxLines ?? 1,
+      style:widget.textStyle ?? AppStyles.semiBold20SoftBlue,
+      validator: widget.validator,
+      keyboardType: widget.keyboardType,
+      obscureText: widget.obscureText,
     );
   }
 
   OutlineInputBorder builtTextFieldBorder({required Color? borderColor}) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(borderRadius ?? 16),
+      borderRadius: BorderRadius.circular(widget.borderRadius ?? 16),
       borderSide: BorderSide(
         color: borderColor ?? AppColors.softBlue,
         width: 2,

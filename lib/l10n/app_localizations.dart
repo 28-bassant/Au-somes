@@ -181,6 +181,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create one'**
   String get create_one;
+
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get or;
+
+  /// No description provided for @login_google.
+  ///
+  /// In en, this message translates to:
+  /// **'Login With Google'**
+  String get login_google;
+
+  /// No description provided for @forget_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget Password?'**
+  String get forget_password;
 }
 
 class _AppLocalizationsDelegate
