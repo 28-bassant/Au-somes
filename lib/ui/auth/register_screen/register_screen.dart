@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../api/api_manager.dart';
+import '../../../core/cache/shared_prefs_utils.dart';
+import '../../../core/cache/token_utils.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -183,7 +185,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void Register() async {
     if (formKey.currentState?.validate() == true) {
-      //todo: show loading
       DialogUtils.showLoading(textLoading: 'Loading', context: context);
 
       try {
@@ -196,8 +197,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         DialogUtils.hideLoading(context: context);
+        if (response != null && response.token != null) {
+          await TokenUtils.saveTokens(response);
 
-        Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
+          final expiryTimestamp = DateTime.now()
+              .add(Duration(seconds: response.expiresIn ?? 1800))
+              .millisecondsSinceEpoch;
+          await SharedPrefsUtils.saveData(
+            key: "tokenExpiry",
+            value: expiryTimestamp,
+          );
+
+          DialogUtils.showMsg(
+            context: context,
+            title: "Success",
+            msg: "register Successful",
+            posActionName: "OK",
+            posAction: () {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.selectScreenRouteName,
+              );
+            },
+          );
+        }
 
       } catch (e) {
         DialogUtils.hideLoading(context: context);

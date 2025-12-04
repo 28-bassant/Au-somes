@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:au_somes/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../api/api_manager.dart';
+import '../../../core/cache/shared_prefs_utils.dart';
+import '../../../core/cache/token_utils.dart';
 import '../../../custom_widgets/custom_elevated_button.dart';
 import '../../../custom_widgets/custom_language_widget.dart';
 import '../../../custom_widgets/custom_text_form_field.dart';
@@ -11,6 +16,7 @@ import '../../../utils/app_assets.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_routes.dart';
 import '../../../utils/app_styles.dart';
+import '../../../utils/dialog_utils.dart';
 
 class LoginScreen extends StatefulWidget{
   @override
@@ -179,7 +185,67 @@ class _LoginScreenState extends State<LoginScreen> {
         ));
   }
 
-  void login() {
-    if (formKey.currentState?.validate() == true) {}
+  void login() async {
+    if (formKey.currentState?.validate() == true) {
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+
+      try {
+        //todo:show loading
+        DialogUtils.showLoading(
+            textLoading: "Logging in...", context: context);
+
+        final response = await ApiManager.login(
+          email: email,
+          password: password,
+        );
+
+        //todo:hide loading
+        DialogUtils.hideLoading(context: context);
+
+        if (response != null && response.token != null) {
+          //todo: save token
+          await TokenUtils.saveLoginTokens(response);
+          //todo: save token expiry time
+          final expiryTimestamp = DateTime.now()
+              .add(Duration(seconds: response.expiresIn ?? 1800))
+              .millisecondsSinceEpoch;
+          await SharedPrefsUtils.saveData(
+              key: "tokenExpiry", value: expiryTimestamp);
+
+          //todo:success
+          //todo:show msg
+          DialogUtils.showMsg(
+            context: context,
+            title: "Success",
+            msg: "Login Successful",
+            posActionName: "OK",
+            posAction: () {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.selectScreenRouteName,
+              );
+            },
+          );
+        }
+
+      } on SocketException {
+        DialogUtils.hideLoading(context: context);
+        DialogUtils.showMsg(
+          context: context,
+          title: "No Internet",
+          msg: "Please check your internet connection and try again.",
+          posActionName: "Retry",
+        );
+      } catch (e) {
+        DialogUtils.hideLoading(context: context);
+        DialogUtils.showMsg(
+          context: context,
+          title: "Login Failed",
+          msg: e.toString().replaceFirst("Exception:", "").trim(),
+          posActionName: "Ok",
+        );
+      }
+    }
   }
 }
