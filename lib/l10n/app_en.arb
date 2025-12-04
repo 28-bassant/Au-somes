@@ -23,6 +23,11 @@
   "send_email":"Send Email",
   "enter_verification_code":"Enter verification code",
   "verify":"Verify",
- "change_password":"Change Password"
+ "change_password":"Change Password",
+ "this_field_is_required" : "This field is required",
+ "enter_valid_email" : "Enter valid email",
+ "enter_strong_password" : "Enter strong password please",
+ "password_not_matching" : "Passwords not matching",
+ "enter_nums_only" : "Enter nums only"
 
 }

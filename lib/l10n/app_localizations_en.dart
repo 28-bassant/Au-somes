@@ -81,4 +81,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get change_password => 'Change Password';
+
+  @override
+  String get this_field_is_required => 'This field is required';
+
+  @override
+  String get enter_valid_email => 'Enter valid email';
+
+  @override
+  String get enter_strong_password => 'Enter strong password please';
+
+  @override
+  String get password_not_matching => 'Passwords not matching';
+
+  @override
+  String get enter_nums_only => 'Enter nums only';
 }

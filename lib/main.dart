@@ -5,6 +5,7 @@ import 'package:au_somes/ui/auth/forget_password/forget_password_screen2.dart';
 import 'package:au_somes/ui/auth/forget_password/forget_password_screen3.dart';
 import 'package:au_somes/ui/auth/login_screen/login_screen.dart';
 import 'package:au_somes/ui/auth/register_screen/register_screen.dart';
+import 'package:au_somes/ui/select_screen/select_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:au_somes/l10n/app_localizations.dart';
 
+import 'core/cache/shared_prefs_utils.dart';
 
-void main(){
+
+void main()async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefsUtils.init();
   runApp( MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AppLanguageProvider(),),
@@ -40,8 +45,9 @@ class MyApp extends StatelessWidget{
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),
         AppRoutes.registerScreenRouteName : (context) => RegisterScreen(),
         AppRoutes.forgetPasswordScreen1RouteName:(context)=>ForgetPasswordScreen1(),
-        AppRoutes.forgetPasswordScreen2RouteName:(context)=>ForgetPasswordScreen2()
-        ,AppRoutes.forgetPasswordScreen3RouteName:(context)=>ForgetPasswordScreen3()
+        AppRoutes.forgetPasswordScreen2RouteName:(context)=>ForgetPasswordScreen2(),
+        AppRoutes.forgetPasswordScreen3RouteName:(context)=>ForgetPasswordScreen3(),
+        AppRoutes.selectScreenRouteName:(context)=>SelectScreen(),
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

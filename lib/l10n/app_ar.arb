@@ -22,6 +22,12 @@
    "send_email":"إرسال البريد الإلكتروني",
     "enter_verification_code":"أدخل رمز التحقق",
      "verify":"تحقق",
-      "change_password":"تغيير كلمة المرور"
+      "change_password":"تغيير كلمة المرور",
+      "this_field_is_required" : "هذا الحقل مطلوب",
+      "enter_valid_email" : "أدخل بريدًا إلكترونيًا صالحًا",
+      "enter_strong_password" : "من فضلك أدخل كلمة مرور قوية",
+      "password_not_matching" : "كلمات المرور غير متطابقة",
+      "enter_nums_only" : "أدخل أرقامًا فقط"
+
 
 }
