@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../core/cache/token_utils.dart';
+import '../models/login_response.dart';
 import '../models/register_response.dart';
+import '../utils/app_routes.dart';
 import 'api_constants.dart';
 import 'api_endpoints.dart';
 
@@ -61,6 +64,59 @@ class ApiManager {
       throw Exception("Registration failed. Try again.");
     }
   }
+  static Future<LoginResponse?> login({
+    required String email,
+    required String password,
+  }) async {
+    Uri url = Uri.parse(ApiConstants.baseUrl + ApiEndpoints.login);
+
+    var body = jsonEncode({
+      "email": email,
+      "password": password,
+    });
+
+    var response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+
+      final loginResponse = LoginResponse.fromJson(data);
+
+      await TokenUtils.saveLoginTokens(loginResponse);
+
+      return loginResponse;
+    } else {
+      final errorJson = jsonDecode(response.body);
+
+      if (errorJson["errors"] is List) {
+        final description = errorJson["errors"][0]["description"];
+        throw Exception(description);
+      }
+
+      if (errorJson["errors"] is Map) {
+        final Map errors = errorJson["errors"];
+        List<String> messages = [];
+
+        errors.forEach((key, value) {
+          if (value is List) {
+            for (var msg in value) {
+              messages.add(msg.toString());
+            }
+          }
+        });
+
+        throw Exception(messages.join("\n"));
+      }
+
+      throw Exception("Login failed. Try again.");
+    }
+  }
+
+
 
 
 }
