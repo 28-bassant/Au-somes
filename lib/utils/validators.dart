@@ -34,7 +34,7 @@ class AppValidators{
       return 'This field is required';
     }
     else if(val != password){
-      return 'Passwords not matching';
+      return 'Passwords are not matching';
     }
     else{
       return null;
@@ -49,13 +49,11 @@ class AppValidators{
       return null;
     }
   }
-  static String? validatePhoneNumber(String? val){
-    if(val == null ){
+  static String? validateAge(String? val){
+    if(val == null || val.isEmpty){
       return 'This field is required';
     }else if(int.tryParse(val.trim()) == null){
       return 'Enter nums only ';
-    }else if(val.trim().length != 11 ){
-      return 'Enter value must equal 11 digits';
     }
     else{
       return null;

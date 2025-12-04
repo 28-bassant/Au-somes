@@ -80,4 +80,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get change_password => 'تغيير كلمة المرور';
+
+  @override
+  String get this_field_is_required => 'هذا الحقل مطلوب';
+
+  @override
+  String get enter_valid_email => 'أدخل بريدًا إلكترونيًا صالحًا';
+
+  @override
+  String get enter_strong_password => 'من فضلك أدخل كلمة مرور قوية';
+
+  @override
+  String get password_not_matching => 'كلمات المرور غير متطابقة';
+
+  @override
+  String get enter_nums_only => 'أدخل أرقامًا فقط';
 }

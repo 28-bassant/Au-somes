@@ -241,6 +241,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change Password'**
   String get change_password;
+
+  /// No description provided for @this_field_is_required.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get this_field_is_required;
+
+  /// No description provided for @enter_valid_email.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter valid email'**
+  String get enter_valid_email;
+
+  /// No description provided for @enter_strong_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter strong password please'**
+  String get enter_strong_password;
+
+  /// No description provided for @password_not_matching.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords not matching'**
+  String get password_not_matching;
+
+  /// No description provided for @enter_nums_only.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter nums only'**
+  String get enter_nums_only;
 }
 
 class _AppLocalizationsDelegate
