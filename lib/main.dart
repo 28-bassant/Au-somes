@@ -5,6 +5,8 @@ import 'package:au_somes/ui/auth/forget_password/forget_password_screen2.dart';
 import 'package:au_somes/ui/auth/forget_password/forget_password_screen3.dart';
 import 'package:au_somes/ui/auth/login_screen/login_screen.dart';
 import 'package:au_somes/ui/auth/register_screen/register_screen.dart';
+import 'package:au_somes/ui/child_screen/child_screen.dart';
+import 'package:au_somes/ui/parent_screen/parent_screen.dart';
 import 'package:au_somes/ui/select_screen/select_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_theme.dart';
@@ -48,6 +50,8 @@ class MyApp extends StatelessWidget{
         AppRoutes.forgetPasswordScreen2RouteName:(context)=>ForgetPasswordScreen2(),
         AppRoutes.forgetPasswordScreen3RouteName:(context)=>ForgetPasswordScreen3(),
         AppRoutes.selectScreenRouteName:(context)=>SelectScreen(),
+        AppRoutes.parentScreenRouteName:(context)=>ParentScreen(),
+        AppRoutes.childScreenRouteName:(context)=>ChildScreen(),
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

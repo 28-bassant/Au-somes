@@ -6,4 +6,6 @@ class AppRoutes {
   static String forgetPasswordScreen2RouteName = "forget_password_screen2";
   static String forgetPasswordScreen3RouteName = "forget_password_screen3";
   static String selectScreenRouteName = "select_screen";
+  static String parentScreenRouteName = "parent_screen";
+  static String childScreenRouteName = "child_screen";
 }

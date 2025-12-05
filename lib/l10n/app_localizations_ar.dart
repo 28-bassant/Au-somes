@@ -95,4 +95,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enter_nums_only => 'أدخل أرقامًا فقط';
+
+  @override
+  String get parent => 'ولي الامر';
+
+  @override
+  String get child => 'الطفل';
+
+  @override
+  String get caring_for_my_child => 'رعاية طفلي';
+
+  @override
+  String get search => 'بحث';
 }

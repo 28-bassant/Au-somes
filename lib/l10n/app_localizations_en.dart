@@ -96,4 +96,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enter_nums_only => 'Enter nums only';
+
+  @override
+  String get parent => 'Parent';
+
+  @override
+  String get child => 'Child';
+
+  @override
+  String get caring_for_my_child => 'Caring for My Child';
+
+  @override
+  String get search => 'Search';
 }

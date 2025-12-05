@@ -271,6 +271,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter nums only'**
   String get enter_nums_only;
+
+  /// No description provided for @parent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get parent;
+
+  /// No description provided for @child.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get child;
+
+  /// No description provided for @caring_for_my_child.
+  ///
+  /// In en, this message translates to:
+  /// **'Caring for My Child'**
+  String get caring_for_my_child;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
 }
 
 class _AppLocalizationsDelegate

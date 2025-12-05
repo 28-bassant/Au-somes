@@ -24,6 +24,16 @@ class AppStyles{
     fontWeight: FontWeight.w800,
     color: AppColors.softBlue
   );
+ static TextStyle extraBold24PastelPink = GoogleFonts.glory(
+    fontSize: 24,
+    fontWeight: FontWeight.w800,
+    color: AppColors.pastelPink
+  );
+static TextStyle extraBold24MintGreen = GoogleFonts.glory(
+    fontSize: 24,
+    fontWeight: FontWeight.w800,
+    color: AppColors.mintGreen
+  );
 
   static TextStyle semiBold20SoftBlue = GoogleFonts.glory(
     fontSize: 20,

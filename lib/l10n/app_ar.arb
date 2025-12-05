@@ -27,7 +27,13 @@
       "enter_valid_email" : "أدخل بريدًا إلكترونيًا صالحًا",
       "enter_strong_password" : "من فضلك أدخل كلمة مرور قوية",
       "password_not_matching" : "كلمات المرور غير متطابقة",
-      "enter_nums_only" : "أدخل أرقامًا فقط"
+      "enter_nums_only" : "أدخل أرقامًا فقط",
+      "parent" : "ولي الامر",
+       "child" : "الطفل",
+       "caring_for_my_child" : "رعاية طفلي",
+       "search" : "بحث"
+
+
 
 
 }

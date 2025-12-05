@@ -28,6 +28,10 @@
  "enter_valid_email" : "Enter valid email",
  "enter_strong_password" : "Enter strong password please",
  "password_not_matching" : "Passwords not matching",
- "enter_nums_only" : "Enter nums only"
+ "enter_nums_only" : "Enter nums only",
+ "parent" : "Parent",
+ "child" : "Child",
+ "caring_for_my_child" : "Caring for My Child",
+ "search" : "Search"
 
 }
