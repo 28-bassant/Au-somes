@@ -30,7 +30,7 @@ class _ParentScreenState extends State<ParentScreen> {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.caring_for_my_child,style: AppStyles.bold24SoftBlue,),
+        title:selectedIndex==0? Text(AppLocalizations.of(context)!.caring_for_my_child,style: AppStyles.bold24SoftBlue,):null,
         centerTitle: true,
         actions: [
           CustomLanguageWidget(),
