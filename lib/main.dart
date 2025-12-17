@@ -7,6 +7,7 @@ import 'package:au_somes/ui/auth/login_screen/login_screen.dart';
 import 'package:au_somes/ui/auth/register_screen/register_screen.dart';
 import 'package:au_somes/ui/child_screen/child_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
 import 'package:au_somes/ui/select_screen/select_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_theme.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.selectScreenRouteName:(context)=>SelectScreen(),
         AppRoutes.parentScreenRouteName:(context)=>ParentScreen(),
         AppRoutes.childScreenRouteName:(context)=>ChildScreen(),
+        AppRoutes.chatbotScreenRouteName:(context)=>ChatbotScreen(),
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

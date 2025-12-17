@@ -295,6 +295,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search'**
   String get search;
+
+  /// No description provided for @welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome !\nHow can i help you ?'**
+  String get welcome;
+
+  /// No description provided for @what_is_visual_spatial_perception.
+  ///
+  /// In en, this message translates to:
+  /// **'What is visual–spatial perception?'**
+  String get what_is_visual_spatial_perception;
+
+  /// No description provided for @how_is_visual_spatial_perception_related_to_autism.
+  ///
+  /// In en, this message translates to:
+  /// **'How is visual–spatial perception related to autism?'**
+  String get how_is_visual_spatial_perception_related_to_autism;
+
+  /// No description provided for @game_improve.
+  ///
+  /// In en, this message translates to:
+  /// **'What games improve visual–spatial skills'**
+  String get game_improve;
+
+  /// No description provided for @confusion.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help my child with direction confusion?'**
+  String get confusion;
+
+  /// No description provided for @another_question.
+  ///
+  /// In en, this message translates to:
+  /// **'Another Question'**
+  String get another_question;
+
+  /// No description provided for @visual_spatial_perception_meaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual–spatial perception is the ability to understand what we see and how objects relate to each other in space, such as shape, size, distance, and position (up, down, left, right).'**
+  String get visual_spatial_perception_meaning;
+
+  /// No description provided for @type_your_question_here.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your question here ...'**
+  String get type_your_question_here;
 }
 
 class _AppLocalizationsDelegate

@@ -31,7 +31,15 @@
       "parent" : "ولي الامر",
        "child" : "الطفل",
        "caring_for_my_child" : "رعاية طفلي",
-       "search" : "بحث"
+       "search" : "بحث",
+       "welcome":"مرحبا !\nكيف أساعدك ؟",
+        "what_is_visual_spatial_perception":"ما هو الإدراك البصري-المكاني؟",
+        "how_is_visual_spatial_perception_related_to_autism":"ما هي علاقة الإدراك البصري-المكاني بالتوحد؟",
+        "game_improve":"ما الألعاب المناسبة لتنمية الإدراك البصري-المكاني؟",
+        "confusion":"كيف أقدر أساعد طفلي في مشكلة اللخبطة في الاتجاهات؟",
+        "another_question":"سؤال اخر",
+        "visual_spatial_perception_meaning":"الإدراك البصري-المكاني هو القدرة على فهم ما نراه وكيفية ارتباط الأشياء ببعضها في المكان، مثل الشكل، والحجم، والمسافة، والموقع (فوق، تحت، يمين، يسار).",
+        "type_your_question_here":"اكتب سؤالك هنا ..."
 
 
 

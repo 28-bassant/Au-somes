@@ -107,4 +107,32 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get search => 'بحث';
+
+  @override
+  String get welcome => 'مرحبا !\nكيف أساعدك ؟';
+
+  @override
+  String get what_is_visual_spatial_perception =>
+      'ما هو الإدراك البصري-المكاني؟';
+
+  @override
+  String get how_is_visual_spatial_perception_related_to_autism =>
+      'ما هي علاقة الإدراك البصري-المكاني بالتوحد؟';
+
+  @override
+  String get game_improve =>
+      'ما الألعاب المناسبة لتنمية الإدراك البصري-المكاني؟';
+
+  @override
+  String get confusion => 'كيف أقدر أساعد طفلي في مشكلة اللخبطة في الاتجاهات؟';
+
+  @override
+  String get another_question => 'سؤال اخر';
+
+  @override
+  String get visual_spatial_perception_meaning =>
+      'الإدراك البصري-المكاني هو القدرة على فهم ما نراه وكيفية ارتباط الأشياء ببعضها في المكان، مثل الشكل، والحجم، والمسافة، والموقع (فوق، تحت، يمين، يسار).';
+
+  @override
+  String get type_your_question_here => 'اكتب سؤالك هنا ...';
 }
