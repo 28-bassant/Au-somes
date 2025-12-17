@@ -21,5 +21,12 @@ class AppAssets{
   static const String ad2_arabic = 'assets/images/ad2_arabic.png';
   static const String ad3_arabic = 'assets/images/ad3_arabic.png';
   static const String chatbotImage= 'assets/images/chatbot_image.png';
-
+  static const String editIcon = 'assets/images/edit_icon.png';
+  static const String resetIcon = 'assets/images/reset_icon.png';
+  static const String frequentlyQuestionIcon = 'assets/images/questions_icon.png';
+  static const String reviewIcon = 'assets/images/review_icon.png';
+  static const String aboutIcon = 'assets/images/about_icon.png';
+  static const String logoutIcon = 'assets/images/logout_icon.png';
+  static const String arrowIcon = 'assets/images/arrow.png';
+  static const String childAvatar= 'assets/images/child_avatar.png';
 }

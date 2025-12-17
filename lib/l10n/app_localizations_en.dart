@@ -135,4 +135,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get type_your_question_here => 'Type your question here ...';
+
+  @override
+  String get edit_profile => 'Edit Profile';
+
+  @override
+  String get reset_password => 'Reset Password';
+
+  @override
+  String get frequently_asked_questions => 'Frequently Asked Questions';
+
+  @override
+  String get about_us => 'About Us';
+
+  @override
+  String get review_au_somes => 'Review Au-somes';
+
+  @override
+  String get logout => 'Logout';
 }

@@ -39,7 +39,13 @@
         "confusion":"كيف أقدر أساعد طفلي في مشكلة اللخبطة في الاتجاهات؟",
         "another_question":"سؤال اخر",
         "visual_spatial_perception_meaning":"الإدراك البصري-المكاني هو القدرة على فهم ما نراه وكيفية ارتباط الأشياء ببعضها في المكان، مثل الشكل، والحجم، والمسافة، والموقع (فوق، تحت، يمين، يسار).",
-        "type_your_question_here":"اكتب سؤالك هنا ..."
+        "type_your_question_here":"اكتب سؤالك هنا ...",
+        "edit_profile": "تعديل الملف الشخصي",
+        "reset_password": "تغيير كلمة المرور",
+        "frequently_asked_questions": "الاسئلة الشائعة",
+        "about_us": "نبذة عنا",
+        "review_au_somes": "تقييم Au-some",
+        "logout": "تسجيل الخروج"
 
 
 

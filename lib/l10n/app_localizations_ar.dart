@@ -135,4 +135,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get type_your_question_here => 'اكتب سؤالك هنا ...';
+
+  @override
+  String get edit_profile => 'تعديل الملف الشخصي';
+
+  @override
+  String get reset_password => 'تغيير كلمة المرور';
+
+  @override
+  String get frequently_asked_questions => 'الاسئلة الشائعة';
+
+  @override
+  String get about_us => 'نبذة عنا';
+
+  @override
+  String get review_au_somes => 'تقييم Au-some';
+
+  @override
+  String get logout => 'تسجيل الخروج';
 }
