@@ -32,6 +32,14 @@
  "parent" : "Parent",
  "child" : "Child",
  "caring_for_my_child" : "Caring for My Child",
- "search" : "Search"
+ "search" : "Search",
+ "welcome":"Welcome !\nHow can i help you ?",
+ "what_is_visual_spatial_perception":"What is visual–spatial perception?",
+ "how_is_visual_spatial_perception_related_to_autism":"How is visual–spatial perception related to autism?",
+ "game_improve":"What games improve visual–spatial skills",
+ "confusion":"How can I help my child with direction confusion?",
+ "another_question":"Another Question",
+ "visual_spatial_perception_meaning":"Visual–spatial perception is the ability to understand what we see and how objects relate to each other in space, such as shape, size, distance, and position (up, down, left, right).",
+ "type_your_question_here":"Type your question here ..."
 
 }

@@ -45,6 +45,12 @@ static TextStyle extraBold24MintGreen = GoogleFonts.glory(
     fontWeight: FontWeight.bold,
     color: AppColors.whiteColor
   );
+  static TextStyle bold16White = GoogleFonts.glory(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: AppColors.whiteColor
+  );
+
   static TextStyle bold24White = GoogleFonts.glory(
     fontSize: 24,
     fontWeight: FontWeight.bold,

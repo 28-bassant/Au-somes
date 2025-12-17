@@ -108,4 +108,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get search => 'Search';
+
+  @override
+  String get welcome => 'Welcome !\nHow can i help you ?';
+
+  @override
+  String get what_is_visual_spatial_perception =>
+      'What is visual–spatial perception?';
+
+  @override
+  String get how_is_visual_spatial_perception_related_to_autism =>
+      'How is visual–spatial perception related to autism?';
+
+  @override
+  String get game_improve => 'What games improve visual–spatial skills';
+
+  @override
+  String get confusion => 'How can I help my child with direction confusion?';
+
+  @override
+  String get another_question => 'Another Question';
+
+  @override
+  String get visual_spatial_perception_meaning =>
+      'Visual–spatial perception is the ability to understand what we see and how objects relate to each other in space, such as shape, size, distance, and position (up, down, left, right).';
+
+  @override
+  String get type_your_question_here => 'Type your question here ...';
 }

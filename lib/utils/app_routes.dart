@@ -8,4 +8,5 @@ class AppRoutes {
   static String selectScreenRouteName = "select_screen";
   static String parentScreenRouteName = "parent_screen";
   static String childScreenRouteName = "child_screen";
+  static String chatbotScreenRouteName = "chatbot_screen";
 }

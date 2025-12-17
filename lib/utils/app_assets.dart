@@ -20,5 +20,6 @@ class AppAssets{
   static const String ad1_arabic = 'assets/images/ad1_arabic.png';
   static const String ad2_arabic = 'assets/images/ad2_arabic.png';
   static const String ad3_arabic = 'assets/images/ad3_arabic.png';
+  static const String chatbotImage= 'assets/images/chatbot_image.png';
 
 }
