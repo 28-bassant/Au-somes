@@ -153,4 +153,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logout => 'تسجيل الخروج';
+
+  @override
+  String get verification_code_sent => 'تم إرسال رمز التحقق بنجاح';
+
+  @override
+  String get failed_to_send_verification_code => 'فشل في إرسال رمز التحقق';
+
+  @override
+  String get verification_successful => 'تم التحقق بنجاح';
+
+  @override
+  String get enter_code => 'أدخل الرمز';
+
+  @override
+  String get code_must_be_5 => 'يجب أن يكون الرمز مكونًا من 5 أرقام بالضبط';
+
+  @override
+  String get code_must_contain_nums => 'يجب أن يحتوي الرمز على أرقام فقط';
+
+  @override
+  String get password_changed_successfully => 'تم تغيير كلمة المرور بنجاح!';
 }

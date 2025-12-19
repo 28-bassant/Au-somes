@@ -379,6 +379,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logout'**
   String get logout;
+
+  /// No description provided for @verification_code_sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent successfully'**
+  String get verification_code_sent;
+
+  /// No description provided for @failed_to_send_verification_code.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send verification code'**
+  String get failed_to_send_verification_code;
+
+  /// No description provided for @verification_successful.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification successful'**
+  String get verification_successful;
+
+  /// No description provided for @enter_code.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter code'**
+  String get enter_code;
+
+  /// No description provided for @code_must_be_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Code must be exactly 5 digits'**
+  String get code_must_be_5;
+
+  /// No description provided for @code_must_contain_nums.
+  ///
+  /// In en, this message translates to:
+  /// **'Code must contain only numbers'**
+  String get code_must_contain_nums;
+
+  /// No description provided for @password_changed_successfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully!'**
+  String get password_changed_successfully;
 }
 
 class _AppLocalizationsDelegate

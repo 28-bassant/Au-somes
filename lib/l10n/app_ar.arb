@@ -32,7 +32,7 @@
        "child" : "الطفل",
        "caring_for_my_child" : "رعاية طفلي",
        "search" : "بحث",
-       "welcome":"مرحبا !\nكيف أساعدك ؟",
+        "welcome":"مرحبا !\nكيف أساعدك ؟",
         "what_is_visual_spatial_perception":"ما هو الإدراك البصري-المكاني؟",
         "how_is_visual_spatial_perception_related_to_autism":"ما هي علاقة الإدراك البصري-المكاني بالتوحد؟",
         "game_improve":"ما الألعاب المناسبة لتنمية الإدراك البصري-المكاني؟",
@@ -45,7 +45,16 @@
         "frequently_asked_questions": "الاسئلة الشائعة",
         "about_us": "نبذة عنا",
         "review_au_somes": "تقييم Au-some",
-        "logout": "تسجيل الخروج"
+        "logout": "تسجيل الخروج",
+        "verification_code_sent" : "تم إرسال رمز التحقق بنجاح",
+        "failed_to_send_verification_code" : "فشل في إرسال رمز التحقق",
+         "verification_successful": "تم التحقق بنجاح",
+          "enter_code": "أدخل الرمز",
+          "code_must_be_5": "يجب أن يكون الرمز مكونًا من 5 أرقام بالضبط",
+          "code_must_contain_nums": "يجب أن يحتوي الرمز على أرقام فقط",
+          "password_changed_successfully": "تم تغيير كلمة المرور بنجاح!"
+
+
 
 
 
