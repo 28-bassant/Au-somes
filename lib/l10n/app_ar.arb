@@ -31,7 +31,17 @@
       "parent" : "ولي الامر",
        "child" : "الطفل",
        "caring_for_my_child" : "رعاية طفلي",
-       "search" : "بحث"
+       "search" : "بحث",
+       "verification_code_sent" : "تم إرسال رمز التحقق بنجاح",
+       "failed_to_send_verification_code" : "فشل في إرسال رمز التحقق",
+       "verification_successful": "تم التحقق بنجاح",
+       "enter_code": "أدخل الرمز",
+       "code_must_be_5": "يجب أن يكون الرمز مكونًا من 5 أرقام بالضبط",
+       "code_must_contain_nums": "يجب أن يحتوي الرمز على أرقام فقط",
+       "password_changed_successfully": "تم تغيير كلمة المرور بنجاح!"
+
+
+
 
 
 

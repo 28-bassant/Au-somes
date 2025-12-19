@@ -2,7 +2,7 @@ import 'package:au_somes/custom_widgets/custom_language_widget.dart';
 import 'package:au_somes/l10n/app_localizations.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/home_tab.dart';
 import 'package:au_somes/ui/parent_screen/tabs/notification_tab/notification_tab.dart';
-import 'package:au_somes/ui/parent_screen/tabs/profile_tab/profile_tap.dart';
+import 'package:au_somes/ui/parent_screen/tabs/profile_tab/profile_tab.dart';
 import 'package:au_somes/ui/parent_screen/tabs/search_tab/search_tab.dart';
 import 'package:au_somes/utils/app_colors.dart';
 import 'package:au_somes/utils/app_styles.dart';

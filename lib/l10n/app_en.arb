@@ -32,6 +32,13 @@
  "parent" : "Parent",
  "child" : "Child",
  "caring_for_my_child" : "Caring for My Child",
- "search" : "Search"
+ "search" : "Search",
+"verification_code_sent": "Verification code sent successfully",
+"failed_to_send_verification_code": "Failed to send verification code",
+"verification_successful": "Verification successful",
+"enter_code": "Enter code",
+"code_must_be_5": "Code must be exactly 5 digits",
+"code_must_contain_nums": "Code must contain only numbers",
+"password_changed_successfully": "Password changed successfully!"
 
 }
