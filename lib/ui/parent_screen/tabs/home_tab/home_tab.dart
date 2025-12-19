@@ -1,4 +1,5 @@
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/widgets/image_slide_show_widget.dart';
+import 'package:au_somes/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 
 class HomeTab extends StatelessWidget{
@@ -11,7 +12,10 @@ class HomeTab extends StatelessWidget{
         padding:  EdgeInsets.symmetric(horizontal: width * .04,vertical: 0),
         child: Column(
           children: [
-            ImageSlideShowWidget()
+            ImageSlideShowWidget(),
+            TextButton(onPressed: (){
+              Navigator.pushNamed(context, AppRoutes.chatbotScreenRouteName);
+            }, child:Text("chatbot"))
           ],
         ),
       ),

@@ -296,6 +296,90 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get search;
 
+  /// No description provided for @welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome !\nHow can i help you ?'**
+  String get welcome;
+
+  /// No description provided for @what_is_visual_spatial_perception.
+  ///
+  /// In en, this message translates to:
+  /// **'What is visual–spatial perception?'**
+  String get what_is_visual_spatial_perception;
+
+  /// No description provided for @how_is_visual_spatial_perception_related_to_autism.
+  ///
+  /// In en, this message translates to:
+  /// **'How is visual–spatial perception related to autism?'**
+  String get how_is_visual_spatial_perception_related_to_autism;
+
+  /// No description provided for @game_improve.
+  ///
+  /// In en, this message translates to:
+  /// **'What games improve visual–spatial skills'**
+  String get game_improve;
+
+  /// No description provided for @confusion.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help my child with direction confusion?'**
+  String get confusion;
+
+  /// No description provided for @another_question.
+  ///
+  /// In en, this message translates to:
+  /// **'Another Question'**
+  String get another_question;
+
+  /// No description provided for @visual_spatial_perception_meaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual–spatial perception is the ability to understand what we see and how objects relate to each other in space, such as shape, size, distance, and position (up, down, left, right).'**
+  String get visual_spatial_perception_meaning;
+
+  /// No description provided for @type_your_question_here.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your question here ...'**
+  String get type_your_question_here;
+
+  /// No description provided for @edit_profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get edit_profile;
+
+  /// No description provided for @reset_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get reset_password;
+
+  /// No description provided for @frequently_asked_questions.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequently Asked Questions'**
+  String get frequently_asked_questions;
+
+  /// No description provided for @about_us.
+  ///
+  /// In en, this message translates to:
+  /// **'About Us'**
+  String get about_us;
+
+  /// No description provided for @review_au_somes.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Au-somes'**
+  String get review_au_somes;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
   /// No description provided for @verification_code_sent.
   ///
   /// In en, this message translates to:
