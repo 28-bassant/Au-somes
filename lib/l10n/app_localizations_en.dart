@@ -153,4 +153,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logout => 'Logout';
+
+  @override
+  String get verification_code_sent => 'Verification code sent successfully';
+
+  @override
+  String get failed_to_send_verification_code =>
+      'Failed to send verification code';
+
+  @override
+  String get verification_successful => 'Verification successful';
+
+  @override
+  String get enter_code => 'Enter code';
+
+  @override
+  String get code_must_be_5 => 'Code must be exactly 5 digits';
+
+  @override
+  String get code_must_contain_nums => 'Code must contain only numbers';
+
+  @override
+  String get password_changed_successfully => 'Password changed successfully!';
 }
