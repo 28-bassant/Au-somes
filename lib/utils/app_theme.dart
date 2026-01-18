@@ -8,7 +8,7 @@ class AppTheme{
     appBarTheme: AppBarTheme(
       backgroundColor: AppColors.backgroundColor,
         iconTheme: IconThemeData(
-          color: AppColors.softBlue,
+          color: AppColors.blackColor,
 
         )
 

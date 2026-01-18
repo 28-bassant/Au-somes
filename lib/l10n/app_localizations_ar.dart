@@ -21,6 +21,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get age => 'العمر';
 
   @override
+  String get years => 'Years';
+
+  @override
   String get parent_email => 'البريد الإلكتروني لولي الأمر';
 
   @override
@@ -66,6 +69,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get forget_password => 'نسيت كلمة المرور';
 
   @override
+  String get change_password => 'تغيير كلمة المرور';
+
+  @override
   String get email_associated_with_account =>
       'أدخل عنوان بريدك الإلكتروني المرتبط بحسابك.';
 
@@ -77,9 +83,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get verify => 'تحقق';
-
-  @override
-  String get change_password => 'تغيير كلمة المرور';
 
   @override
   String get this_field_is_required => 'هذا الحقل مطلوب';
@@ -137,7 +140,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get type_your_question_here => 'اكتب سؤالك هنا ...';
 
   @override
-  String get edit_profile => 'تعديل الملف الشخصي';
+  String get edit_profile => 'تعديل الحساب';
 
   @override
   String get reset_password => 'تغيير كلمة المرور';
@@ -174,4 +177,60 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get password_changed_successfully => 'تم تغيير كلمة المرور بنجاح!';
+
+  @override
+  String get ask_chatbot => 'المساعد الذكي';
+
+  @override
+  String get get_instant_answers => 'احصل على اجابات فورية';
+
+  @override
+  String get progress_level => 'مستوى التقدم';
+
+  @override
+  String get your_child_progress => 'تقدم طفلك';
+
+  @override
+  String get overall_progress => 'التقدم العام';
+
+  @override
+  String get activities_done => 'الأنشطة المنجزة';
+
+  @override
+  String get stories_done => 'وقت القصص';
+
+  @override
+  String get achievements => 'الإنجازات';
+
+  @override
+  String get today => 'اليوم';
+
+  @override
+  String get done => 'مكتمل';
+
+  @override
+  String get new_word => 'جديد';
+
+  @override
+  String get today_progress => 'التقدم اليومي';
+
+  @override
+  String get visual_spatial_visualization_activities =>
+      'أنشطة التصور البصري المكاني';
+
+  @override
+  String get spatial_relations_activities => 'أنشطة العلاقات المكانية';
+
+  @override
+  String get spatial_concepts_activities => 'أنشطة المفاهيم المكانية';
+
+  @override
+  String get update_profile => 'تعديل الحساب';
+
+  @override
+  String get edit_profile_text =>
+      'حدّث معلومات طفلك للحصول على تجربة مخصصة بشكل أفضل.';
+
+  @override
+  String get well_done => 'أحسنت';
 }

@@ -39,16 +39,18 @@ class _ForgetPasswordScreen2State extends State<ForgetPasswordScreen2> {
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        title: Text(
-          AppLocalizations.of(context)!.forget_password,
-          style: AppStyles.bold24SoftBlue,
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back, size: 35),
-        ),
+          backgroundColor: AppColors.lightPastelBlue,
+          elevation: 0,
+          iconTheme: IconThemeData(
+              color: AppColors.blackColor
+          ),
+          centerTitle: true,
+          title: Column(
+            children: [
+              Text(AppLocalizations.of(context)!.forget_password,style: AppStyles.bold22Black,),
+              Text(AppLocalizations.of(context)!.change_password,style: AppStyles.regular14BlackWithOpacity60,),
+            ],
+          )
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * .04, vertical: height * .02),
@@ -64,7 +66,7 @@ class _ForgetPasswordScreen2State extends State<ForgetPasswordScreen2> {
               SizedBox(height: height * .04),
               Text(
                 AppLocalizations.of(context)!.enter_verification_code,
-                style: AppStyles.bold24SoftBlue,
+                style: AppStyles.bold24BlackWithOpacity60,
               ),
               SizedBox(height: height * .02),
               Form(
@@ -96,8 +98,8 @@ class _ForgetPasswordScreen2State extends State<ForgetPasswordScreen2> {
                       fieldWidth: 50,
                       borderWidth: 3,
                       activeColor: AppColors.mintGreen,
-                      selectedColor: AppColors.softBlue,
-                      inactiveColor: AppColors.softBlue,
+                      selectedColor: AppColors.mintGreen,
+                      inactiveColor: AppColors.greyColor,
                     ),
                     animationType: AnimationType.none,
                   )

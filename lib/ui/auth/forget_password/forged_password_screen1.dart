@@ -27,16 +27,18 @@ class _ForgetPasswordScreen1State extends State<ForgetPasswordScreen1> {
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        title: Text(
-          AppLocalizations.of(context)!.forget_password,
-          style: AppStyles.bold24SoftBlue,
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back, size: 35),
-        ),
+          backgroundColor: AppColors.lightPastelBlue,
+          elevation: 0,
+          iconTheme: IconThemeData(
+              color: AppColors.blackColor
+          ),
+          centerTitle: true,
+          title: Column(
+            children: [
+              Text(AppLocalizations.of(context)!.forget_password,style: AppStyles.bold22Black,),
+              Text(AppLocalizations.of(context)!.change_password,style: AppStyles.regular14BlackWithOpacity60,),
+            ],
+          )
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * .04, vertical: height * .02),
@@ -49,7 +51,7 @@ class _ForgetPasswordScreen1State extends State<ForgetPasswordScreen1> {
               SizedBox(height: height * .04),
               Text(
                 AppLocalizations.of(context)!.email_associated_with_account,
-                style: AppStyles.bold24SoftBlue,
+                style: AppStyles.bold24BlackWithOpacity60,
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: height * .02),
@@ -63,7 +65,7 @@ class _ForgetPasswordScreen1State extends State<ForgetPasswordScreen1> {
                       keyboardType: TextInputType.emailAddress,
                       hintText: AppLocalizations.of(context)!.email,
                       validator: AppValidators.validateEmail,
-                      prefixIcon: Image.asset(AppAssets.emailIcon),
+                      prefixIcon: Icon(Icons.email_outlined,color: AppColors.greyColor,),
                     ),
                     SizedBox(height: height * .04),
                     CustomElevatedButton(
@@ -77,7 +79,7 @@ class _ForgetPasswordScreen1State extends State<ForgetPasswordScreen1> {
               if (isLoading)
                 Padding(
                   padding: EdgeInsets.only(top: 20),
-                  child: Center(child: CircularProgressIndicator(color: AppColors.softBlue)),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.mintGreen)),
                 ),
             ],
           ),

@@ -30,13 +30,13 @@ class CustomElevatedButton extends StatelessWidget {
     this.onPressed,
     required this.text,
     this.textStyle,
-    this.backgroundColor = AppColors.softBlue,
-    this.borderColor = AppColors.softBlue,
+    this.backgroundColor = AppColors.mintGreen,
+    this.borderColor = AppColors.mintGreen,
     this.isIcon = false,
     this.iconWidget,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.borderReadius,
-    this.suffixIconColor=AppColors.softBlue,
+    this.suffixIconColor=AppColors.greyColor,
     this.space =.01,
     this.suffixIconName,
     this.text2,
@@ -59,7 +59,7 @@ class CustomElevatedButton extends StatelessWidget {
         ),
         backgroundColor: MaterialStateProperty.all(backgroundColor),
         side: MaterialStateProperty.all(
-          BorderSide(color: borderColor, width: 2.5),
+          BorderSide(color: borderColor, width: 1),
         ),
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderReadius ?? 16)),
@@ -76,7 +76,7 @@ class CustomElevatedButton extends StatelessWidget {
           istext2?
           Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(text!,style:textStyle ?? AppStyles.bold24SoftBlue,),
+              Text(text!,style:textStyle ?? AppStyles.semiBold20White,),
               Text(text2??'',style: AppStyles.medium20Black,),
             ],
           ):Text(text!,style:textStyle ?? AppStyles.medium20Black ,),

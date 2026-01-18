@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 140),
                               SizedBox(width: width * .04),
                               Text(AppLocalizations.of(context)!.welcome_back,
-                                  style: AppStyles.bold24SoftBlue),
+                                  style: AppStyles.bold24BlackWithOpacity60),
                             ],
                           ),
 
@@ -79,16 +79,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(AppLocalizations.of(context)!.email,
-                                style: AppStyles.semiBold20SoftBlue),
+                                style: AppStyles.medium20BlackWithOpacity60),
 
                             CustomTextFormField(
                               controller: emailController,
                               keyboardType:  TextInputType.emailAddress,
                               validator: AppValidators.validateEmail,
+                              prefixIcon: Icon(Icons.email_outlined,color: AppColors.greyColor,),
+                              hintText: AppLocalizations.of(context)!.email,
                             ),
                             SizedBox(height: height * .02),
                             Text(AppLocalizations.of(context)!.password,
-                                style: AppStyles.semiBold20SoftBlue),
+                                style: AppStyles.medium20BlackWithOpacity60),
 
                             CustomTextFormField(
                                 controller: passwordController,
@@ -100,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 }, icon: Icon(
                                       obscure ? Icons.visibility_off : Icons
                                           .visibility,
-                                      color: AppColors.softBlue,)),
+                                      color: AppColors.greyColor,)),
                                 obscureText: obscure)
                             ,
                             SizedBox(height: height * .01),
@@ -113,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         AppRoutes.forgetPasswordScreen1RouteName);
                                       },
                                     child: Text(AppLocalizations.of(context)!.forget_passwordd
-                                      , style: AppStyles.bold20SoftBlue),),
+                                      , style: AppStyles.medium16grey),),
                               ],
                             ),
                             SizedBox(height: height * .02),
@@ -136,20 +138,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                 indent: width * .05,
                                 endIndent: width * .04,
                                 thickness: 3,
-                                color: AppColors.softBlue,
+                                color: AppColors.mintGreen,
                               )),
                               Text(AppLocalizations.of(context)!.or,
-                                style: AppStyles.bold24SoftBlue,),
+                                style: AppStyles.bold24MintGreen,),
                               Expanded(child: Divider(thickness: 3,
                                 indent: width * .04,
                                 endIndent: width * .06,
-                                color: AppColors.softBlue,))
+                                color: AppColors.mintGreen,))
                             ],),
                             SizedBox(height: height * .02),
 
                             CustomElevatedButton(onPressed: () {},
                               text: AppLocalizations.of(context)!.login_google,
-                              textStyle: AppStyles.bold24SoftBlue,
+                              textStyle: AppStyles.bold20BlackWithOpacity60,
                               backgroundColor: AppColors.backgroundColor,
                               mainAxisAlignment: MainAxisAlignment.center,
                               isIcon: true,
@@ -162,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 Text(AppLocalizations.of(context)!
                                     .dont_have_account,
-                                  style: AppStyles.bold16SoftBlue,),
+                                  style: AppStyles.regular16BlackWithOpacity60,),
                                 InkWell(
                                     onTap: () {
                                       //todo: Navigate to register screen
@@ -171,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     },
                                     child: Text(AppLocalizations.of(context)!
                                         .create_one, style: AppStyles
-                                        .extraBold16SoftBlue,)),
+                                        .bold16BlackWithOpacity60,)),
                               ],
                             )
 

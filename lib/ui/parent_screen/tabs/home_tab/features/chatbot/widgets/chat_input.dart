@@ -19,15 +19,14 @@ class ChatInput extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.whiteColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(width: 2,color: AppColors.softBlue),
-      ),
+          border:Border.all(color: AppColors.blackColorWithOpacity60,width: 1) ),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.type_your_question_here,
-                hintStyle:AppStyles.bold16SoftBlue,
+                hintStyle:AppStyles.bold14BlackWithOpacity60,
                 border: InputBorder.none,
               ),
             ),
@@ -35,7 +34,7 @@ class ChatInput extends StatelessWidget {
           IconButton(
             icon: Icon(
               Icons.send,
-              color: AppColors.softBlue,
+              color: AppColors.blackColorWithOpacity60,
             ),
             onPressed: onSend,
           ),

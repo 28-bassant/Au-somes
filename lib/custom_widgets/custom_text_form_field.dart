@@ -58,30 +58,30 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            width: 2,
+            width: 1,
             strokeAlign: 2
           )
         ),
         enabledBorder: builtTextFieldBorder(
             borderColor:
-            widget.borderColor ?? AppColors.softBlue,
+            widget.borderColor ?? AppColors.greyColor,
         ),
-        focusedBorder: builtTextFieldBorder(borderColor: AppColors.softBlue),
+        focusedBorder: builtTextFieldBorder(borderColor: AppColors.mintGreen),
         errorBorder: builtTextFieldBorder(borderColor: AppColors.redColor),
         errorStyle: AppStyles.medium16Red.copyWith(color: AppColors.redColor),
-        fillColor: widget.filledColor ?? AppColors.trasparentColor,
+        fillColor: widget.filledColor ?? AppColors.whiteColor,
         filled: true,
         labelText: widget.labelText,
         hintText: widget.hintText,
-        hintStyle:widget.hintStyle ?? AppStyles.semiBold20SoftBlue ,
-        labelStyle: widget.labelStyle ?? AppStyles.semiBold20SoftBlue,
+        hintStyle:widget.hintStyle ?? AppStyles.medium16grey ,
+        labelStyle: widget.labelStyle ?? AppStyles.medium20BlackWithOpacity60,
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.suffixIcon,
 
       ),
       controller: widget.controller,
       maxLines: widget.maxLines ?? 1,
-      style:widget.textStyle ?? AppStyles.semiBold20SoftBlue,
+      style:widget.textStyle ?? AppStyles.medium16BlackWithOpacity60,
       validator: widget.validator,
       keyboardType: widget.keyboardType,
       obscureText: widget.obscureText,
@@ -92,7 +92,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(widget.borderRadius ?? 16),
       borderSide: BorderSide(
-        color: borderColor ?? AppColors.softBlue,
+        color: borderColor ?? AppColors.mintGreen,
         width: 2,
       ),
     );

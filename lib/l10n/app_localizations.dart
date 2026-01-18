@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Age'**
   String get age;
 
+  /// No description provided for @years.
+  ///
+  /// In en, this message translates to:
+  /// **'Years'**
+  String get years;
+
   /// No description provided for @parent_email.
   ///
   /// In en, this message translates to:
@@ -212,6 +218,12 @@ abstract class AppLocalizations {
   /// **'Forget Password'**
   String get forget_password;
 
+  /// No description provided for @change_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get change_password;
+
   /// No description provided for @email_associated_with_account.
   ///
   /// In en, this message translates to:
@@ -235,12 +247,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify'**
   String get verify;
-
-  /// No description provided for @change_password.
-  ///
-  /// In en, this message translates to:
-  /// **'Change Password'**
-  String get change_password;
 
   /// No description provided for @this_field_is_required.
   ///
@@ -421,6 +427,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password changed successfully!'**
   String get password_changed_successfully;
+
+  /// No description provided for @ask_chatbot.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Chatbot'**
+  String get ask_chatbot;
+
+  /// No description provided for @get_instant_answers.
+  ///
+  /// In en, this message translates to:
+  /// **'Get instant answers'**
+  String get get_instant_answers;
+
+  /// No description provided for @progress_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress Level'**
+  String get progress_level;
+
+  /// No description provided for @your_child_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Your child\'s progress'**
+  String get your_child_progress;
+
+  /// No description provided for @overall_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Progress'**
+  String get overall_progress;
+
+  /// No description provided for @activities_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities Done'**
+  String get activities_done;
+
+  /// No description provided for @stories_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories Done'**
+  String get stories_done;
+
+  /// No description provided for @achievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievements;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @new_word.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get new_word;
+
+  /// No description provided for @today_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Progress'**
+  String get today_progress;
+
+  /// No description provided for @visual_spatial_visualization_activities.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual–Spatial Visualization Activities'**
+  String get visual_spatial_visualization_activities;
+
+  /// No description provided for @spatial_relations_activities.
+  ///
+  /// In en, this message translates to:
+  /// **'Spatial Relations Activities'**
+  String get spatial_relations_activities;
+
+  /// No description provided for @spatial_concepts_activities.
+  ///
+  /// In en, this message translates to:
+  /// **'Spatial Concepts Activities'**
+  String get spatial_concepts_activities;
+
+  /// No description provided for @update_profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Profile'**
+  String get update_profile;
+
+  /// No description provided for @edit_profile_text.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your child\'s info for a better personalized experience.'**
+  String get edit_profile_text;
+
+  /// No description provided for @well_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Well Done'**
+  String get well_done;
 }
 
 class _AppLocalizationsDelegate

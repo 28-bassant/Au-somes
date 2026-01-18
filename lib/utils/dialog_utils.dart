@@ -12,10 +12,10 @@ class DialogUtils{
           AlertDialog(
             content: Row(
               children: [
-                CircularProgressIndicator(color: AppColors.softBlue,),
+                CircularProgressIndicator(color: AppColors.mintGreen,),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(textLoading,style: AppStyles.semiBold20SoftBlue,),
+                  child: Text(textLoading,style: AppStyles.medium20BlackWithOpacity60,),
                 )
               ],
             ),
@@ -35,28 +35,28 @@ class DialogUtils{
       actions.add(TextButton(onPressed: (){
         Navigator.pop(context);
         posAction?.call();
-      }, child: Text(posActionName,style:AppStyles.semiBold20SoftBlue,)));
+      }, child: Text(posActionName,style:AppStyles.bold24MintGreen,)));
 
     }
     if(negActionName !=null){
       actions.add(TextButton(onPressed: (){
         Navigator.pop(context);
         negAction?.call();
-      }, child: Text(negActionName,style:AppStyles.semiBold20SoftBlue ,)));
+      }, child: Text(negActionName,style:AppStyles.medium16Red ,)));
     }
     if (actions.isEmpty) {
       actions.add(
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text("OK", style: AppStyles.semiBold20SoftBlue),
+          child: Text("OK", style: AppStyles.bold20BlackWithOpacity60),
         ),
       );
     }
 
     showDialog(barrierDismissible: barrierDismissible,
         context: context, builder: (context) => AlertDialog(
-          content: Text(msg,style: AppStyles.semiBold20SoftBlue,),
-          title: Text(title??'',style: AppStyles.semiBold20SoftBlue,),
+          content: Text(msg,style: AppStyles.medium20BlackWithOpacity60,),
+          title: Text(title??'',style: AppStyles.bold20BlackWithOpacity60,),
           actions: actions,
         ));
   }
