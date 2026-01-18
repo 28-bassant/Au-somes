@@ -255,4 +255,40 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get daily_routine => 'الروتين اليومي';
+
+  @override
+  String get yesterday => 'أمس';
+
+  @override
+  String get reminder => 'تذكير';
+
+  @override
+  String get reminder_message => 'حان وقت تمرين الإدراك البصري المكاني لليوم.';
+
+  @override
+  String get new_activity => 'نشاط جديد';
+
+  @override
+  String get new_activity_message => 'نشاط جديد جاهز لطفلك.';
+
+  @override
+  String get daily_tips_message => 'نصيحة جديدة لدعم طفلك.';
+
+  @override
+  String get ask_chatbot_now => 'اسأل المساعد الآن';
+
+  @override
+  String get ask_chatbot_message => 'لديك سؤال؟ اسأل المساعد الآن.';
+
+  @override
+  String get support_message => 'دعمك يُحدث فرقًا لطفلك';
+
+  @override
+  String get minutes_ago => '23دقيقة';
+
+  @override
+  String get days_ago => ' يوم';
+
+  @override
+  String get notifications => 'الإشعارات';
 }

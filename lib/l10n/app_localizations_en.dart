@@ -256,4 +256,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get daily_routine => 'Daily Routine';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get reminder => 'Reminder';
+
+  @override
+  String get reminder_message =>
+      'It\'s time for today\'s visual-spatial perception exercise.';
+
+  @override
+  String get new_activity => 'New Activity';
+
+  @override
+  String get new_activity_message => 'A new activity is ready for your child.';
+
+  @override
+  String get daily_tips_message => 'A new tip to support your child.';
+
+  @override
+  String get ask_chatbot_now => 'Ask Chatbot Now';
+
+  @override
+  String get ask_chatbot_message => 'Have a question? Ask the assistant now.';
+
+  @override
+  String get support_message =>
+      'Your support makes a difference for your child';
+
+  @override
+  String get minutes_ago => '23min';
+
+  @override
+  String get days_ago => ' day';
+
+  @override
+  String get notifications => 'Notifications';
 }
