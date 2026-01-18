@@ -74,7 +74,14 @@
   "edit_profile": "Edit Profile",
   "update_profile": "Update Profile",
   "edit_profile_text": "Update your child's info for a better personalized experience.",
-  "well_done": "Well Done"
+  "well_done": "Well Done",
+  "thinking":"...Thinking",
+  "show_more":"Show more",
+  "show_less":"Show less",
+  "exceeded_api":"You have exceeded your daily API request limit. Please try again later.",
+  "error_try_again":"An error occurred, please try again",
+  "daily_tips":"Daily Tips",
+  "daily_routine":"Daily Routine"
 
 
 

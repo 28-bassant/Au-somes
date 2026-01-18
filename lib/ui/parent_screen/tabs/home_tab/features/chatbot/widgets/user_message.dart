@@ -25,7 +25,7 @@ class UserMessage extends StatelessWidget{
         ),
         child: Text(
           text,
-          style:AppStyles.medium14BlackWithOpacity60
+          style:AppStyles.medium16Black
         ),
       ),
     );

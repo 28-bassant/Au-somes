@@ -10,5 +10,7 @@ class AppRoutes {
   static String childScreenRouteName = "child_screen";
   static String chatbotScreenRouteName = "chatbot_screen";
   static String progressLevelScreenRouteName = "progress_level_screen";
+  static String dailyRoutineScreenRouteName = "daily_routine_screen";
+  static String dailyTipsScreenRouteName = "daily_tips_screen";
   static String editProfileScreenRouteName = "edit_profile_screen";
 }

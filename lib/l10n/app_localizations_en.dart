@@ -234,4 +234,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get well_done => 'Well Done';
+
+  @override
+  String get thinking => '...Thinking';
+
+  @override
+  String get show_more => 'Show more';
+
+  @override
+  String get show_less => 'Show less';
+
+  @override
+  String get exceeded_api =>
+      'You have exceeded your daily API request limit. Please try again later.';
+
+  @override
+  String get error_try_again => 'An error occurred, please try again';
+
+  @override
+  String get daily_tips => 'Daily Tips';
+
+  @override
+  String get daily_routine => 'Daily Routine';
 }

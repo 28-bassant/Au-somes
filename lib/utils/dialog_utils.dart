@@ -12,7 +12,7 @@ class DialogUtils{
           AlertDialog(
             content: Row(
               children: [
-                CircularProgressIndicator(color: AppColors.mintGreen,),
+                CircularProgressIndicator(color: AppColors.softBlue,),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(textLoading,style: AppStyles.medium20BlackWithOpacity60,),
@@ -35,7 +35,7 @@ class DialogUtils{
       actions.add(TextButton(onPressed: (){
         Navigator.pop(context);
         posAction?.call();
-      }, child: Text(posActionName,style:AppStyles.bold24MintGreen,)));
+      }, child: Text(posActionName,style:AppStyles.bold24SoftBlue,)));
 
     }
     if(negActionName !=null){

@@ -58,6 +58,8 @@ class MyApp extends StatelessWidget{
         AppRoutes.chatbotScreenRouteName:(context)=>ChatbotScreen(),
         AppRoutes.progressLevelScreenRouteName:(context)=>ProgressLevelScreen(),
         AppRoutes.editProfileScreenRouteName:(context)=>EditProfileScreen(),
+
+
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

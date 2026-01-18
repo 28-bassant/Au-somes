@@ -1,6 +1,8 @@
+import 'package:au_somes/l10n/app_localizations.dart';
 import 'package:au_somes/providers/app_language_provider.dart';
 import 'package:au_somes/utils/app_assets.dart';
 import 'package:au_somes/utils/app_styles.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../../../../../utils/app_colors.dart';
@@ -28,9 +30,7 @@ class BotMessage extends StatelessWidget {
         Flexible(
           child: Align(
             alignment:languageProvider.isArabic()?Alignment.centerRight: Alignment.centerLeft,
-
             child: Container(
-
               padding: EdgeInsets.all(width * .03),
               margin: EdgeInsets.only(
                 right:languageProvider.isArabic()? 0: width * .08,
@@ -41,9 +41,14 @@ class BotMessage extends StatelessWidget {
                 borderRadius: BorderRadius.only(topLeft:Radius.circular(16),bottomLeft:languageProvider.isArabic()?Radius.circular(16):Radius.circular(0),
                     topRight: Radius.circular(16),bottomRight:languageProvider.isArabic()? Radius.circular(0):Radius.circular(16) ),
               ),
-              child: Text(
+              child:ExpandableText(
                 text,
-                style:AppStyles.medium14BlackWithOpacity60
+                expandText: AppLocalizations.of(context)!.show_more,
+                collapseText:AppLocalizations.of(context)!.show_less,
+                maxLines: 7,
+                linkColor: AppColors.blackColor,
+                linkStyle: AppStyles.bold14Black,
+                style: AppStyles.medium16Black
               ),
             ),
           ),

@@ -59,6 +59,11 @@ class AppStyles{
     fontWeight: FontWeight.bold,
     color: AppColors.pastelPink
   );
+  static TextStyle bold14Black = GoogleFonts.glory(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: AppColors.blackColor
+  );
   static TextStyle bold16MintGreen = GoogleFonts.glory(
     fontSize: 16,
     fontWeight: FontWeight.bold,
@@ -145,7 +150,8 @@ static TextStyle extraBold24MintGreen = GoogleFonts.glory(
       fontWeight: FontWeight.bold,
       color: AppColors.whiteColor
   );
-static TextStyle bold32MintGreen = GoogleFonts.glory(
+
+  static TextStyle bold32MintGreen = GoogleFonts.glory(
       fontSize: 32,
       fontWeight: FontWeight.bold,
       color: AppColors.mintGreen
@@ -163,6 +169,11 @@ static TextStyle medium16Red = GoogleFonts.glory(
   );
   static TextStyle medium20Black = GoogleFonts.glory(
       fontSize: 20,
+      fontWeight: FontWeight.w500,
+      color: AppColors.blackColor
+  );
+  static TextStyle medium16Black = GoogleFonts.glory(
+      fontSize: 16,
       fontWeight: FontWeight.w500,
       color: AppColors.blackColor
   );

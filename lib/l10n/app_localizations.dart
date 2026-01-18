@@ -535,6 +535,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Well Done'**
   String get well_done;
+
+  /// No description provided for @thinking.
+  ///
+  /// In en, this message translates to:
+  /// **'...Thinking'**
+  String get thinking;
+
+  /// No description provided for @show_more.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get show_more;
+
+  /// No description provided for @show_less.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get show_less;
+
+  /// No description provided for @exceeded_api.
+  ///
+  /// In en, this message translates to:
+  /// **'You have exceeded your daily API request limit. Please try again later.'**
+  String get exceeded_api;
+
+  /// No description provided for @error_try_again.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred, please try again'**
+  String get error_try_again;
+
+  /// No description provided for @daily_tips.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Tips'**
+  String get daily_tips;
+
+  /// No description provided for @daily_routine.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Routine'**
+  String get daily_routine;
 }
 
 class _AppLocalizationsDelegate

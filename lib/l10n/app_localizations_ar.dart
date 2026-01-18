@@ -233,4 +233,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get well_done => 'أحسنت';
+
+  @override
+  String get thinking => 'جاري التفكير...';
+
+  @override
+  String get show_more => 'عرض المزيد';
+
+  @override
+  String get show_less => 'عرض اقل';
+
+  @override
+  String get exceeded_api =>
+      'لقد تجاوزت الحد اليومي للطلبات على الـ API. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get error_try_again => 'حدث خطأ، حاول مرة أخرى';
+
+  @override
+  String get daily_tips => 'نصائح يومية';
+
+  @override
+  String get daily_routine => 'الروتين اليومي';
 }
