@@ -23,15 +23,17 @@ class _CustomLanguageWidgetState extends State<CustomLanguageWidget> {
 
       },
       child: Container(
+
         child: Text(
           languageProvider.appLanguage == 'en'?'AR' : 'En'
-          ,style: AppStyles.medium16SoftBlue,),
+          ,style: AppStyles.medium16BlackWithOpacity60,),
         padding: EdgeInsets.symmetric(horizontal: 10,vertical: 6),
         decoration: BoxDecoration(
+          color: AppColors.whiteColor,
           borderRadius: BorderRadius.circular(8),
           border:Border.all(
             color: AppColors.softBlue,
-            width: 2
+            width: 1
           )
 
         ),

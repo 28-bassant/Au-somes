@@ -26,7 +26,15 @@ class AppAssets{
   static const String frequentlyQuestionIcon = 'assets/images/questions_icon.png';
   static const String reviewIcon = 'assets/images/review_icon.png';
   static const String aboutIcon = 'assets/images/about_icon.png';
-  static const String logoutIcon = 'assets/images/logout_icon.png';
-  static const String arrowIcon = 'assets/images/arrow.png';
+  static const String logoutEnglishIcon = 'assets/images/logout_english_icon.png';
+  static const String logoutArabicIcon = 'assets/images/logout_arabic_icon.png';
+  static const String arrowEnglishIcon = 'assets/images/arrow_english.png';
+  static const String arrowArabicIcon = 'assets/images/arrow_arabic.png';
   static const String childAvatar= 'assets/images/child_avatar.png';
+  static const String searchIcon= 'assets/images/search_icon.png';
+  static const String achivementsIcon= 'assets/images/achivements_icon.png';
+  static const String activitesDoneIcon= 'assets/images/activites_done_icon.png';
+  static const String overallProgressIcon= 'assets/images/overall_progress_icon.png';
+  static const String storiesTimeIcon= 'assets/images/stories_time_icon.png';
+  static const String starImage= 'assets/images/star.png';
 }

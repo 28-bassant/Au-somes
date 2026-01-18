@@ -29,14 +29,6 @@ class _ParentScreenState extends State<ParentScreen> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        title:selectedIndex==0? Text(AppLocalizations.of(context)!.caring_for_my_child,style: AppStyles.bold24SoftBlue,):null,
-        centerTitle: true,
-        actions: [
-          CustomLanguageWidget(),
-          SizedBox(width: width * .02,)
-        ],
-      ),
       bottomNavigationBar: Container(
         margin: EdgeInsets.symmetric(
           horizontal: width * .02,
@@ -46,7 +38,7 @@ class _ParentScreenState extends State<ParentScreen> {
           borderRadius: BorderRadius.circular(40),
           border: Border.all(
             color: AppColors.softBlue,
-            width: 3
+            width: 1
           )
         ),
         height: height * .066,
@@ -91,11 +83,6 @@ class _ParentScreenState extends State<ParentScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // ImageIcon(
-          //   AssetImage(isSelected ? selectedIconName : unSelectedIconName),
-          //   size: 24,
-          //   color: isSelected ? AppColors.softBlue : AppColors.whiteColor,
-          // ),
           Image(image: AssetImage(isSelected ? selectedIconName : unSelectedIconName))
         ],
       ),

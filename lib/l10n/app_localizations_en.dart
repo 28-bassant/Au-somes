@@ -22,6 +22,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get age => 'Age';
 
   @override
+  String get years => 'Years';
+
+  @override
   String get parent_email => 'Parent Email';
 
   @override
@@ -67,6 +70,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forget_password => 'Forget Password';
 
   @override
+  String get change_password => 'Change Password';
+
+  @override
   String get email_associated_with_account =>
       'Enter your email address associated with your account.';
 
@@ -78,9 +84,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verify => 'Verify';
-
-  @override
-  String get change_password => 'Change Password';
 
   @override
   String get this_field_is_required => 'This field is required';
@@ -175,4 +178,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get password_changed_successfully => 'Password changed successfully!';
+
+  @override
+  String get ask_chatbot => 'Ask Chatbot';
+
+  @override
+  String get get_instant_answers => 'Get instant answers';
+
+  @override
+  String get progress_level => 'Progress Level';
+
+  @override
+  String get your_child_progress => 'Your child\'s progress';
+
+  @override
+  String get overall_progress => 'Overall Progress';
+
+  @override
+  String get activities_done => 'Activities Done';
+
+  @override
+  String get stories_done => 'Stories Done';
+
+  @override
+  String get achievements => 'Achievements';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get new_word => 'New';
+
+  @override
+  String get today_progress => 'Today\'s Progress';
+
+  @override
+  String get visual_spatial_visualization_activities =>
+      'Visual–Spatial Visualization Activities';
+
+  @override
+  String get spatial_relations_activities => 'Spatial Relations Activities';
+
+  @override
+  String get spatial_concepts_activities => 'Spatial Concepts Activities';
+
+  @override
+  String get update_profile => 'Update Profile';
+
+  @override
+  String get edit_profile_text =>
+      'Update your child\'s info for a better personalized experience.';
+
+  @override
+  String get well_done => 'Well Done';
 }

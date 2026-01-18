@@ -41,16 +41,18 @@ class _ForgetPasswordScreen3State extends State<ForgetPasswordScreen3> {
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        title: Text(
-          AppLocalizations.of(context)!.forget_password,
-          style: AppStyles.bold24SoftBlue,
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, size: 35),
-        ),
+          backgroundColor: AppColors.lightPastelBlue,
+          elevation: 0,
+          iconTheme: IconThemeData(
+              color: AppColors.blackColor
+          ),
+          centerTitle: true,
+          title: Column(
+            children: [
+              Text(AppLocalizations.of(context)!.forget_password,style: AppStyles.bold22Black,),
+              Text(AppLocalizations.of(context)!.change_password,style: AppStyles.regular14BlackWithOpacity60,),
+            ],
+          )
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -72,7 +74,7 @@ class _ForgetPasswordScreen3State extends State<ForgetPasswordScreen3> {
                 SizedBox(height: height * .04), 
                 Text(
                   AppLocalizations.of(context)!.new_password,
-                  style: AppStyles.semiBold20SoftBlue,
+                  style: AppStyles.medium20BlackWithOpacity60,
                 ),
                 CustomTextFormField(
                   controller: newPasswordController,
@@ -82,7 +84,7 @@ class _ForgetPasswordScreen3State extends State<ForgetPasswordScreen3> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       obscure ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.softBlue,
+                      color: AppColors.greyColor,
                     ),
                     onPressed: () {
                       setState(() {
@@ -96,7 +98,7 @@ class _ForgetPasswordScreen3State extends State<ForgetPasswordScreen3> {
 
                 Text(
                   AppLocalizations.of(context)!.confirm_password,
-                  style: AppStyles.semiBold20SoftBlue,
+                  style: AppStyles.medium20BlackWithOpacity60,
                 ),
                 SizedBox(height: height * .01),
                 CustomTextFormField(
@@ -111,7 +113,7 @@ class _ForgetPasswordScreen3State extends State<ForgetPasswordScreen3> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       obscure ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.softBlue,
+                      color: AppColors.greyColor,
                     ),
                     onPressed: () {
                       setState(() {

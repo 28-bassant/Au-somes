@@ -61,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Image(image: AssetImage(AppAssets.logoImage), width: 108),
                       SizedBox(width: width * .04),
                       Text(AppLocalizations.of(context)!.join_us,
-                          style: AppStyles.bold24SoftBlue),
+                          style: AppStyles.bold24BlackWithOpacity60),
                     ],
                   ),
 
@@ -73,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               Text(
                 AppLocalizations.of(context)!.register_qoute,
-                style: AppStyles.medium16SoftBlue,
+                style: AppStyles.medium16BlackWithOpacity60,
               ),
               SizedBox(height: height * 0.04),
               Form(
@@ -82,30 +82,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(AppLocalizations.of(context)!.child_name,
-                        style: AppStyles.semiBold20SoftBlue),
+                        style: AppStyles.medium20BlackWithOpacity60),
                     CustomTextFormField(
                       controller: childNameController,
                       validator: AppValidators.validateFullName,
+                      prefixIcon: Icon(Icons.person,color: AppColors.greyColor,),
+                      hintText: AppLocalizations.of(context)!.child_name,
                     ),
                     SizedBox(height: height * .01),
                     Text(AppLocalizations.of(context)!.age,
-                        style: AppStyles.semiBold20SoftBlue),
+                        style: AppStyles.medium20BlackWithOpacity60),
                     CustomTextFormField(
                       controller: ageController,
+                      prefixIcon: Icon(Icons.person,color: AppColors.greyColor,),
+                      hintText: AppLocalizations.of(context)!.age,
                       validator: (value) =>
                           AppValidators.validateAge(ageController.text),
 
                     ),
                     SizedBox(height: height * .01),
                     Text(AppLocalizations.of(context)!.parent_email,
-                        style: AppStyles.semiBold20SoftBlue),
+                        style: AppStyles.medium20BlackWithOpacity60),
                     CustomTextFormField(
                         controller: parentEmailController,
+                        prefixIcon: Icon(Icons.email_outlined,color: AppColors.greyColor,),
+                        hintText: AppLocalizations.of(context)!.email,
                         validator: AppValidators.validateEmail
                     ),
                     SizedBox(height: height * .01),
                     Text(AppLocalizations.of(context)!.password,
-                        style: AppStyles.semiBold20SoftBlue),
+                        style: AppStyles.medium20BlackWithOpacity60),
                     CustomTextFormField(
                         controller: passwordController,
                         validator: AppValidators.validatePassword,
@@ -117,13 +123,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ,
                             icon: Icon(
                               obscure ? Icons.visibility_off : Icons.visibility,
-                              color: AppColors.softBlue,)),
+                              color: AppColors.greyColor,)),
                         obscureText: obscure
                     ),
                     SizedBox(height: height * .01),
                     Text(
                       AppLocalizations.of(context)!.confirm_password,
-                      style: AppStyles.semiBold20SoftBlue,
+                      style: AppStyles.medium20BlackWithOpacity60,
                     ),
                     CustomTextFormField(
                         controller: confirmPasswordController,
@@ -138,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ,
                             icon: Icon(
                               obscure ? Icons.visibility_off : Icons.visibility,
-                              color: AppColors.softBlue,)),
+                              color: AppColors.greyColor,)),
                         obscureText: obscure
                     ),
                     SizedBox(height: height * .02),
@@ -159,7 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         Text(
                           AppLocalizations.of(context)!.already_have_an_account,
-                          style: AppStyles.bold16SoftBlue,),
+                          style: AppStyles.regular16BlackWithOpacity60,),
                         InkWell(
                             onTap: () {
                               //todo: Navigate to login screen
@@ -167,7 +173,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   context, AppRoutes.loginScreenRouteName);
                             },
                             child: Text(AppLocalizations.of(context)!.login,
-                              style: AppStyles.extraBold16SoftBlue,)),
+                              style: AppStyles.bold16BlackWithOpacity60,)),
                       ],
                     ),
                     SizedBox(height: height * .04)

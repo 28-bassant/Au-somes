@@ -4,6 +4,7 @@
   "child_name": "Child Name",
   "child_name": "Child Name",
   "age": "Age",
+  "years": "Years",
   "parent_email": "Parent Email",
   "password": "Password",
   "new_password": "New Password",
@@ -19,6 +20,7 @@
   "login_google": "Login With Google",
   "forget_passwordd": "Forget Password?",
   "forget_password": "Forget Password",
+  "change_password": "Change Password",
   "email_associated_with_account":"Enter your email address associated with your account.",
   "send_email":"Send Email",
   "enter_verification_code":"Enter verification code",
@@ -53,7 +55,28 @@
   "enter_code": "Enter code",
   "code_must_be_5": "Code must be exactly 5 digits",
   "code_must_contain_nums": "Code must contain only numbers",
-  "password_changed_successfully": "Password changed successfully!"
+  "password_changed_successfully": "Password changed successfully!",
+  "ask_chatbot": "Ask Chatbot",
+  "get_instant_answers": "Get instant answers",
+  "progress_level": "Progress Level",
+  "your_child_progress": "Your child's progress",
+  "overall_progress": "Overall Progress",
+  "activities_done": "Activities Done",
+  "stories_done": "Stories Done",
+  "achievements": "Achievements",
+  "today": "Today",
+  "done": "Done",
+  "new_word": "New",
+  "today_progress": "Today's Progress",
+  "visual_spatial_visualization_activities": "Visual–Spatial Visualization Activities",
+  "spatial_relations_activities": "Spatial Relations Activities",
+  "spatial_concepts_activities": "Spatial Concepts Activities",
+  "edit_profile": "Edit Profile",
+  "update_profile": "Update Profile",
+  "edit_profile_text": "Update your child's info for a better personalized experience.",
+  "well_done": "Well Done"
+
+
 
 
 }

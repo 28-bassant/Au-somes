@@ -9,4 +9,6 @@ class AppRoutes {
   static String parentScreenRouteName = "parent_screen";
   static String childScreenRouteName = "child_screen";
   static String chatbotScreenRouteName = "chatbot_screen";
+  static String progressLevelScreenRouteName = "progress_level_screen";
+  static String editProfileScreenRouteName = "edit_profile_screen";
 }

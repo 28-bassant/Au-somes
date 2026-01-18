@@ -18,6 +18,7 @@
   "login_google": "تسجيل الدخول عبر جوجل",
    "forget_passwordd": "نسيت كلمة المرور؟",
    "forget_password": "نسيت كلمة المرور",
+     "change_password": "قم بتغيير كلمة المرور",
    "email_associated_with_account":"أدخل عنوان بريدك الإلكتروني المرتبط بحسابك.",
    "send_email":"إرسال البريد الإلكتروني",
     "enter_verification_code":"أدخل رمز التحقق",
@@ -52,7 +53,32 @@
           "enter_code": "أدخل الرمز",
           "code_must_be_5": "يجب أن يكون الرمز مكونًا من 5 أرقام بالضبط",
           "code_must_contain_nums": "يجب أن يحتوي الرمز على أرقام فقط",
-          "password_changed_successfully": "تم تغيير كلمة المرور بنجاح!"
+          "password_changed_successfully": "تم تغيير كلمة المرور بنجاح!",
+          "ask_chatbot": "المساعد الذكي",
+          "get_instant_answers": "احصل على اجابات فورية",
+          "progress_level": "مستوى التقدم",
+          "your_child_progress": "تقدم طفلك",
+          "overall_progress": "التقدم العام",
+          "activities_done": "الأنشطة المنجزة",
+          "stories_done": "وقت القصص",
+          "achievements": "الإنجازات",
+          "today": "اليوم",
+           "done": "مكتمل",
+           "new_word": "جديد",
+          "today_progress": "التقدم اليومي",
+          "visual_spatial_visualization_activities": "أنشطة التصور البصري المكاني",
+          "spatial_relations_activities": "أنشطة العلاقات المكانية",
+          "spatial_concepts_activities": "أنشطة المفاهيم المكانية",
+           "edit_profile": "تعديل الحساب",
+           "update_profile": "تعديل الحساب",
+           "edit_profile_text": "حدّث معلومات طفلك للحصول على تجربة مخصصة بشكل أفضل.",
+           "well_done": "أحسنت"
+
+
+
+
+
+
 
 
 

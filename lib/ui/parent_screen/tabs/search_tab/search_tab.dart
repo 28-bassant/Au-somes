@@ -12,15 +12,16 @@ class SearchTab extends StatelessWidget{
     return Scaffold(
       body: Padding(
         padding:  EdgeInsets.symmetric(horizontal: width * .04,
-          vertical: height * .02
+          vertical: height * .08
         ),
         child: Column(
           children: [
             CustomTextFormField(
-              prefixIcon: Icon(Icons.search,color: AppColors.softBlue,),
+              prefixIcon: Icon(Icons.search,color: AppColors.greyColor,),
               hintText: AppLocalizations.of(context)!.search,
-              hintStyle: AppStyles.bold20SoftBlue,
-              borderRadius: 24,
+              hintStyle: AppStyles.bold16BlackWithOpacity60,
+              borderRadius: 16,
+              borderColor: AppColors.greyColor,
             ),
           ],
         ),

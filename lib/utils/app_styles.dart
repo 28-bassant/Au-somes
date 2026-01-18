@@ -19,6 +19,96 @@ class AppStyles{
     fontWeight: FontWeight.bold,
     color: AppColors.softBlue
   );
+  static TextStyle bold16BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle bold20BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle bold14BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle bold22Black = GoogleFonts.glory(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    color: AppColors.blackColor
+  );
+  static TextStyle bold22BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 22,
+    fontWeight: FontWeight.bold,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle bold24White = GoogleFonts.glory(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: AppColors.whiteColor
+  );
+  static TextStyle bold24MintGreen = GoogleFonts.glory(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: AppColors.mintGreen
+  );
+  static TextStyle bold16PastelPink = GoogleFonts.glory(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: AppColors.pastelPink
+  );
+  static TextStyle bold16MintGreen = GoogleFonts.glory(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: AppColors.mintGreen
+  );
+  static TextStyle bold24BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle medium20BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 20,
+    fontWeight: FontWeight.w500,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle medium14BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle medium16BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle medium16grey = GoogleFonts.glory(
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    color: AppColors.greyColor
+  );
+  static TextStyle regular14BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle regular16BlackWithOpacity60 = GoogleFonts.glory(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle regular16White = GoogleFonts.glory(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.whiteColor
+  );
+  static TextStyle regular14White = GoogleFonts.glory(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.whiteColor
+  );
   static TextStyle extraBold16SoftBlue = GoogleFonts.glory(
     fontSize: 16,
     fontWeight: FontWeight.w800,
@@ -40,6 +130,11 @@ static TextStyle extraBold24MintGreen = GoogleFonts.glory(
     fontWeight: FontWeight.w600,
     color: AppColors.softBlue
   );
+  static TextStyle semiBold20White = GoogleFonts.glory(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: AppColors.whiteColor
+  );
  static TextStyle bold22White = GoogleFonts.glory(
     fontSize: 22,
     fontWeight: FontWeight.bold,
@@ -50,11 +145,10 @@ static TextStyle extraBold24MintGreen = GoogleFonts.glory(
       fontWeight: FontWeight.bold,
       color: AppColors.whiteColor
   );
-
-  static TextStyle bold24White = GoogleFonts.glory(
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    color: AppColors.whiteColor
+static TextStyle bold32MintGreen = GoogleFonts.glory(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: AppColors.mintGreen
   );
 
 static TextStyle medium16SoftBlue = GoogleFonts.glory(

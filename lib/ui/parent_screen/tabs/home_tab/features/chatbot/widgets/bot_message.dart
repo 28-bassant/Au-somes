@@ -1,6 +1,8 @@
+import 'package:au_somes/providers/app_language_provider.dart';
 import 'package:au_somes/utils/app_assets.dart';
 import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import '../../../../../../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
 class BotMessage extends StatelessWidget {
@@ -11,6 +13,7 @@ class BotMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    var languageProvider = Provider.of<AppLanguageProvider>(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -23,16 +26,25 @@ class BotMessage extends StatelessWidget {
         ),
         SizedBox(width:width* .02),
         Flexible(
-          child: Container(
-            padding: EdgeInsets.all(width*.03),
-            decoration: BoxDecoration(
-              color: AppColors.softBlue,
-              borderRadius: BorderRadius.only(topLeft:Radius.circular(16),bottomLeft:Radius.circular(1),
-                  topRight: Radius.circular(16),bottomRight: Radius.circular(16) ),
-            ),
-            child: Text(
-              text,
-              style:AppStyles.bold16White
+          child: Align(
+            alignment:languageProvider.isArabic()?Alignment.centerRight: Alignment.centerLeft,
+
+            child: Container(
+
+              padding: EdgeInsets.all(width * .03),
+              margin: EdgeInsets.only(
+                right:languageProvider.isArabic()? 0: width * .08,
+                left:languageProvider.isArabic()? width * .08 :0  ,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.only(topLeft:Radius.circular(16),bottomLeft:languageProvider.isArabic()?Radius.circular(16):Radius.circular(0),
+                    topRight: Radius.circular(16),bottomRight:languageProvider.isArabic()? Radius.circular(0):Radius.circular(16) ),
+              ),
+              child: Text(
+                text,
+                style:AppStyles.medium14BlackWithOpacity60
+              ),
             ),
           ),
         ),
