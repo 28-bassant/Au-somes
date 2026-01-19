@@ -75,6 +75,8 @@ class EditProfileScreen extends StatelessWidget{
                 SizedBox(
                   width: double.infinity,
                   child: CustomElevatedButton(
+                    backgroundColor: AppColors.mintGreen,
+                    borderColor: AppColors.mintGreen,
                     text: AppLocalizations.of(context)!.update_profile,
                     textStyle: AppStyles.bold22White,
                     onPressed: () {

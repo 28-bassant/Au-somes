@@ -37,4 +37,12 @@ class AppAssets{
   static const String overallProgressIcon= 'assets/images/overall_progress_icon.png';
   static const String storiesTimeIcon= 'assets/images/stories_time_icon.png';
   static const String starImage= 'assets/images/star.png';
+  static const String askChatbotImage= 'assets/images/ask_chatbot.png';
+  static const String progressImage= 'assets/images/pogress_level.png';
+  static const String dailyTipsImage= 'assets/images/daily_tips.png';
+  static const String dailyRoutineImage= 'assets/images/daily_routine.png';
+  static const String timeIcon= 'assets/images/time_icon.png';
+  static const String tipsIcon= 'assets/images/tips_icon.png';
+  static const String reminderIcon= 'assets/images/reminder.png';
+  static const String chatbotIcon= 'assets/images/chatbot_icon.png';
 }

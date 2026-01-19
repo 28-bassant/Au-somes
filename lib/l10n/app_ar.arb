@@ -72,7 +72,34 @@
            "edit_profile": "تعديل الحساب",
            "update_profile": "تعديل الحساب",
            "edit_profile_text": "حدّث معلومات طفلك للحصول على تجربة مخصصة بشكل أفضل.",
-           "well_done": "أحسنت"
+           "well_done": "أحسنت",
+           "thinking":"جاري التفكير...",
+             "show_more":"عرض المزيد",
+             "show_less":"عرض اقل",
+             "exceeded_api":"لقد تجاوزت الحد اليومي للطلبات على الـ API. يرجى المحاولة لاحقًا.",
+             "error_try_again":"حدث خطأ، حاول مرة أخرى",
+             "daily_tips":"نصائح يومية",
+               "daily_routine":"الروتين اليومي",
+               "today": "اليوم",
+                 "yesterday": "أمس",
+
+                 "reminder": "تذكير",
+                 "reminder_message": "حان وقت تمرين الإدراك البصري المكاني لليوم.",
+
+                 "new_activity": "نشاط جديد",
+                 "new_activity_message": "نشاط جديد جاهز لطفلك.",
+
+                 "daily_tips": "نصائح يومية",
+                 "daily_tips_message": "نصيحة جديدة لدعم طفلك.",
+
+                 "ask_chatbot_now": "اسأل المساعد الآن",
+                 "ask_chatbot_message": "لديك سؤال؟ اسأل المساعد الآن.",
+
+                 "support_message": "دعمك يُحدث فرقًا لطفلك",
+
+                 "minutes_ago": "23دقيقة",
+                 "days_ago": " يوم",
+                 "notifications":"الإشعارات"
 
 
 

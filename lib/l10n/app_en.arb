@@ -74,7 +74,34 @@
   "edit_profile": "Edit Profile",
   "update_profile": "Update Profile",
   "edit_profile_text": "Update your child's info for a better personalized experience.",
-  "well_done": "Well Done"
+  "well_done": "Well Done",
+  "thinking":"...Thinking",
+  "show_more":"Show more",
+  "show_less":"Show less",
+  "exceeded_api":"You have exceeded your daily API request limit. Please try again later.",
+  "error_try_again":"An error occurred, please try again",
+  "daily_tips":"Daily Tips",
+  "daily_routine":"Daily Routine",
+  "today": "Today",
+    "yesterday": "Yesterday",
+
+    "reminder": "Reminder",
+    "reminder_message": "It's time for today's visual-spatial perception exercise.",
+
+    "new_activity": "New Activity",
+    "new_activity_message": "A new activity is ready for your child.",
+
+    "daily_tips": "Daily Tips",
+    "daily_tips_message": "A new tip to support your child.",
+
+    "ask_chatbot_now": "Ask Chatbot Now",
+    "ask_chatbot_message": "Have a question? Ask the assistant now.",
+
+    "support_message": "Your support makes a difference for your child",
+
+    "minutes_ago": "23min",
+    "days_ago": " day",
+    "notifications":"Notifications"
 
 
 

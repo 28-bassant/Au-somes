@@ -4,12 +4,15 @@ import 'package:au_somes/utils/app_styles.dart';
 import '../../../../../../../l10n/app_localizations.dart';
 import '../../../../../../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
-
 class ChatInput extends StatelessWidget {
+  final TextEditingController controller;
   final VoidCallback onSend;
 
-  const ChatInput({super.key, required this.onSend});
-
+  const ChatInput({
+    super.key,
+    required this.controller,
+    required this.onSend,
+  });
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -24,6 +27,7 @@ class ChatInput extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
+            controller: controller,
               decoration: InputDecoration(
                 hintText: AppLocalizations.of(context)!.type_your_question_here,
                 hintStyle:AppStyles.bold14BlackWithOpacity60,
@@ -34,7 +38,7 @@ class ChatInput extends StatelessWidget {
           IconButton(
             icon: Icon(
               Icons.send,
-              color: AppColors.blackColorWithOpacity60,
+              color: AppColors.softBlue,
             ),
             onPressed: onSend,
           ),
@@ -43,3 +47,9 @@ class ChatInput extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+

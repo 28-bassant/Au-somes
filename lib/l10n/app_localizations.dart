@@ -535,6 +535,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Well Done'**
   String get well_done;
+
+  /// No description provided for @thinking.
+  ///
+  /// In en, this message translates to:
+  /// **'...Thinking'**
+  String get thinking;
+
+  /// No description provided for @show_more.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get show_more;
+
+  /// No description provided for @show_less.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get show_less;
+
+  /// No description provided for @exceeded_api.
+  ///
+  /// In en, this message translates to:
+  /// **'You have exceeded your daily API request limit. Please try again later.'**
+  String get exceeded_api;
+
+  /// No description provided for @error_try_again.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred, please try again'**
+  String get error_try_again;
+
+  /// No description provided for @daily_tips.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Tips'**
+  String get daily_tips;
+
+  /// No description provided for @daily_routine.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Routine'**
+  String get daily_routine;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @reminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get reminder;
+
+  /// No description provided for @reminder_message.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time for today\'s visual-spatial perception exercise.'**
+  String get reminder_message;
+
+  /// No description provided for @new_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'New Activity'**
+  String get new_activity;
+
+  /// No description provided for @new_activity_message.
+  ///
+  /// In en, this message translates to:
+  /// **'A new activity is ready for your child.'**
+  String get new_activity_message;
+
+  /// No description provided for @daily_tips_message.
+  ///
+  /// In en, this message translates to:
+  /// **'A new tip to support your child.'**
+  String get daily_tips_message;
+
+  /// No description provided for @ask_chatbot_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Chatbot Now'**
+  String get ask_chatbot_now;
+
+  /// No description provided for @ask_chatbot_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Have a question? Ask the assistant now.'**
+  String get ask_chatbot_message;
+
+  /// No description provided for @support_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your support makes a difference for your child'**
+  String get support_message;
+
+  /// No description provided for @minutes_ago.
+  ///
+  /// In en, this message translates to:
+  /// **'23min'**
+  String get minutes_ago;
+
+  /// No description provided for @days_ago.
+  ///
+  /// In en, this message translates to:
+  /// **' day'**
+  String get days_ago;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
 }
 
 class _AppLocalizationsDelegate

@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         AppRoutes.forgetPasswordScreen1RouteName);
                                       },
                                     child: Text(AppLocalizations.of(context)!.forget_passwordd
-                                      , style: AppStyles.medium16grey),),
+                                      , style: AppStyles.bold20BlackWithOpacity60),),
                               ],
                             ),
                             SizedBox(height: height * .02),
@@ -138,14 +138,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 indent: width * .05,
                                 endIndent: width * .04,
                                 thickness: 3,
-                                color: AppColors.mintGreen,
+                                color: AppColors.softBlue,
                               )),
                               Text(AppLocalizations.of(context)!.or,
-                                style: AppStyles.bold24MintGreen,),
+                                style: AppStyles.bold24SoftBlue,),
                               Expanded(child: Divider(thickness: 3,
                                 indent: width * .04,
                                 endIndent: width * .06,
-                                color: AppColors.mintGreen,))
+                                color: AppColors.softBlue,))
                             ],),
                             SizedBox(height: height * .02),
 

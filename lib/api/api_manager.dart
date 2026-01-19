@@ -220,6 +220,29 @@ class ApiManager {
     }
   }
 
+  static Future<String> askChatbot(String prompt) async {
+    Uri url = Uri.parse("http://au-somes.runasp.net/api/Chat/ask");
+
+    var response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"Prompt": prompt}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data["answer"];
+    } else {
+      final errorBody = response.body.toLowerCase();
+
+      if (errorBody.contains("quota") || errorBody.contains("quotafailure")) {
+        throw Exception("QuotaExceeded");
+      }
+
+      throw Exception("Failed to get response");
+    }
+  }
+
 
 
 }
