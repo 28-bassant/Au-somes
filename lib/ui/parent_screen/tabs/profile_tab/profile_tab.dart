@@ -17,6 +17,10 @@ class ProfileTab extends StatelessWidget{
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<AppLanguageProvider>(context);
+
+    final name = TokenUtils.getChildName();
+    final age = TokenUtils.getChildAge();
+
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -30,8 +34,8 @@ class ProfileTab extends StatelessWidget{
             children: [
               Image(image: AssetImage(AppAssets.childAvatar,)),
               SizedBox(height: height*.01),
-              Text("Ali Mohammed",style: AppStyles.bold20BlackWithOpacity60,),
-              Text("8 ${AppLocalizations.of(context)!.years}",style: AppStyles.medium20BlackWithOpacity60,),
+              Text('$name',style: AppStyles.bold20BlackWithOpacity60,),
+              Text("$age ${AppLocalizations.of(context)!.years}",style: AppStyles.medium20BlackWithOpacity60,),
               SizedBox(height: height*.05,),
               Container(
                 margin:  EdgeInsets.symmetric(vertical: height*.007),

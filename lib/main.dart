@@ -6,8 +6,10 @@ import 'package:au_somes/ui/auth/forget_password/forget_password_screen3.dart';
 import 'package:au_somes/ui/auth/login_screen/login_screen.dart';
 import 'package:au_somes/ui/auth/register_screen/register_screen.dart';
 import 'package:au_somes/ui/child_screen/child_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_routine/daily_routine_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/progress_level/progress_level_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/edit_profile/edit_profile_screen.dart';
 import 'package:au_somes/ui/select_screen/select_screen.dart';
@@ -58,6 +60,8 @@ class MyApp extends StatelessWidget{
         AppRoutes.chatbotScreenRouteName:(context)=>ChatbotScreen(),
         AppRoutes.progressLevelScreenRouteName:(context)=>ProgressLevelScreen(),
         AppRoutes.editProfileScreenRouteName:(context)=>EditProfileScreen(),
+        AppRoutes.spatialConceptsScreenRouteName:(context)=>SpatialConceptsScreen(),
+        AppRoutes.dailyRoutineScreenRouteName:(context)=>DailyRoutineScreen(),
 
 
       },

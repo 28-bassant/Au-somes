@@ -15,7 +15,19 @@ class NotificationItem extends StatelessWidget{
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Container(
-      color: AppColors.backgroundColor,
+      padding: EdgeInsets.symmetric(
+        horizontal: width * .02,
+        vertical: height *.02
+      ),
+   decoration: BoxDecoration(
+     color: AppColors.whiteColor,
+     borderRadius: BorderRadius.circular(16),
+     border: Border.all(
+       color: AppColors.blackColorWithOpacity60,
+       width: 1
+     )
+
+   ),      
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(children: [

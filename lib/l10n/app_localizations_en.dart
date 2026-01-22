@@ -294,4 +294,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifications => 'Notifications';
+
+  @override
+  String get visual_spatial_perception => 'Visual Spatial Perception';
+
+  @override
+  String get spatial_concepts => 'Spatial Concepts';
+
+  @override
+  String get spatial_relations => 'Spatial Relations';
+
+  @override
+  String get hi => 'Hi';
+
+  @override
+  String get above_under => 'Above & Under Activities';
+
+  @override
+  String get right_left => 'Right & Left Activities';
+
+  @override
+  String get near_far => 'Near & Far Activities';
+
+  @override
+  String get inside_outside => 'Inside & Outside Activities';
+
+  @override
+  String get between => 'Between Activities';
+
+  @override
+  String get current_progress => 'Current Progress';
+
+  @override
+  String get of_word => 'of';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get afternoon => 'Afternoon';
+
+  @override
+  String get evening => 'Evening';
+
+  @override
+  String get morning_routine => 'Morning Routine';
+
+  @override
+  String get afternoon_routine => 'Afternoon Routine';
+
+  @override
+  String get evening_routine => 'Evening Routine';
+
+  @override
+  String get wake_up => 'Wake up & Stretch';
+
+  @override
+  String get morning_hygiene => 'Morning Hygiene';
+
+  @override
+  String get breakfast_time => 'Breakfast Time';
+
+  @override
+  String get quiet_time => 'Quiet Time';
+
+  @override
+  String get school_work => 'School Work';
+
+  @override
+  String get snack_time => 'Snack Time';
+
+  @override
+  String get physical_activity => 'Physical Activity ';
+
+  @override
+  String get lunch_time => 'Lunch Time';
+
+  @override
+  String get nap => 'Nap';
+
+  @override
+  String get interactive_activity => 'Interactive Activity';
+
+  @override
+  String get dinner_time => 'Dinner Time';
+
+  @override
+  String get stories_time => 'Stories Time';
+
+  @override
+  String get bed_time_routine => 'Bed Time Routine';
+
+  @override
+  String get bed_time => 'Bed Time';
+
+  @override
+  String get am => 'AM';
+
+  @override
+  String get pm => 'PM';
 }

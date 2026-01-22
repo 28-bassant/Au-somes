@@ -11,12 +11,16 @@ class PercentLinearIndicator extends StatelessWidget{
   TextStyle activityPercentStyle;
   Color indicatorColor;
   double percent;
+  double? givenWidth;
+  double? containerWidth;
   PercentLinearIndicator({
     required this.activityName,
     required this.activityPercent,
     required this.activityPercentStyle,
     required this.indicatorColor,
-    required this.percent
+    required this.percent,
+    this.givenWidth,
+    this.containerWidth,
 });
   @override
   Widget build(BuildContext context) {
@@ -24,6 +28,7 @@ class PercentLinearIndicator extends StatelessWidget{
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<AppLanguageProvider>(context);
     return   Container(
+      width: containerWidth ?? double.infinity,
       padding: EdgeInsets.symmetric(
         vertical: height * .008,
         horizontal: width * .02
@@ -44,7 +49,7 @@ class PercentLinearIndicator extends StatelessWidget{
           Padding(
             padding: EdgeInsets.all(width * .02),
             child:  LinearPercentIndicator(
-              width: width * .8,
+              width:givenWidth ??  width * .8,
               animation: true,
               isRTL: languageProvider.isArabic()?true : false,
               lineHeight: height * .02,

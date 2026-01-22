@@ -104,6 +104,11 @@ class AppStyles{
     fontWeight: FontWeight.w400,
     color: AppColors.blackColorWithOpacity60
   );
+  static TextStyle regular14Grey = GoogleFonts.glory(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.greyColor
+  );
   static TextStyle regular16BlackWithOpacity60 = GoogleFonts.glory(
     fontSize: 16,
     fontWeight: FontWeight.w400,
@@ -113,6 +118,11 @@ class AppStyles{
       fontSize: 18,
       fontWeight: FontWeight.w400,
       color: AppColors.blackColorWithOpacity60
+  );
+  static TextStyle regular18Black = GoogleFonts.glory(
+      fontSize: 18,
+      fontWeight: FontWeight.w400,
+      color: AppColors.blackColor
   );
   static TextStyle regular16White = GoogleFonts.glory(
     fontSize: 16,

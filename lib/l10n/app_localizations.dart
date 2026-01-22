@@ -649,6 +649,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notifications'**
   String get notifications;
+
+  /// No description provided for @visual_spatial_perception.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual Spatial Perception'**
+  String get visual_spatial_perception;
+
+  /// No description provided for @spatial_concepts.
+  ///
+  /// In en, this message translates to:
+  /// **'Spatial Concepts'**
+  String get spatial_concepts;
+
+  /// No description provided for @spatial_relations.
+  ///
+  /// In en, this message translates to:
+  /// **'Spatial Relations'**
+  String get spatial_relations;
+
+  /// No description provided for @hi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi'**
+  String get hi;
+
+  /// No description provided for @above_under.
+  ///
+  /// In en, this message translates to:
+  /// **'Above & Under Activities'**
+  String get above_under;
+
+  /// No description provided for @right_left.
+  ///
+  /// In en, this message translates to:
+  /// **'Right & Left Activities'**
+  String get right_left;
+
+  /// No description provided for @near_far.
+  ///
+  /// In en, this message translates to:
+  /// **'Near & Far Activities'**
+  String get near_far;
+
+  /// No description provided for @inside_outside.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside & Outside Activities'**
+  String get inside_outside;
+
+  /// No description provided for @between.
+  ///
+  /// In en, this message translates to:
+  /// **'Between Activities'**
+  String get between;
+
+  /// No description provided for @current_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Progress'**
+  String get current_progress;
+
+  /// No description provided for @of_word.
+  ///
+  /// In en, this message translates to:
+  /// **'of'**
+  String get of_word;
+
+  /// No description provided for @morning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// No description provided for @afternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get afternoon;
+
+  /// No description provided for @evening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get evening;
+
+  /// No description provided for @morning_routine.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Routine'**
+  String get morning_routine;
+
+  /// No description provided for @afternoon_routine.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon Routine'**
+  String get afternoon_routine;
+
+  /// No description provided for @evening_routine.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Routine'**
+  String get evening_routine;
+
+  /// No description provided for @wake_up.
+  ///
+  /// In en, this message translates to:
+  /// **'Wake up & Stretch'**
+  String get wake_up;
+
+  /// No description provided for @morning_hygiene.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Hygiene'**
+  String get morning_hygiene;
+
+  /// No description provided for @breakfast_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast Time'**
+  String get breakfast_time;
+
+  /// No description provided for @quiet_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet Time'**
+  String get quiet_time;
+
+  /// No description provided for @school_work.
+  ///
+  /// In en, this message translates to:
+  /// **'School Work'**
+  String get school_work;
+
+  /// No description provided for @snack_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Snack Time'**
+  String get snack_time;
+
+  /// No description provided for @physical_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical Activity '**
+  String get physical_activity;
+
+  /// No description provided for @lunch_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch Time'**
+  String get lunch_time;
+
+  /// No description provided for @nap.
+  ///
+  /// In en, this message translates to:
+  /// **'Nap'**
+  String get nap;
+
+  /// No description provided for @interactive_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactive Activity'**
+  String get interactive_activity;
+
+  /// No description provided for @dinner_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner Time'**
+  String get dinner_time;
+
+  /// No description provided for @stories_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories Time'**
+  String get stories_time;
+
+  /// No description provided for @bed_time_routine.
+  ///
+  /// In en, this message translates to:
+  /// **'Bed Time Routine'**
+  String get bed_time_routine;
+
+  /// No description provided for @bed_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Bed Time'**
+  String get bed_time;
+
+  /// No description provided for @am.
+  ///
+  /// In en, this message translates to:
+  /// **'AM'**
+  String get am;
+
+  /// No description provided for @pm.
+  ///
+  /// In en, this message translates to:
+  /// **'PM'**
+  String get pm;
 }
 
 class _AppLocalizationsDelegate

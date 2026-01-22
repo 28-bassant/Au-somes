@@ -99,7 +99,46 @@
 
                  "minutes_ago": "23دقيقة",
                  "days_ago": " يوم",
-                 "notifications":"الإشعارات"
+                 "notifications":"الإشعارات",
+                 "visual_spatial_perception":"الإدراك البصري المكاني",
+                 "spatial_concepts":"المفاهيم المكانية",
+                 "spatial_relations":"العلاقات المكانية",
+                 "hi":"مرحبا",
+                 "above_under":"أنشطة فوق و  تحت",
+                 "right_left":"أنشطة يمين و يسار",
+                  "near_far":"أنشطة قريب و بعيد",
+                  "inside_outside":"أنشطة داخل و خارج",
+                  "between":"أنشطة بين",
+                  "current_progress":"التقدم الحالي",
+                  "of_word":"من",
+                   "morning":"الصباح",
+                   "afternoon":"الظهر",
+                    "evening":"المساء",
+                    "morning_routine":"الروتين الصباحي",
+                    "afternoon_routine":"روتين بعد الظهر",
+                    "evening_routine":"الروتين المسائي",
+                    "wake_up": "الاستيقاظ والتمدد",
+                    "morning_hygiene": "نظافة الصباح",
+                    "breakfast_time": "وقت الإفطار",
+                    "quiet_time": "وقت الهدوء",
+                    "school_work": "الأنشطة الدراسية",
+                    "snack_time": "وقت الوجبة الخفيفة",
+                    "physical_activity": "النشاط البدني",
+                    "lunch_time": "وقت الغداء",
+                    "nap": "وقت القيلولة",
+                    "interactive_activity": "نشاط تفاعلي",
+                    "dinner_time": "وقت العشاء",
+                    "stories_time": "وقت القصص",
+                    "bed_time_routine": "روتين ما قبل النوم",
+                    "bed_time": "وقت النوم",
+                     "am":"صباحا",
+                     "pm":"مساء",
+                     "years":"سنوات"
+
+
+
+
+
 
 
 
