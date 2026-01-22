@@ -23,6 +23,7 @@ class CustomTextFormField extends StatefulWidget {
   TextStyle? textStyle;
   double? borderRadius;
   String? hintText;
+  String? initialValue;
   TextStyle? hintStyle;
 
   CustomTextFormField({
@@ -41,7 +42,8 @@ class CustomTextFormField extends StatefulWidget {
     this.keyboardType,
     this.obscureText = false,
     this.textStyle,
-    this.borderRadius
+    this.borderRadius,
+    this.initialValue
 
   });
 
@@ -53,7 +55,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-
+      initialValue: widget.initialValue,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -66,7 +68,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             borderColor:
             widget.borderColor ?? AppColors.greyColor,
         ),
-        focusedBorder: builtTextFieldBorder(borderColor: AppColors.mintGreen),
+        focusedBorder: builtTextFieldBorder(borderColor: AppColors.blackColorWithOpacity60),
         errorBorder: builtTextFieldBorder(borderColor: AppColors.redColor),
         errorStyle: AppStyles.medium16Red.copyWith(color: AppColors.redColor),
         fillColor: widget.filledColor ?? AppColors.whiteColor,

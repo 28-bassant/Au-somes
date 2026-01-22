@@ -1,53 +1,63 @@
-import 'package:au_somes/ui/child_screen/reinforcement_widgets/sound_helper.dart';
-import 'package:au_somes/ui/child_screen/reinforcement_widgets/well_done_card.dart';
-import 'package:au_somes/utils/app_colors.dart';
+import 'package:au_somes/l10n/app_localizations.dart';
+import 'package:au_somes/ui/child_screen/widget/acticites_widget.dart';
+import 'package:au_somes/utils/app_assets.dart';
+import 'package:au_somes/utils/app_routes.dart';
+import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-class ChildScreen extends StatefulWidget{
+import '../../core/cache/token_utils.dart';
+
+class ChildScreen extends StatelessWidget{
   @override
-  State<ChildScreen> createState() => _ChildScreenState();
-}
+  Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    final name = TokenUtils.getChildName();
 
-class _ChildScreenState extends State<ChildScreen> {
-  bool showOverlay = false;
-
-  @override
-    Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            title: const Text('child screen'),
-            iconTheme: IconThemeData(
-              color: AppColors.softBlue,
+    return Scaffold(
+      appBar: AppBar(),
+      body: Padding(
+        padding:  EdgeInsets.symmetric(horizontal: width * .04),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Text('${AppLocalizations.of(context)!.hi} $name !',style: AppStyles.bold24BlackWithOpacity60,),
+                SizedBox(width: width * .02,),
+                Image(image: AssetImage(AppAssets.hi_icon))
+              ],
             ),
-          ),
-          body:
+            SizedBox(height: height * .04,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ActivitiesWidget(
+                    image: AppAssets.spatial_relations,
+                    text: AppLocalizations.of(context)!.spatial_relations,
+                    onPressed: () {
+                      //todo : Navigate to Spatial Relations
+                    },),
+                SizedBox(width: width * .02,),
+                ActivitiesWidget(
+                    image: AppAssets.spatial_concepts,
+                    text: AppLocalizations.of(context)!.spatial_concepts,
+                    onPressed: () {
+                      //todo : Navigate to Spatial Concepts
+                      Navigator.pushNamed(context, AppRoutes.spatialConceptsScreenRouteName);
+                    },),
+              ],
+            ),
+            SizedBox(height: height * .02,),
+            ActivitiesWidget(
+              image: AppAssets.visual_spatial_perception,
+              text: AppLocalizations.of(context)!.visual_spatial_perception,
+              onPressed: () {
+                //todo : Navigate to Visual Spatial Perception
+              },),
 
-          ElevatedButton(
-            onPressed: showSuccess,
-            child: const Text("Finish"),
-          ),
+          ],
         ),
-
-        WellDoneCard(
-          visible: showOverlay,
-        ),
-      ],
+      ),
     );
   }
-
-  void showSuccess() {
-    setState(() => showOverlay = true);
-
-    SoundHelper.playSuccess();
-
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        setState(() => showOverlay = false);
-      }
-    });
-  }
-
 }

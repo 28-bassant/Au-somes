@@ -119,6 +119,7 @@ class ApiManager {
     }
   }
 
+
   static Future<void> forgetPassword({required String email}) async {
     Uri url = Uri.parse(ApiConstants.baseUrl + ApiEndpoints.forgetPassword);
 

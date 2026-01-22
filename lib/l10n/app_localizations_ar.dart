@@ -21,7 +21,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get age => 'العمر';
 
   @override
-  String get years => 'Years';
+  String get years => 'سنوات';
 
   @override
   String get parent_email => 'البريد الإلكتروني لولي الأمر';
@@ -291,4 +291,103 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notifications => 'الإشعارات';
+
+  @override
+  String get visual_spatial_perception => 'الإدراك البصري المكاني';
+
+  @override
+  String get spatial_concepts => 'المفاهيم المكانية';
+
+  @override
+  String get spatial_relations => 'العلاقات المكانية';
+
+  @override
+  String get hi => 'مرحبا';
+
+  @override
+  String get above_under => 'أنشطة فوق و  تحت';
+
+  @override
+  String get right_left => 'أنشطة يمين و يسار';
+
+  @override
+  String get near_far => 'أنشطة قريب و بعيد';
+
+  @override
+  String get inside_outside => 'أنشطة داخل و خارج';
+
+  @override
+  String get between => 'أنشطة بين';
+
+  @override
+  String get current_progress => 'التقدم الحالي';
+
+  @override
+  String get of_word => 'من';
+
+  @override
+  String get morning => 'الصباح';
+
+  @override
+  String get afternoon => 'الظهر';
+
+  @override
+  String get evening => 'المساء';
+
+  @override
+  String get morning_routine => 'الروتين الصباحي';
+
+  @override
+  String get afternoon_routine => 'روتين بعد الظهر';
+
+  @override
+  String get evening_routine => 'الروتين المسائي';
+
+  @override
+  String get wake_up => 'الاستيقاظ والتمدد';
+
+  @override
+  String get morning_hygiene => 'نظافة الصباح';
+
+  @override
+  String get breakfast_time => 'وقت الإفطار';
+
+  @override
+  String get quiet_time => 'وقت الهدوء';
+
+  @override
+  String get school_work => 'الأنشطة الدراسية';
+
+  @override
+  String get snack_time => 'وقت الوجبة الخفيفة';
+
+  @override
+  String get physical_activity => 'النشاط البدني';
+
+  @override
+  String get lunch_time => 'وقت الغداء';
+
+  @override
+  String get nap => 'وقت القيلولة';
+
+  @override
+  String get interactive_activity => 'نشاط تفاعلي';
+
+  @override
+  String get dinner_time => 'وقت العشاء';
+
+  @override
+  String get stories_time => 'وقت القصص';
+
+  @override
+  String get bed_time_routine => 'روتين ما قبل النوم';
+
+  @override
+  String get bed_time => 'وقت النوم';
+
+  @override
+  String get am => 'صباحا';
+
+  @override
+  String get pm => 'مساء';
 }
