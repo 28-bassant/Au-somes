@@ -10,6 +10,7 @@ import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_scree
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_routine/daily_routine_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/daily_tips_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/progress_level/progress_level_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/edit_profile/edit_profile_screen.dart';
 import 'package:au_somes/ui/select_screen/select_screen.dart';
@@ -62,7 +63,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.editProfileScreenRouteName:(context)=>EditProfileScreen(),
         AppRoutes.spatialConceptsScreenRouteName:(context)=>SpatialConceptsScreen(),
         AppRoutes.dailyRoutineScreenRouteName:(context)=>DailyRoutineScreen(),
-
+        AppRoutes.dailyTipsScreenRouteName:(context)=>DailyTipsScreen(),
 
       },
       theme: AppTheme.lightTheme,
