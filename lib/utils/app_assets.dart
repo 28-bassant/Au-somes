@@ -85,4 +85,8 @@ class AppAssets{
   static const String stories_time_arabic = 'assets/images/stories_time_arabic.png';
   static const String bed_time_routine_arabic = 'assets/images/bed_time_routine_arabic.png';
   static const String bed_time_arabic = 'assets/images/bed_time_arabic.png';
+  static const String behaviorIcon= 'assets/images/behav_icon.png';
+  static const String communicationIcon= 'assets/images/comm_icon.png';
+  static const String sensoryIcon= 'assets/images/sensory_icon.png';
+  static const String childPhoto= 'assets/images/child_photo.png';
 }
