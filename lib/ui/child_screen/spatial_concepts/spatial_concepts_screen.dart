@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_styles.dart';
+import '../reinforcement_widgets/well_done_overlay.dart';
 
 class SpatialConceptsScreen extends StatelessWidget {
   @override
@@ -35,6 +36,7 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               onPressed: () {
                 //todo: Navigate to Above & Under Activities
+
               },
             ),
             SizedBox(height: height * .02),
