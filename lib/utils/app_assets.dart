@@ -53,6 +53,7 @@ class AppAssets{
   static const String right_and_left = 'assets/images/right_and_left.png';
   static const String inside_and_outside = 'assets/images/inside_and_outside.png';
   static const String near_and_far = 'assets/images/near_and_far.png';
+  static const String front_and_back = 'assets/images/front_and_back.png';
   static const String between = 'assets/images/between.png';
   static const String morning_icon = 'assets/images/morning_icon.png';
   static const String afternoon_icon = 'assets/images/afternoon_icon.png';
@@ -89,4 +90,5 @@ class AppAssets{
   static const String communicationIcon= 'assets/images/comm_icon.png';
   static const String sensoryIcon= 'assets/images/sensory_icon.png';
   static const String childPhoto= 'assets/images/child_photo.png';
+  static const String soundIcon= 'assets/images/sound_icon.png';
 }
