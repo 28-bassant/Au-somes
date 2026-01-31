@@ -1,10 +1,12 @@
 import 'package:au_somes/ui/child_screen/spatial_concepts/widgets/activity_name.dart';
 import 'package:au_somes/utils/app_assets.dart';
+import 'package:au_somes/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_styles.dart';
+import '../reinforcement_widgets/well_done_overlay.dart';
 
 class SpatialConceptsScreen extends StatelessWidget {
   @override
@@ -35,6 +37,16 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               onPressed: () {
                 //todo: Navigate to Above & Under Activities
+              },
+            ),
+            SizedBox(height: height * .02),
+            ActivityName(
+              image: AppAssets.front_and_back,
+              text: AppLocalizations.of(context)!.front_back,
+              icon: Icons.lock_outline,
+              onPressed: () {
+                //todo: Navigate to Front & Back Activities
+                Navigator.pushNamed(context, AppRoutes.frontBackBaseActivityScreenRouteName);
               },
             ),
             SizedBox(height: height * .02),

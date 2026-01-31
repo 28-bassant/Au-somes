@@ -311,6 +311,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get right_left => 'أنشطة يمين و يسار';
 
   @override
+  String get front_back => 'أنشطة أمام و خلف';
+
+  @override
   String get near_far => 'أنشطة قريب و بعيد';
 
   @override
@@ -390,4 +393,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pm => 'مساء';
+
+  @override
+  String get level => 'المستوى';
 }

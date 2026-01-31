@@ -686,6 +686,12 @@ abstract class AppLocalizations {
   /// **'Right & Left Activities'**
   String get right_left;
 
+  /// No description provided for @front_back.
+  ///
+  /// In en, this message translates to:
+  /// **'Front & Back Activities'**
+  String get front_back;
+
   /// No description provided for @near_far.
   ///
   /// In en, this message translates to:
@@ -847,6 +853,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PM'**
   String get pm;
+
+  /// No description provided for @level.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get level;
 }
 
 class _AppLocalizationsDelegate

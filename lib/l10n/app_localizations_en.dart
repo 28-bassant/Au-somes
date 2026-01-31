@@ -314,6 +314,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get right_left => 'Right & Left Activities';
 
   @override
+  String get front_back => 'Front & Back Activities';
+
+  @override
   String get near_far => 'Near & Far Activities';
 
   @override
@@ -393,4 +396,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pm => 'PM';
+
+  @override
+  String get level => 'Level';
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../core/cache/token_utils.dart';
+import '../models/activities/activity_response.dart';
 import '../models/login_response.dart';
 import '../models/register_response.dart';
 import '../utils/app_routes.dart';
@@ -244,6 +245,28 @@ class ApiManager {
     }
   }
 
+  static Future<ActivityResponse> getActivity(
+      String activityId, int param1, int param2) async {
 
+    final url =
+        "${ApiConstants.baseUrl}${ApiEndpoints.getActivity}/$activityId/$param1/$param2";
+    Uri uri = Uri.parse(url);
+
+    print("Request URL: $uri");
+
+    final response = await http.get(uri);
+
+    print("Raw response body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("Decoded JSON: $data");
+
+      return ActivityResponse.fromJson(data);
+    } else {
+      throw Exception(
+          "Failed to fetch activity: ${response.statusCode} - ${response.body}");
+    }
+  }
 
 }

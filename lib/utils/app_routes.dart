@@ -14,4 +14,5 @@ class AppRoutes {
   static String dailyTipsScreenRouteName = "daily_tips_screen";
   static String editProfileScreenRouteName = "edit_profile_screen";
   static String spatialConceptsScreenRouteName = "spatial_concepts_screen";
+  static String frontBackBaseActivityScreenRouteName = "front_back_base_activity_screen";
 }
