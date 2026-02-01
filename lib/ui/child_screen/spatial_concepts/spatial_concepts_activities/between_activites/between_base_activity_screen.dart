@@ -1,35 +1,33 @@
-import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/up_activites/level1/up_level1_stage1_activity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
-import 'level1/up_level1_stage2_activity.dart';
-import 'level1/up_level1_stage3_activity.dart';
-import 'level1/up_level1_stage4_activity.dart';
-import 'level2/up_level2_stage1_activity.dart';
-import 'level2/up_level2_stage2_activity.dart';
-import 'level2/up_level2_stage3_activity.dart';
-import 'level2/up_level2_stage4_activity.dart';
-class UpBaseActivityScreen extends StatefulWidget {
+import 'level1/between_level1_stage1_activity.dart';
+import 'level1/between_level1_stage2_activity.dart';
+import 'level1/between_level1_stage3_activity.dart';
+import 'level1/between_level1_stage4_activity.dart';
+import 'level2/between_level2_stage1_activity.dart';
+import 'level2/between_level2_stage2_activity.dart';
+import 'level2/between_level2_stage3_activity.dart';
+
+class BetweenBaseActivityScreen extends StatefulWidget {
   @override
-  _UpBaseActivityScreenState createState() =>
-      _UpBaseActivityScreenState();
+  _BetweenBaseActivityScreenState createState() =>
+      _BetweenBaseActivityScreenState();
 }
 
-class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
-  final stage11Key = GlobalKey<UpLevel1Stage1ActivityState>();
-  final stage12Key = GlobalKey<UpLevel1Stage2ActivityState>();
-  final stage13Key = GlobalKey<UpLevel1Stage3ActivityState>();
+class _BetweenBaseActivityScreenState extends State<BetweenBaseActivityScreen> {
+  final stage11Key = GlobalKey<BetweenLevel1Stage1ActivityState>();
+  final stage12Key = GlobalKey<BetweenLevel1Stage2ActivityState>();
 
-  final stage14Key = GlobalKey<UpLevel1Stage4ActivityState>();
-
-  final stage21Key = GlobalKey<UpLevel2Stage1ActivityState>();
-
-  final stage22Key = GlobalKey<UpLevel2Stage2ActivityState>();
-  final stage23Key = GlobalKey<UpLevel2Stage3ActivityState>();
-  final stage24Key = GlobalKey<UpLevel2Stage4ActivityState>();
+  final stage13Key = GlobalKey<BetweenLevel1Stage3ActivityState>();
+  final stage14Key = GlobalKey<BetweenLevel1Stage4ActivityState>();
+  final stage21Key = GlobalKey<BetweenLevel2Stage1ActivityState>();
+  final stage22Key = GlobalKey<BetweenLevel2Stage2ActivityState>();
+  final stage23Key = GlobalKey<BetweenLevel2Stage3ActivityState>();
 
 
   late final List<Widget> activities;
@@ -39,43 +37,36 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
   void initState() {
     super.initState();
     activities = [
-      UpLevel1Stage1Activity(
+      BetweenLevel1Stage1Activity(
         key: stage11Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel1Stage2Activity(
+      BetweenLevel1Stage2Activity(
         key: stage12Key,
         onNextStage: goToNextActivity,
       ),
 
-      UpLevel1Stage3Activity(
+      BetweenLevel1Stage3Activity(
         key: stage13Key,
         onNextStage: goToNextActivity,
       ),
 
-      UpLevel1Stage4Activity(
+      BetweenLevel1Stage4Activity(
         key: stage14Key,
         onNextStage: goToNextActivity,
       ),
-
-      UpLevel2Stage1Activity(
+      BetweenLevel2Stage1Activity(
         key: stage21Key,
         onNextStage: goToNextActivity,
       ),
-
-      UpLevel2Stage2Activity(
+      BetweenLevel2Stage2Activity(
         key: stage22Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel2Stage3Activity(
+      BetweenLevel2Stage3Activity(
         key: stage23Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel2Stage4Activity(
-        key: stage24Key,
-        onNextStage: goToNextActivity,
-      ),
-
 
     ];
   }
@@ -86,28 +77,17 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
     } else if (currentActivityIndex == 1) {
       stage12Key.currentState?.repeatSound();
     }
-
     else if (currentActivityIndex == 2) {
       stage13Key.currentState?.repeatSound();
-    }
-
-    else if (currentActivityIndex == 3) {
+    } else if (currentActivityIndex == 3) {
       stage14Key.currentState?.repeatSound();
-    }
-    else if (currentActivityIndex == 4) {
+    } else if (currentActivityIndex == 4) {
       stage21Key.currentState?.repeatSound();
-    }
-
-    else if (currentActivityIndex == 5) {
+    } else if (currentActivityIndex == 5) {
       stage22Key.currentState?.repeatSound();
     } else if (currentActivityIndex == 6) {
       stage23Key.currentState?.repeatSound();
     }
-    else if (currentActivityIndex == 7) {
-      stage24Key.currentState?.repeatSound();
-    }
-
-
 
 
   }
@@ -161,8 +141,8 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
     ),
     child: Icon(
     Icons.home_outlined,
-    color: AppColors.blackColorWithOpacity60,
-    size: 25,
+      color: AppColors.blackColorWithOpacity60,
+      size: 25,
     ),
     ),
             ),

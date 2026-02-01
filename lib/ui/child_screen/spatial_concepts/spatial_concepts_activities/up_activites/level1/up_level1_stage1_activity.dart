@@ -104,7 +104,7 @@ class UpLevel1Stage1ActivityState extends State<UpLevel1Stage1Activity> {
         final containerLeft = width * 0.40;
         final containerTop = height * 0.23;
         final containerWidth = width * 0.28;
-        final containerHeight = height * 0.19;
+        final containerHeight = height * 0.2;
 
         final containerRect =
         Rect.fromLTWH(

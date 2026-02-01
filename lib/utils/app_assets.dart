@@ -91,4 +91,7 @@ class AppAssets{
   static const String sensoryIcon= 'assets/images/sensory_icon.png';
   static const String childPhoto= 'assets/images/child_photo.png';
   static const String soundIcon= 'assets/images/sound_icon.png';
+  static const String table = 'assets/images/tables2.png';
+  static const String bag1 = 'assets/images/bag1.png';
+  static const String bag2 = 'assets/images/bag2.png';
 }
