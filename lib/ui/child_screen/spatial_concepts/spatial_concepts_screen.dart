@@ -37,6 +37,7 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               onPressed: () {
                 //todo: Navigate to Above & Under Activities
+                Navigator.pushNamed(context, AppRoutes.upBaseActivityScreenRouteName);
               },
             ),
             SizedBox(height: height * .02),

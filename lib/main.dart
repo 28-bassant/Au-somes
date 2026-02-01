@@ -6,7 +6,8 @@ import 'package:au_somes/ui/auth/forget_password/forget_password_screen3.dart';
 import 'package:au_somes/ui/auth/login_screen/login_screen.dart';
 import 'package:au_somes/ui/auth/register_screen/register_screen.dart';
 import 'package:au_somes/ui/child_screen/child_screen.dart';
-import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_back_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_and_back_activities/front_back_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/up_activites/up_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
@@ -66,7 +67,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.dailyRoutineScreenRouteName:(context)=>DailyRoutineScreen(),
         AppRoutes.dailyTipsScreenRouteName:(context)=>DailyTipsScreen(),
         AppRoutes.frontBackBaseActivityScreenRouteName:(context)=>FrontBackBaseActivityScreen(),
-
+        AppRoutes.upBaseActivityScreenRouteName:(context)=>UpBaseActivityScreen(),
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),
