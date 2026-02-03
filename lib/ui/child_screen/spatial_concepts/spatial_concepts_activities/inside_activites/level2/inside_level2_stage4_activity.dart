@@ -1,27 +1,29 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
+import 'package:au_somes/utils/app_assets.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../../../utils/dialog_utils.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
-class UpLevel2Stage3Activity extends StatefulWidget {
+
+class InsideLevel2Stage4Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const UpLevel2Stage3Activity({
+  const InsideLevel2Stage4Activity({
     Key? key,
     this.onNextStage,
   }) : super(key: key);
 
   @override
-  State<UpLevel2Stage3Activity> createState() =>
-      UpLevel2Stage3ActivityState();
+  State<InsideLevel2Stage4Activity> createState() =>
+      InsideLevel2Stage4ActivityState();
 }
 
-class UpLevel2Stage3ActivityState
-    extends State<UpLevel2Stage3Activity> {
+class InsideLevel2Stage4ActivityState
+    extends State<InsideLevel2Stage4Activity> {
   ActivityResponse? activity;
   bool isLoading = true;
   bool isPlacedCorrectly = false;
@@ -45,9 +47,9 @@ class UpLevel2Stage3ActivityState
 
   void fetchActivity() async {
     activity = await ApiManager.getActivity(
-      ApiConstants.up_down_activityId,
+      ApiConstants.inside_outside_activityId,
       2,
-      3,
+      4,
     );
 
     actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
@@ -85,134 +87,126 @@ class UpLevel2Stage3ActivityState
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-// 🪑 حجم الطرابيزة
-    final anchorWidth = screenWidth * 2.6;
-    final anchorHeight = screenHeight * 0.7;
-    final anchorTop = screenHeight * 0.01;
 
     return Stack(
       children: [
-
+        /// ===== Shadow الغلط =====
         Positioned(
-          top: anchorTop,
-          left: (screenWidth - anchorWidth) / 2 + 15,
-          child: Image.network(
-            anchor.imageUrl ?? '',
-            width: anchorWidth,
-            height: anchorHeight,
-            fit: BoxFit.contain,
+          left: 10,
+          top: 380,
+          child: DragTarget<String>(
+            onWillAccept: (data) => data == actor.id,
+            onAccept: (_) {
+              showWrongDialog();
+            },
+            builder: (context, _, __) {
+              return Transform.rotate(
+                angle: .3,
+                child: Image.network(
+                  shadow2.imageUrl ?? '',
+                  width: 140,
+
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
           ),
         ),
 
-        /// ===== Shadow الغلط =====
+        /// ===== الخلفية =====
         Positioned(
-          left: 50,
-          top: 390,
-          child: Container(
-            key: _shadow2Key,
-            width: 230,
-            height: 250,
-
-            child: Image.network(
-              shadow2.imageUrl ?? '',
-              fit: BoxFit.cover,
-            ),
+          right:5,
+          top: 80,
+          child: Image.network(
+            anchor.imageUrl ?? '',
+            width: 280,
           ),
         ),
 
         /// ===== Shadow الصح =====
         Positioned(
-          left: 100,
-          top: 185, // موقع الـ Shadow الأصلي
+          right:110,
+          top: 235,
           child: Container(
             key: _shadow1Key,
-            width: 250,
-            height: 250,
+            width: 115,
             child: DragTarget<String>(
               onWillAccept: (data) => data == actor.id,
               onAccept: (_) {
                 setState(() {
                   isPlacedCorrectly = true;
                 });
+
                 WellDoneOverlay.show(context);
+
                 Future.delayed(const Duration(seconds: 3), () {
                   widget.onNextStage?.call();
                 });
               },
               builder: (context, _, __) {
-                if (isPlacedCorrectly) {
-                  return Transform.translate(
-                    offset: const Offset(0, -44), // -Y  أعلى
-                    child: Transform.scale(
-                      scale: .86,
-                      child: Image.network(
-                        actor.imageUrl ?? '',
-                        width: 250,
-                        height: 250,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
-                } else {
-                  // لو مش اتسحب صح → Shadow
-                  return Image.network(
-                    shadow1.imageUrl ?? '',
-                    width: 250,
-                    height: 250,
-                    fit: BoxFit.cover,
-                  );
-                }
+                return isPlacedCorrectly
+                    ? Transform.translate(
+                  offset: const Offset(0, -5),
+                  child: Transform.rotate(
+                    angle: .3,
+                    child: Image.network(actor.imageUrl ?? '',
+                        width: 130,fit: BoxFit.contain),
+                  ),
+                )
+                    : Transform.rotate(
+                      angle: .3,
+                      child: Image.network(shadow1.imageUrl ?? '',
+                      width: 130, fit: BoxFit.contain),
+                    );
               },
             ),
           ),
         ),
+
         /// ===== Actor =====
         if (!isPlacedCorrectly)
           Positioned(
-            right:0,
-            bottom: -15,
+            left: 20,
+            bottom: 140,
             child: Draggable<String>(
               data: actor.id,
-
               feedback: Material(
                 color: Colors.transparent,
-                child: Image.network(
-                  actor.imageUrl ?? '',
-                  width: 200,
+                child: Transform.rotate(
+                  angle: .3,
+                  child: Image.network(
+                    actor.imageUrl ?? '',
+                    width: 130,
+                  ),
                 ),
               ),
               childWhenDragging: const SizedBox(),
-              child: Image.network(
-                actor.imageUrl ?? '',
-                width: 200,
+              child: Transform.rotate(
+                angle: .3,
+                child: Image.network(
+                  actor.imageUrl ?? '',
+                  width: 130,
+                ),
               ),
               onDragEnd: (details) {
                 final RenderBox actorBox =
                 context.findRenderObject() as RenderBox; // Stack context
                 final actorPos = details.offset; // Offset من الشاشة
 
-                 // مركز الـ actor
+                // مركز الـ actor
                 final actorCenter = Offset(
                   actorPos.dx + 220 / 2,
                   actorPos.dy + 220 / 2,
                 );
 
-                  // Shadow الصح
+                // Shadow الصح
                 final shadow1Box =
                 _shadow1Key.currentContext!.findRenderObject() as RenderBox;
                 final shadow1Pos = shadow1Box.localToGlobal(Offset.zero);
                 final shadow1Size = shadow1Box.size;
                 final shadow1Rect =
-                Rect.fromLTWH(shadow1Pos.dx, shadow1Pos.dy, shadow1Size.width,
-                    shadow1Size.height);
+                Rect.fromLTWH(shadow1Pos.dx, shadow1Pos.dy, shadow1Size.width, shadow1Size.height);
+
                 // لو المركز جوه Shadow الصح
                 if (shadow1Rect.contains(actorCenter)) {
                   setState(() {
@@ -249,9 +243,7 @@ class UpLevel2Stage3ActivityState
               },
 
             ),
-
           ),
-
       ],
     );
   }

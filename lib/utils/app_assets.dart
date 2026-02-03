@@ -94,4 +94,5 @@ class AppAssets{
   static const String table = 'assets/images/tables2.png';
   static const String bag1 = 'assets/images/bag1.png';
   static const String bag2 = 'assets/images/bag2.png';
+  static const String shirtOutside = 'assets/images/shirt_outside.png';
 }

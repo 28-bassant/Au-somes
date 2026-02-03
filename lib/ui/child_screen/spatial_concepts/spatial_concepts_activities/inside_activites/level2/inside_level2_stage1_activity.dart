@@ -1,26 +1,28 @@
 import 'dart:async';
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
+import 'package:au_somes/utils/app_assets.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
-class UpLevel2Stage1Activity extends StatefulWidget {
+
+class InsideLevel2Stage1Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const UpLevel2Stage1Activity({
+  const InsideLevel2Stage1Activity({
     Key? key,
     this.onNextStage,
   }) : super(key: key);
 
   @override
-  UpLevel2Stage1ActivityState createState() =>
-      UpLevel2Stage1ActivityState();
+  InsideLevel2Stage1ActivityState createState() =>
+      InsideLevel2Stage1ActivityState();
 }
 
-class UpLevel2Stage1ActivityState
-    extends State<UpLevel2Stage1Activity> {
+class InsideLevel2Stage1ActivityState
+    extends State<InsideLevel2Stage1Activity> {
 
   ActivityResponse? activity;
   bool isLoading = true;
@@ -41,7 +43,7 @@ class UpLevel2Stage1ActivityState
 
   void fetchActivity() async {
     final response = await ApiManager.getActivity(
-      ApiConstants.up_down_activityId,
+      ApiConstants.inside_outside_activityId,
       2,
       1,
     );
@@ -78,32 +80,23 @@ class UpLevel2Stage1ActivityState
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    // 🪑 حجم الطرابيزة
-    final anchorWidth = screenWidth * 2.6;
-    final anchorHeight = screenHeight * 0.7;
-    final anchorTop = screenHeight * 0.01;
 
     return Stack(
       children: [
-
-
+        /// ===== Anchor (خلفية ثابتة) =====
         Positioned(
-          top: anchorTop,
-          left: (screenWidth - anchorWidth) / 2 + 15,
-          child: Image.network(
-            anchor.imageUrl ?? '',
-            width: anchorWidth,
-            height: anchorHeight,
-            fit: BoxFit.contain,
+          right:5,
+          top: 130,
+            child: Image.network(
+              anchor.imageUrl ?? '',
+              width: 280,
+            ),
           ),
-        ),
 
         /// ===== Shadow (مكان الإسقاط) =====
         Positioned(
-          left: 100,
-          top: 120,
+          right:131,
+          top: 230,
           child: DragTarget<String>(
             onWillAccept: (data) => data == shadow.id,
             onAccept: (data) {
@@ -120,15 +113,15 @@ class UpLevel2Stage1ActivityState
             builder: (context, candidateData, rejectedData) {
               return isPlacedCorrectly
                   ? Transform.translate(
-                offset: const Offset(0, 15),
-                child: Image.network(
+                offset: const Offset(0, -5),
+                    child: Image.network(
                                     actor.imageUrl ?? '',
-                                    width: 250,
+                                    width: 50,
                                   ),
                   )
                   : Image.network(
                 shadow.imageUrl ?? '',
-                width: 250,
+                width: 50,
               );
             },
           ),
@@ -137,17 +130,17 @@ class UpLevel2Stage1ActivityState
         /// ===== Actor (اللي بيتسحب فعليًا) =====
         if (!isPlacedCorrectly)
           Positioned(
-            right: 0,
-            bottom: -15,
+            left: 20,
+            top: 220,
             child: Draggable<String>(
               data: actor.targetedZoneId,
 
               /// 👈 ده اللي الطفل شايفه وهو بيسحب
               feedback: Material(
                 color: Colors.transparent,
-                child: Image.network(
-                  actor.imageUrl ?? '',
-                  width: 220,
+                child: Image.asset(
+                  AppAssets.shirtOutside,
+                  width: 100,
                 ),
               ),
 
@@ -155,9 +148,9 @@ class UpLevel2Stage1ActivityState
               childWhenDragging: const SizedBox(),
 
               /// 👈 الشكل قبل السحب
-              child: Image.network(
-                actor.imageUrl ?? '',
-                width: 220,
+              child: Image.asset(
+                AppAssets.shirtOutside,
+                width: 100,
               ),
             ),
           ),

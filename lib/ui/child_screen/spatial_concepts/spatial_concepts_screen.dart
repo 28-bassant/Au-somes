@@ -66,6 +66,7 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_open,
               onPressed: () {
                 //todo: Navigate to Inside & Outside Activities
+                Navigator.pushNamed(context, AppRoutes.insideBaseActivityScreenRouteName);
               },
             ),
             SizedBox(height: height * .02),
