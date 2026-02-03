@@ -141,7 +141,6 @@ class UpLevel2Stage1ActivityState
             bottom: -15,
             child: Draggable<String>(
               data: actor.targetedZoneId,
-
               /// 👈 ده اللي الطفل شايفه وهو بيسحب
               feedback: Material(
                 color: Colors.transparent,
