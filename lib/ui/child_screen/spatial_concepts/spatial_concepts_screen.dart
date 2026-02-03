@@ -37,6 +37,7 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               onPressed: () {
                 //todo: Navigate to Above & Under Activities
+                Navigator.pushNamed(context, AppRoutes.upBaseActivityScreenRouteName);
               },
             ),
             SizedBox(height: height * .02),
@@ -65,6 +66,7 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_open,
               onPressed: () {
                 //todo: Navigate to Inside & Outside Activities
+                Navigator.pushNamed(context, AppRoutes.insideBaseActivityScreenRouteName);
               },
             ),
             SizedBox(height: height * .02),
@@ -83,6 +85,7 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               onPressed: () {
                 //todo: Navigate to Between Activities
+                Navigator.pushNamed(context, AppRoutes.betweenBaseActivityScreenRouteName);
               },
             ),
             SizedBox(height: height * .02),
