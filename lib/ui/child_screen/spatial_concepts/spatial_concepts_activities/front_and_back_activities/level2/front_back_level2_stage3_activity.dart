@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../../../utils/dialog_utils.dart';
+import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
 class FrontBackLevel2Stage3Activity extends StatefulWidget {
@@ -67,13 +68,6 @@ class FrontBackLevel2Stage3ActivityState
   }
 
   void repeatSound() => playSound();
-
-  void showWrongDialog() {
-    DialogUtils.showMsg(
-      context: context,
-      msg: 'Try Again',
-    );
-  }
 
   @override
   void dispose() {
@@ -215,7 +209,7 @@ class FrontBackLevel2Stage3ActivityState
                 );
 
                 if (wrongRect.contains(actorCenter)) {
-                  showWrongDialog();
+                  TryAgainSound.play();
                 }
               },
 

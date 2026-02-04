@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../utils/dialog_utils.dart';
+import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
 class FrontBackLevel1Stage4Activity extends StatefulWidget {
@@ -75,7 +76,7 @@ class FrontBackLevel1Stage4ActivityState extends State<FrontBackLevel1Stage4Acti
           child: GestureDetector(
             onTap: () {
               //todo: try again
-              DialogUtils.showMsg(context: context, msg: 'Try Again');
+              TryAgainSound.play();
 
             },
             child: Image.network(
@@ -84,7 +85,7 @@ class FrontBackLevel1Stage4ActivityState extends State<FrontBackLevel1Stage4Acti
             ),
           ),
         ),
-        Image.network(anchorElement.imageUrl ?? ''),
+        IgnorePointer(child: Image.network(anchorElement.imageUrl ?? '')),
         Positioned(
           left: 200,
           top: 260,

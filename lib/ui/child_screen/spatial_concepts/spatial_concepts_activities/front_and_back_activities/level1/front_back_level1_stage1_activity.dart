@@ -88,8 +88,6 @@ class FrontBackLevel1Stage1ActivityState extends State<FrontBackLevel1Stage1Acti
                 Future.delayed(const Duration(seconds: 3), () {
                   widget.onNextStage?.call();
                 });
-              } else {
-                DialogUtils.showMsg(context: context, msg: 'Try Again');
               }
             },
             child: Image.network(

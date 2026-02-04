@@ -1,5 +1,6 @@
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
+import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:au_somes/utils/app_assets.dart';
 import 'package:au_somes/utils/dialog_utils.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -75,8 +76,7 @@ class FrontBackLevel1Stage3ActivityState extends State<FrontBackLevel1Stage3Acti
           child: GestureDetector(
             onTap: () {
                //todo: try again
-              DialogUtils.showMsg(context: context, msg: 'Try Again');
-
+              TryAgainSound.play();
             },
             child: Image.network(
               firstElement.imageUrl ?? '',
@@ -84,7 +84,8 @@ class FrontBackLevel1Stage3ActivityState extends State<FrontBackLevel1Stage3Acti
             ),
           ),
         ),
-        Image.network(anchorElement.imageUrl ?? ''),
+        IgnorePointer(
+            child: Image.network(anchorElement.imageUrl ?? '')),
         Positioned(
           left: 100,
           top: 280,
@@ -95,6 +96,7 @@ class FrontBackLevel1Stage3ActivityState extends State<FrontBackLevel1Stage3Acti
               Future.delayed(const Duration(seconds: 3), () {
                 widget.onNextStage?.call();
               });
+
             },
             child: Image.network(
               lastElement.imageUrl ?? '',
