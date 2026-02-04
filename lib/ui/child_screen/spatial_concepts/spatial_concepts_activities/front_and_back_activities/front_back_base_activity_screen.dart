@@ -7,11 +7,11 @@ import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../providers/app_language_provider.dart';
-import '../../../../utils/app_colors.dart';
-import 'front_and_back_activities/level1/front_back_level1_stage3_activity.dart';
-import 'front_and_back_activities/level1/front_back_level1_stage4_activity.dart';
-import 'front_and_back_activities/level2/front_back_level2_stage2_activity.dart';
+import '../../../../../providers/app_language_provider.dart';
+import '../../../../../utils/app_colors.dart';
+import 'level1/front_back_level1_stage3_activity.dart';
+import 'level1/front_back_level1_stage4_activity.dart';
+import 'level2/front_back_level2_stage2_activity.dart';
 
 class FrontBackBaseActivityScreen extends StatefulWidget {
   @override

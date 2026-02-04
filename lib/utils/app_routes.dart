@@ -15,4 +15,6 @@ class AppRoutes {
   static String editProfileScreenRouteName = "edit_profile_screen";
   static String spatialConceptsScreenRouteName = "spatial_concepts_screen";
   static String frontBackBaseActivityScreenRouteName = "front_back_base_activity_screen";
+  static String rightLeftBaseActivityScreenRouteName = "right_left_base_activity_screen";
+  static String nearFarBaseActivityScreenRouteName = "near_far_base_activity_screen";
 }
