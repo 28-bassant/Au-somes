@@ -10,6 +10,8 @@ import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activ
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_and_back_activities/front_back_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/inside_activites/inside_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/up_activites/up_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/near_and_far_activities/near_far_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/right_and_left_acrivities/right_left_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
@@ -72,6 +74,9 @@ class MyApp extends StatelessWidget{
         AppRoutes.upBaseActivityScreenRouteName:(context)=>UpBaseActivityScreen(),
         AppRoutes.betweenBaseActivityScreenRouteName:(context)=>BetweenBaseActivityScreen(),
         AppRoutes.insideBaseActivityScreenRouteName:(context)=>InsideBaseActivityScreen(),
+        AppRoutes.rightLeftBaseActivityScreenRouteName:(context)=>RightLeftBaseActivityScreen(),
+        AppRoutes.nearFarBaseActivityScreenRouteName:(context)=>NearFarBaseActivityScreen(),
+
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

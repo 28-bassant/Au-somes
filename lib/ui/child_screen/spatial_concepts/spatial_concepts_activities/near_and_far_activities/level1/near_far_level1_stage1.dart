@@ -1,3 +1,5 @@
+
+
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
 import 'package:au_somes/utils/app_colors.dart';
@@ -7,17 +9,17 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class FrontBackLevel1Stage1Activity extends StatefulWidget {
+class NearFarLevel1Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const FrontBackLevel1Stage1Activity({Key? key, this.onNextStage}) : super(key: key);
+  const NearFarLevel1Stage1({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  FrontBackLevel1Stage1ActivityState createState() =>
-      FrontBackLevel1Stage1ActivityState();
+  NearFarLevel1Stage1State createState() =>
+      NearFarLevel1Stage1State();
 }
 
-class FrontBackLevel1Stage1ActivityState extends State<FrontBackLevel1Stage1Activity> {
+class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1> {
   ActivityResponse? activity;
   bool isLoading = true;
   late AudioPlayer _player;
@@ -31,7 +33,7 @@ class FrontBackLevel1Stage1ActivityState extends State<FrontBackLevel1Stage1Acti
 
   void fetchActivity() async {
     final response = await ApiManager.getActivity(
-      ApiConstants.front_back_activityId,
+      ApiConstants.near_far_activityId,
       1,
       1,
     );
@@ -64,40 +66,64 @@ class FrontBackLevel1Stage1ActivityState extends State<FrontBackLevel1Stage1Acti
     if (isLoading) return const Center(child: CircularProgressIndicator());
 
     final firstElement = activity!.elements!.first;
-    final anchorElement = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    final anchorElement = activity!.elements!.firstWhere((e) =>
+    e.role == 'Anchor');
 
     return Stack(
-      alignment: Alignment.center,
       children: [
-        Image.network(anchorElement.imageUrl ?? ''),
         Positioned(
-          left: 100,
-          top: 300,
+          right: 90,
+          top: 340,
+          child: InkWell(
+            onTap: () {
+              DialogUtils.showMsg(context: context, msg: 'Try Again');
+            },
+            child: Image.network(anchorElement.imageUrl ?? '',
+              width: 80,
+              ),
+          ),
+        ),
+        Positioned(
+          top: 200,
+          left: 40,
           child: GestureDetector(
-            onTapDown: (details) {
-              final tap = details.localPosition;
-              final containerWidth = 250.0;
-              final containerHeight = 250.0;
+            onTapDown: (TapDownDetails details) {
+              final localPos = details.localPosition;
 
-              // نحدد المنطقة الصح: النص لتحت مثلاً آخر ثلث من الارتفاع
-              final correctAreaTop = containerHeight * 2 / 3;
-              final correctAreaBottom = containerHeight;
+              const imageWidth = 250.0;
+              const imageHeight = 250.0; // عدليها لو مختلفة
 
-              if (tap.dy >= correctAreaTop && tap.dy <= correctAreaBottom) {
+              // ===== منطقة الصح: شريط في النص بالطول كله =====
+              final correctArea = Rect.fromLTWH(
+                imageWidth * 0.3, // بداية الصح أفقيًا
+                0,                // من فوق (الطول كله)
+                imageWidth * 0.4, // عرض منطقة الصح
+                imageHeight,      // الطول كله
+              );
+
+              if (correctArea.contains(localPos)) {
+                // ✅ صح
                 WellDoneOverlay.show(context);
                 Future.delayed(const Duration(seconds: 3), () {
                   widget.onNextStage?.call();
                 });
+              } else {
+                // ❌ غلط
+                DialogUtils.showMsg(
+                  context: context,
+                  msg: 'Try Again',
+                );
               }
             },
             child: Image.network(
               firstElement.imageUrl ?? '',
               width: 250,
-              height: 250,
-              fit: BoxFit.cover,
             ),
           ),
         ),
+
+
+
       ],
     );
   }

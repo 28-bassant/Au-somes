@@ -6,24 +6,23 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../../../utils/dialog_utils.dart';
-import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class FrontBackLevel2Stage3Activity extends StatefulWidget {
+class RightLeftLevel2Stage3 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const FrontBackLevel2Stage3Activity({
+  const RightLeftLevel2Stage3({
     Key? key,
     this.onNextStage,
   }) : super(key: key);
 
   @override
-  State<FrontBackLevel2Stage3Activity> createState() =>
-      FrontBackLevel2Stage3ActivityState();
+  State<RightLeftLevel2Stage3> createState() =>
+      RightLeftLevel2Stage3State();
 }
 
-class FrontBackLevel2Stage3ActivityState
-    extends State<FrontBackLevel2Stage3Activity> {
+class RightLeftLevel2Stage3State
+    extends State<RightLeftLevel2Stage3> {
   ActivityResponse? activity;
   bool isLoading = true;
   bool isPlacedCorrectly = false;
@@ -47,7 +46,7 @@ class FrontBackLevel2Stage3ActivityState
 
   void fetchActivity() async {
     activity = await ApiManager.getActivity(
-      ApiConstants.front_back_activityId,
+      ApiConstants.right_left_activityId,
       2,
       3,
     );
@@ -69,6 +68,13 @@ class FrontBackLevel2Stage3ActivityState
 
   void repeatSound() => playSound();
 
+  void showWrongDialog() {
+    DialogUtils.showMsg(
+      context: context,
+      msg: 'Try Again',
+    );
+  }
+
   @override
   void dispose() {
     _player.dispose();
@@ -82,11 +88,12 @@ class FrontBackLevel2Stage3ActivityState
     }
 
     return Stack(
+      alignment: Alignment.center,
       children: [
         /// ===== Shadow الغلط =====
         Positioned(
-          left: 40,
-          top: 150,
+          right: 190,
+          top: 300,
           child: Container(
             key: _shadow2Key,
             width: 250,
@@ -100,16 +107,17 @@ class FrontBackLevel2Stage3ActivityState
         ),
 
         /// ===== الخلفية =====
-        Center(
+        Positioned(
+          left: 100,
           child: Image.network(
             anchor.imageUrl ?? '',
-            width: 600,
+            width: 300,
           ),
         ),
 
         /// ===== Shadow الصح =====
         Positioned(
-          left: 160,
+          left: 210,
           top: 300,
           child: Container(
             key: _shadow1Key,
@@ -209,7 +217,7 @@ class FrontBackLevel2Stage3ActivityState
                 );
 
                 if (wrongRect.contains(actorCenter)) {
-                  TryAgainSound.play();
+                  showWrongDialog();
                 }
               },
 

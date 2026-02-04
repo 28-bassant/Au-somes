@@ -57,6 +57,8 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               onPressed: () {
                 //todo: Navigate to Right & Left Activities
+                Navigator.pushNamed(context, AppRoutes.rightLeftBaseActivityScreenRouteName);
+
               },
             ),
             SizedBox(height: height * .02),
@@ -76,6 +78,8 @@ class SpatialConceptsScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               onPressed: () {
                 //todo: Navigate to Near & Far Activities
+                Navigator.pushNamed(context, AppRoutes.nearFarBaseActivityScreenRouteName);
+
               },
             ),
             SizedBox(height: height * .02),

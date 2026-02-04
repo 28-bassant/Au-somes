@@ -1,23 +1,25 @@
+
+
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
-import 'package:au_somes/utils/app_assets.dart';
+import 'package:au_somes/utils/app_colors.dart';
+import 'package:au_somes/utils/dialog_utils.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
-import '../../../../../../utils/dialog_utils.dart';
-import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class FrontBackLevel1Stage4Activity extends StatefulWidget {
+class RightLeftLevel1Stage2 extends StatefulWidget {
   final VoidCallback? onNextStage;
-  const FrontBackLevel1Stage4Activity({Key? key,this.onNextStage}) : super(key: key);
+
+  const RightLeftLevel1Stage2({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  FrontBackLevel1Stage4ActivityState createState() =>
-      FrontBackLevel1Stage4ActivityState();
+  RightLeftLevel1Stage2State createState() =>
+      RightLeftLevel1Stage2State();
 }
 
-class FrontBackLevel1Stage4ActivityState extends State<FrontBackLevel1Stage4Activity> {
+class RightLeftLevel1Stage2State extends State<RightLeftLevel1Stage2> {
   ActivityResponse? activity;
   bool isLoading = true;
   late AudioPlayer _player;
@@ -31,9 +33,9 @@ class FrontBackLevel1Stage4ActivityState extends State<FrontBackLevel1Stage4Acti
 
   void fetchActivity() async {
     final response = await ApiManager.getActivity(
-      ApiConstants.front_back_activityId,
+      ApiConstants.right_left_activityId,
       1,
-      1,
+      2,
     );
 
     setState(() {
@@ -63,32 +65,24 @@ class FrontBackLevel1Stage4ActivityState extends State<FrontBackLevel1Stage4Acti
   Widget build(BuildContext context) {
     if (isLoading) return const Center(child: CircularProgressIndicator());
 
-    final firstElement = activity!.elements!.first;
     final lastElement = activity!.elements!.last;
-    final anchorElement = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    final anchorElement = activity!.elements!.firstWhere((e) =>
+    e.role == 'Anchor');
 
     return Stack(
       alignment: Alignment.center,
       children: [
-        Positioned(
-          right: 170,
-          bottom: 180,
-          child: GestureDetector(
+        InkWell(
             onTap: () {
-              //todo: try again
-              TryAgainSound.play();
-
+              DialogUtils.showMsg(context: context, msg: 'Try Again');
             },
-            child: Image.network(
-              lastElement.imageUrl ?? '',
-              width: 150,
-            ),
-          ),
-        ),
-        IgnorePointer(child: Image.network(anchorElement.imageUrl ?? '')),
+            child: Positioned(
+                right: 50,
+                top: 250,
+                child: Image.network(anchorElement.imageUrl ?? ''))),
         Positioned(
           left: 200,
-          top: 260,
+          top: 350,
           child: GestureDetector(
             onTap: () {
               WellDoneOverlay.show(context);
@@ -98,11 +92,12 @@ class FrontBackLevel1Stage4ActivityState extends State<FrontBackLevel1Stage4Acti
               });
             },
             child: Image.network(
-              firstElement.imageUrl ?? '',
-              width: 250,
+              lastElement.imageUrl ?? '',
+              width: 200,
             ),
           ),
         ),
+
       ],
     );
   }
