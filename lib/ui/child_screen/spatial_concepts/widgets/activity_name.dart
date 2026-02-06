@@ -17,7 +17,7 @@ class ActivityName extends StatelessWidget{
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    return InkWell(
+    return GestureDetector(
       onTap: onPressed,
       child: Container(
         width: double . infinity,

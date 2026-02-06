@@ -176,19 +176,19 @@ RightLeftLevel2Stage4(
       body: Column(
         children: [
           Expanded(child: activities[currentActivityIndex]),
-          InkWell(
+          GestureDetector(
             onTap: repeatCurrentSound,
             child: Center(
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
           SizedBox(height: height * .04),
-          InkWell(
-            onTap: goToNextActivity,
-            child: Center(
-              child: Icon(Icons.add),
-            ),
-          ),
+          // InkWell(
+          //   onTap: goToNextActivity,
+          //   child: Center(
+          //     child: Icon(Icons.add),
+          //   ),
+          // ),
         ],
       ),
     );

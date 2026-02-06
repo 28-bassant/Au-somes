@@ -1,36 +1,28 @@
-import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../../../utils/app_assets.dart';
-import '../../../../../../utils/app_colors.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
 class NearFarLevel2Stage2 extends StatefulWidget {
   final VoidCallback? onNextStage;
-
-  const NearFarLevel2Stage2({
-    Key? key,
-    this.onNextStage,
-  }) : super(key: key);
+  const NearFarLevel2Stage2({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  NearFarLevel2Stage2State createState() =>
-      NearFarLevel2Stage2State();
+  State<NearFarLevel2Stage2> createState() => NearFarLevel2Stage2State();
 }
 
-class NearFarLevel2Stage2State
-    extends State<NearFarLevel2Stage2> {
-
-  ActivityResponse? activity;
-  bool isLoading = true;
-  bool isPlacedCorrectly = false;
-
+class NearFarLevel2Stage2State extends State<NearFarLevel2Stage2> {
   late AudioPlayer _player;
+  bool _isLoading = true;
+  bool isPlacedCorrectly = false;
+  bool _hasPlayedSound = false;
+  bool _imagesLoaded = false;
 
+  ActivityResponse? _activity;
   late ActivityElement actor;
   late ActivityElement shadow;
   late ActivityElement anchor;
@@ -39,33 +31,69 @@ class NearFarLevel2Stage2State
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
+
+    // تحميل النشاط مرة واحدة في البداية
+    _loadActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
-      ApiConstants.near_far_activityId,
-      2,
-      2,
-    );
+  Future<void> _loadActivity() async {
+    try {
+      final activity = await ApiManager.getActivity(
+        ApiConstants.near_far_activityId,
+        2,
+        2,
+      );
 
-    activity = response;
+      if (mounted) {
+        setState(() {
+          _activity = activity;
+        });
 
-    actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
-    shadow = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
-    anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+        // حفظ العناصر
+        actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
+        shadow = activity.elements!.firstWhere((e) => e.role == 'Shadow');
+        anchor = activity.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    setState(() {
-      isLoading = false;
-    });
+        // تحميل الصور
+        await _preloadImages(activity);
 
-    playSound();
+        // تشغيل الصوت بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          await playSound();
+          _hasPlayedSound = true;
+        }
+
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> _preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
+
+    _imagesLoaded = true;
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
 
   void repeatSound() => playSound();
@@ -78,80 +106,122 @@ class NearFarLevel2Stage2State
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    // إذا كان في مرحلة التحميل
+    if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Stack(
-      children: [
+    // إذا كان هناك خطأ في تحميل النشاط
+    if (_activity == null) {
+      return const Center(child: Text('Error loading activity'));
+    }
 
-        /// ===== Anchor (خلفية ثابتة) =====
-        Center(
-          child: Image.network(
-            anchor.imageUrl ?? '',
-            width: 250,
-          ),
-        ),
+    // استخدام LayoutBuilder للحصول على حجم الشاشة
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double screenWidth = constraints.maxWidth;
+        final double screenHeight = constraints.maxHeight;
 
-        /// ===== Shadow (مكان الإسقاط) =====
-        Positioned(
-          left: 300,
-          top: 400,
-          child: DragTarget<String>(
-            onWillAccept: (data) => data == shadow.id,
-            onAccept: (data) {
-              setState(() {
-                isPlacedCorrectly = true;
-              });
+        // افتراض أن التصميم الأصلي على شاشة 400px
+        final double designWidth = 400.0;
+        final double scale = screenWidth / designWidth;
 
-              WellDoneOverlay.show(context);
+        // تحويل القيم الثابتة إلى قيم متجاوبة
+        final double anchorWidth = 250 * scale;
+        final double shadowLeft = 300 * scale;
+        final double shadowTop = 400 * scale;
+        final double shadowBallWidth = 80 * scale;
+        final double actorOverlayWidth = 100 * scale;
+        final double actorRight = 10 * scale;
+        final double actorBottom = -15 * scale;
+        final double actorWidth = 120 * scale;
+        final double actorFeedbackWidth = 120 * scale;
 
-              Future.delayed(const Duration(seconds: 3), () {
-                widget.onNextStage?.call();
-              });
-            },
-            builder: (context, candidateData, rejectedData) {
-              return isPlacedCorrectly
-                  ? Image.network(
-                                  actor.imageUrl ?? '',
-                                  width: 100,
-                                )
-                  : Image.asset(
-                AppAssets.ball_image ,
-                width: 80,
-              );
-            },
-          ),
-        ),
-
-        /// ===== Actor (اللي بيتسحب فعليًا) =====
-        if (!isPlacedCorrectly)
-          Positioned(
-            right: 10,
-            bottom: -15,
-            child: Draggable<String>(
-              data: actor.targetedZoneId,
-
-              /// 👈 ده اللي الطفل شايفه وهو بيسحب
-              feedback: Material(
-                color: Colors.transparent,
-                child: Image.network(
-                  actor.imageUrl ?? '',
-                  width: 220,
-                ),
-              ),
-
-              /// 👈 نخفي الأصل
-              childWhenDragging: const SizedBox(),
-
-              /// 👈 الشكل قبل السحب
+        return Stack(
+          children: [
+            /// ===== Anchor =====
+            Center(
               child: Image.network(
-                actor.imageUrl ?? '',
-                width: 220,
+                anchor.imageUrl ?? '',
+                width: anchorWidth,
+                fit: BoxFit.contain,
               ),
             ),
-          ),
-      ],
+
+            /// ===== Shadow (DragTarget) =====
+            Positioned(
+              left: shadowLeft,
+              top: shadowTop,
+              child: DragTarget<String>(
+                onWillAccept: (data) => data == actor.targetedZoneId,
+                onAccept: (data) {
+                  setState(() => isPlacedCorrectly = true);
+                  WellDoneOverlay.show(context);
+                  Future.delayed(const Duration(seconds: 3), () {
+                    if (mounted) {
+                      widget.onNextStage?.call();
+                    }
+                  });
+                },
+                builder: (context, _, __) {
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: shadowBallWidth,
+                        height: shadowBallWidth,
+                        child: Image.asset(
+                          AppAssets.ball_image,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      if (isPlacedCorrectly)
+                        Container(
+                          width: actorOverlayWidth,
+                          height: actorOverlayWidth,
+                          child: Image.network(
+                            actor.imageUrl ?? '',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            /// ===== Actor (Draggable) =====
+            if (!isPlacedCorrectly)
+              Positioned(
+                right: actorRight,
+                bottom: actorBottom+20,
+                child: Draggable<String>(
+                  data: actor.targetedZoneId,
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      width: actorFeedbackWidth,
+                      height: actorFeedbackWidth,
+                      child: Image.network(
+                        actor.imageUrl ?? '',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                  childWhenDragging: const SizedBox(),
+                  child: Container(
+                    width: actorWidth,
+                    height: actorWidth,
+                    child: Image.network(
+                      actor.imageUrl ?? '',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
