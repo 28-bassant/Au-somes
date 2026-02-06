@@ -1,9 +1,5 @@
-
-
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
-import 'package:au_somes/utils/app_colors.dart';
-import 'package:au_somes/utils/dialog_utils.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
@@ -15,42 +11,46 @@ class RightLeftLevel1Stage2 extends StatefulWidget {
   const RightLeftLevel1Stage2({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  RightLeftLevel1Stage2State createState() =>
-      RightLeftLevel1Stage2State();
+  RightLeftLevel1Stage2State createState() => RightLeftLevel1Stage2State();
 }
 
 class RightLeftLevel1Stage2State extends State<RightLeftLevel1Stage2> {
-  ActivityResponse? activity;
-  bool isLoading = true;
   late AudioPlayer _player;
+  late ActivityResponse _activity;
+  bool _imagesLoaded = false;
+  bool _hasPlayedSound = false;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
+  Future<ActivityResponse> _loadActivity() async {
+    _activity = await ApiManager.getActivity(
       ApiConstants.right_left_activityId,
       1,
       2,
     );
 
-    setState(() {
-      activity = response;
-      isLoading = false;
-    });
+    // preload الصور
+    final urls = _activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
 
-    playSound();
+    for (final url in urls) {
+      await precacheImage(NetworkImage(url!), context);
+    }
+
+    _imagesLoaded = true;
+    return _activity;
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
-
+    if (_activity.audioUrl == null || _activity.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity.audioUrl!));
   }
 
   void repeatSound() => playSound();
@@ -63,42 +63,99 @@ class RightLeftLevel1Stage2State extends State<RightLeftLevel1Stage2> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    return FutureBuilder<ActivityResponse>(
+      future: _loadActivity(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting || !_imagesLoaded) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    final lastElement = activity!.elements!.last;
-    final anchorElement = activity!.elements!.firstWhere((e) =>
-    e.role == 'Anchor');
+        if (!snapshot.hasData || snapshot.hasError) {
+          return const Center(child: Text('Error loading activity'));
+        }
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        InkWell(
-            onTap: () {
-              DialogUtils.showMsg(context: context, msg: 'Try Again');
-            },
-            child: Positioned(
-                right: 50,
-                top: 250,
-                child: Image.network(anchorElement.imageUrl ?? ''))),
-        Positioned(
-          left: 200,
-          top: 350,
-          child: GestureDetector(
-            onTap: () {
-              WellDoneOverlay.show(context);
-              //todo: Move to next stage via callback
-              Future.delayed(const Duration(seconds: 3), () {
-                widget.onNextStage?.call();
-              });
-            },
-            child: Image.network(
-              lastElement.imageUrl ?? '',
-              width: 200,
-            ),
-          ),
-        ),
+        final lastElement = _activity.elements!.last;
+        final anchorElement =
+        _activity.elements!.firstWhere((e) => e.role == 'Anchor');
 
-      ],
+        // تشغيل الصوت مرة واحدة بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            playSound();
+            _hasPlayedSound = true;
+          });
+        }
+
+        // استخدام LayoutBuilder للحصول على حجم الشاشة
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final double screenWidth = constraints.maxWidth;
+            final double screenHeight = constraints.maxHeight;
+
+            // افتراض أن التصميم الأصلي على شاشة 400px
+            final double designWidth = 400.0;
+            final double scale = screenWidth / designWidth;
+
+            // تحويل القيم الثابتة إلى قيم متجاوبة
+            final double anchorWidth = 600 * scale;
+            final double actorLeft = 200 * scale;
+            final double actorTop = 350 * scale;
+            final double actorWidth = 200 * scale;
+            final double actorHeight = 200 * scale;
+
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                // Anchor background
+                Center(
+                  child: Image.network(
+                    anchorElement.imageUrl ?? '',
+                    width: anchorWidth,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+
+                // Actor image
+                Positioned(
+                  left: actorLeft,
+                  top: actorTop,
+                  child: GestureDetector(
+                    onTapDown: (details) {
+                      final local = details.localPosition;
+                      final imageWidth = actorWidth;
+                      final imageHeight = actorHeight;
+
+                      // تحديد المنطقة الصح: منتصف الصورة تقريبًا (بنسب مئوية متجاوبة)
+                      final correctArea = Rect.fromLTWH(
+                        imageWidth * 0.25,  // 25% من العرض
+                        imageHeight * 0.25, // 25% من الارتفاع
+                        imageWidth * 0.5,   // 50% من العرض
+                        imageHeight * 0.5,  // 50% من الارتفاع
+                      );
+
+                      if (correctArea.contains(local)) {
+                        // ✅ صح
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          widget.onNextStage?.call();
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: actorWidth,
+                      height: actorHeight,
+                      child: Image.network(
+                        lastElement.imageUrl ?? '',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

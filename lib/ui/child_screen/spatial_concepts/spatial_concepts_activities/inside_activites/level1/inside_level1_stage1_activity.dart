@@ -1,4 +1,3 @@
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../api/api_constants.dart';
@@ -22,6 +21,8 @@ class InsideLevel1Stage1Activity extends StatefulWidget {
 class InsideLevel1Stage1ActivityState extends State<InsideLevel1Stage1Activity> {
   ActivityResponse? activity;
   bool isLoading = true;
+  bool _hasPlayedSound = false;
+  bool _imagesLoaded = false;
   late AudioPlayer _player;
 
   Uint8List? actorBytes; // الصورة بعد تحميلها
@@ -30,31 +31,68 @@ class InsideLevel1Stage1ActivityState extends State<InsideLevel1Stage1Activity> 
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
+    _loadActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
-      ApiConstants.inside_outside_activityId,
-      1,
-      1,
-    );
+  Future<void> _loadActivity() async {
+    try {
+      final response = await ApiManager.getActivity(
+        ApiConstants.inside_outside_activityId,
+        1,
+        1,
+      );
 
-    setState(() {
-      activity = response;
-      isLoading = false;
-    });
+      if (mounted) {
+        setState(() {
+          activity = response;
+        });
 
-    playSound();
-    fetchActorImage();
+        // تحميل الصور أولاً
+        await _preloadImages(response!);
+
+        // ثم تحميل صورة الأكتور
+        await _fetchActorImage();
+
+        // تشغيل الصوت بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          await playSound();
+          setState(() {
+            _hasPlayedSound = true;
+          });
+        }
+
+        setState(() {
+          _imagesLoaded = true;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
   }
 
-  Future<void> fetchActorImage() async {
+  Future<void> _preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
+  }
+
+  Future<void> _fetchActorImage() async {
     try {
       final actorElement =
       activity!.elements!.firstWhere((e) => e.role == 'Actor');
       final resp = await http.get(Uri.parse(actorElement.imageUrl!));
-      if (resp.statusCode == 200) {
+      if (resp.statusCode == 200 && mounted) {
         setState(() {
           actorBytes = resp.bodyBytes;
         });
@@ -80,56 +118,79 @@ class InsideLevel1Stage1ActivityState extends State<InsideLevel1Stage1Activity> 
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    final anchorElement =
-    activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    if (activity == null) {
+      return const Center(child: Text('Error loading activity'));
+    }
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        /// الأنكور (لو اتداس عليه = Try Again)
-        Positioned(
-          left: 27,
-          right:22,
-          top: 70,
-          child: GestureDetector(
-            onTap: () {
-              DialogUtils.showMsg(context: context, msg: 'Try Again');
-            },
-            child: Container(
-              child: Image.network(
-                anchorElement.imageUrl ?? '',
-                fit: BoxFit.contain,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double screenWidth = constraints.maxWidth;
+        final double screenHeight = constraints.maxHeight;
 
+        // افتراض أن التصميم الأصلي على شاشة 400px
+        final double designWidth = 400.0;
+        final double scale = screenWidth / designWidth;
+
+        // تحويل القيم الثابتة إلى قيم متجاوبة
+        final double anchorLeft = 27 * scale;
+        final double anchorRight = 22 * scale;
+        final double anchorTop = 70 * scale;
+        final double actorLeft = 161 * scale;
+        final double actorTop = 189 * scale;
+        final double actorWidth = screenWidth * 0.16; // 16% من عرض الشاشة
+        final double actorHeight = screenHeight * 0.2; // 20% من ارتفاع الشاشة
+
+        final anchorElement =
+        activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            /// الأنكور (لو اتداس عليه = Try Again)
+            Positioned(
+              left: anchorLeft,
+              right: anchorRight,
+              top: anchorTop,
+              child: GestureDetector(
+                onTap: () {
+                  DialogUtils.showMsg(context: context, msg: 'Try Again');
+                },
+                child: Container(
+                  child: Image.network(
+                    anchorElement.imageUrl ?? '',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
 
-        /// الأكتور (الإجابة الصح)
-        if (actorBytes != null)
-          Positioned(
-            left: 161,
-            top: 189,
-            child: GestureDetector(
-              onTap: () {
-                WellDoneOverlay.show(context);
-                Future.delayed(const Duration(seconds: 3), () {
-                  widget.onNextStage?.call();
-                });
-              },
-              child: Image.memory(
-                actorBytes!,
-                width: width*.16,
-                height: height*.2,
-                fit: BoxFit.contain,
+            /// الأكتور (الإجابة الصح)
+            if (actorBytes != null)
+              Positioned(
+                left: actorLeft,
+                top: actorTop,
+                child: GestureDetector(
+                  onTap: () {
+                    WellDoneOverlay.show(context);
+                    Future.delayed(const Duration(seconds: 3), () {
+                      widget.onNextStage?.call();
+                    });
+                  },
+                  child: Image.memory(
+                    actorBytes!,
+                    width: actorWidth,
+                    height: actorHeight,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-            ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

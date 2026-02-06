@@ -15,7 +15,14 @@ class ChildScreen extends StatelessWidget{
     final name = TokenUtils.getChildName();
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
+          },
+        ),
+      ),
       body: Padding(
         padding:  EdgeInsets.symmetric(horizontal: width * .04),
         child: Column(

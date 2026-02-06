@@ -1,9 +1,7 @@
-
+import 'dart:math';
 
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
-import 'package:au_somes/utils/app_colors.dart';
-import 'package:au_somes/utils/dialog_utils.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
@@ -15,42 +13,42 @@ class NearFarLevel1Stage1 extends StatefulWidget {
   const NearFarLevel1Stage1({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  NearFarLevel1Stage1State createState() =>
-      NearFarLevel1Stage1State();
+  State<NearFarLevel1Stage1> createState() => NearFarLevel1Stage1State();
 }
 
 class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1> {
-  ActivityResponse? activity;
-  bool isLoading = true;
   late AudioPlayer _player;
+  ActivityResponse? _activity;
+  bool _hasPlayedSound = false;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
+  Future<ActivityResponse> fetchAndPreload() async {
+    final activity = await ApiManager.getActivity(
       ApiConstants.near_far_activityId,
       1,
       1,
     );
 
-    setState(() {
-      activity = response;
-      isLoading = false;
-    });
+    // preload الصور
+    for (var element in activity.elements!) {
+      if (element.imageUrl != null && element.imageUrl!.isNotEmpty) {
+        await precacheImage(NetworkImage(element.imageUrl!), context);
+      }
+    }
 
-    playSound();
+    _activity = activity;
+    return activity;
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
-
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
 
   void repeatSound() => playSound();
@@ -63,68 +61,98 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    return FutureBuilder<ActivityResponse>(
+      future: fetchAndPreload(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error loading activity'));
+        }
 
-    final firstElement = activity!.elements!.first;
-    final anchorElement = activity!.elements!.firstWhere((e) =>
-    e.role == 'Anchor');
+        final activity = snapshot.data!;
+        final firstElement = activity.elements!.first;
+        final anchorElement = activity.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    return Stack(
-      children: [
-        Positioned(
-          right: 90,
-          top: 340,
-          child: InkWell(
-            onTap: () {
-              DialogUtils.showMsg(context: context, msg: 'Try Again');
-            },
-            child: Image.network(anchorElement.imageUrl ?? '',
-              width: 80,
-              ),
-          ),
-        ),
-        Positioned(
-          top: 200,
-          left: 40,
-          child: GestureDetector(
-            onTapDown: (TapDownDetails details) {
-              final localPos = details.localPosition;
+        // تشغيل الصوت مرة واحدة فقط
+        if (!_hasPlayedSound) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            playSound();
+            _hasPlayedSound = true;
+          });
+        }
 
-              const imageWidth = 250.0;
-              const imageHeight = 250.0; // عدليها لو مختلفة
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // افتراض أن الشاشة الأصلية 400x800
+            final double baseWidth = 200.0;
+            final double baseHeight = 800.0;
 
-              // ===== منطقة الصح: شريط في النص بالطول كله =====
-              final correctArea = Rect.fromLTWH(
-                imageWidth * 0.3, // بداية الصح أفقيًا
-                0,                // من فوق (الطول كله)
-                imageWidth * 0.4, // عرض منطقة الصح
-                imageHeight,      // الطول كله
-              );
+            final double screenWidth = constraints.maxWidth;
+            final double screenHeight = constraints.maxHeight;
 
-              if (correctArea.contains(localPos)) {
-                // ✅ صح
-                WellDoneOverlay.show(context);
-                Future.delayed(const Duration(seconds: 3), () {
-                  widget.onNextStage?.call();
-                });
-              } else {
-                // ❌ غلط
-                DialogUtils.showMsg(
-                  context: context,
-                  msg: 'Try Again',
-                );
-              }
-            },
-            child: Image.network(
-              firstElement.imageUrl ?? '',
-              width: 250,
-            ),
-          ),
-        ),
+            // حساب عامل التحجيم بناءً على أصغر نسبة
+            final double widthRatio = screenWidth / baseWidth;
+            final double heightRatio = screenHeight / baseHeight;
+            final double scale = min(widthRatio, heightRatio);
 
+            // تحويل القيم الثابتة إلى قيم متجاوبة
+            final double responsiveRight = 90 * scale;
+            final double responsiveTop = 340 * scale;
+            final double responsiveAnchorWidth = 100 * scale;
 
+            final double responsiveImageTop = 200 * scale;
+            final double responsiveImageLeft = 40 * scale;
+            final double responsiveImageWidth = 300 * scale;
+            final double responsiveImageHeight = 400 * scale;
 
-      ],
+            return Stack(
+              children: [
+                // Anchor
+                Positioned(
+                  right: responsiveRight,
+                  top: responsiveTop+60,
+                  child: Image.network(
+                    anchorElement.imageUrl ?? '',
+                    width: responsiveAnchorWidth,
+                  ),
+                ),
+
+                // الصورة الأساسية مع منطقة الصح
+                Positioned(
+                  top: responsiveImageTop,
+                  left: responsiveImageLeft,
+                  child: GestureDetector(
+                    onTapDown: (TapDownDetails details) {
+                      final localPos = details.localPosition;
+
+                      final correctArea = Rect.fromLTWH(
+                        responsiveImageWidth * 0.3,
+                        0,
+                        responsiveImageWidth * 0.4,
+                        responsiveImageHeight,
+                      );
+
+                      if (correctArea.contains(localPos)) {
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          widget.onNextStage?.call();
+                        });
+                      }
+                    },
+                    child: Image.network(
+                      firstElement.imageUrl ?? '',
+                      width: responsiveImageWidth * 1.2 ,
+                      height: responsiveImageHeight,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

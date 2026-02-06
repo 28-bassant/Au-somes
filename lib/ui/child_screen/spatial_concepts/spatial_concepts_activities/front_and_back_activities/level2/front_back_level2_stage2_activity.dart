@@ -4,7 +4,6 @@ import 'package:au_somes/api/api_manager.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
-import '../../../../../../models/activities/activity_element.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
 class FrontBackLevel2Stage2Activity extends StatefulWidget {
@@ -16,54 +15,48 @@ class FrontBackLevel2Stage2Activity extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  FrontBackLevel2Stage2ActivityState createState() =>
+  State<FrontBackLevel2Stage2Activity> createState() =>
       FrontBackLevel2Stage2ActivityState();
 }
 
 class FrontBackLevel2Stage2ActivityState
     extends State<FrontBackLevel2Stage2Activity> {
-
-  ActivityResponse? activity;
-  bool isLoading = true;
-  bool isPlacedCorrectly = false;
-
   late AudioPlayer _player;
-
-  late ActivityElement actor;
-  late ActivityElement shadow;
-  late ActivityElement anchor;
+  late ActivityResponse _activity;
+  bool _imagesLoaded = false;
+  bool _hasPlayedSound = false;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
+  Future<ActivityResponse> _loadActivity() async {
+    _activity = await ApiManager.getActivity(
       ApiConstants.front_back_activityId,
       2,
       2,
     );
 
-    activity = response;
+    // preload جميع الصور
+    final urls = _activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
 
-    actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
-    shadow = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
-    anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    for (final url in urls) {
+      await precacheImage(NetworkImage(url!), context);
+    }
 
-    setState(() {
-      isLoading = false;
-    });
-
-    playSound();
+    _imagesLoaded = true;
+    return _activity;
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (_activity.audioUrl == null || _activity.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity.audioUrl!));
   }
 
   void repeatSound() => playSound();
@@ -76,80 +69,120 @@ class FrontBackLevel2Stage2ActivityState
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    return FutureBuilder<ActivityResponse>(
+      future: _loadActivity(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting || !_imagesLoaded) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    return Stack(
-      children: [
+        if (!snapshot.hasData || snapshot.hasError) {
+          return const Center(child: Text('Error loading activity'));
+        }
 
-        /// ===== Anchor (خلفية ثابتة) =====
-        Center(
-          child: Image.network(
-            anchor.imageUrl ?? '',
-            width: 600,
-          ),
-        ),
+        final actor = _activity.elements!.firstWhere((e) => e.role == 'Actor');
+        final shadow = _activity.elements!.firstWhere((e) => e.role == 'Shadow');
+        final anchor = _activity.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        /// ===== Shadow (مكان الإسقاط) =====
-        Positioned(
-          left: 150,
-          top: 280,
-          child: DragTarget<String>(
-            onWillAccept: (data) => data == shadow.id,
-            onAccept: (data) {
-              setState(() {
-                isPlacedCorrectly = true;
-              });
+        // تشغيل الصوت مرة واحدة بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            playSound();
+            _hasPlayedSound = true;
+          });
+        }
 
-              WellDoneOverlay.show(context);
+        bool isPlacedCorrectly = false;
 
-              Future.delayed(const Duration(seconds: 3), () {
-                widget.onNextStage?.call();
-              });
-            },
-            builder: (context, candidateData, rejectedData) {
-              return isPlacedCorrectly
-                  ? Image.network(
-                actor.imageUrl ?? '',
-                width: 250,
-              )
-                  : Image.network(
-                shadow.imageUrl ?? '',
-                width: 250,
-              );
-            },
-          ),
-        ),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final screenHeight = MediaQuery.of(context).size.height;
 
-        /// ===== Actor (اللي بيتسحب فعليًا) =====
-        if (!isPlacedCorrectly)
-          Positioned(
-            right: 40,
-            bottom: -15,
-            child: Draggable<String>(
-              data: actor.targetedZoneId,
+            return Scaffold(
+              body: Container(
+                width: double.infinity,
+                height: double.infinity,
+                child: Stack(
+                  children: [
+                    // Anchor - متجاوب مع الشاشة
+                    Positioned.fill(
+                      child: Center(
+                        child: Image.network(
+                          anchor.imageUrl ?? '',
+                          width: screenWidth * (600 / 400), // 600 ÷ 400 = 1.5
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
 
-              /// 👈 ده اللي الطفل شايفه وهو بيسحب
-              feedback: Material(
-                color: Colors.transparent,
-                child: Image.network(
-                  actor.imageUrl ?? '',
-                  width: 220,
+                    // DragTarget (Shadow) - باستخدام نسب مئوية
+                    Positioned(
+                      left: screenWidth * (150 / 400),  // 150 ÷ 400 = 0.375
+                      top: screenHeight * (300 / 800),  // 300 ÷ 800 = 0.375
+                      child: DragTarget<String>(
+                        onWillAccept: (data) => data == shadow.id,
+                        onAccept: (_) {
+                          setState(() => isPlacedCorrectly = true);
+                          WellDoneOverlay.show(context);
+                          Future.delayed(const Duration(seconds: 3), () {
+                            widget.onNextStage?.call();
+                          });
+                        },
+                        builder: (context, _, __) {
+                          return Container(
+                            width: screenWidth * (250 / 400), // 250 ÷ 400 = 0.625
+                            height: screenWidth * (250 / 400),
+                            child: isPlacedCorrectly
+                                ? Image.network(
+                              actor.imageUrl ?? '',
+                              fit: BoxFit.cover,
+                            )
+                                : Image.network(
+                              shadow.imageUrl ?? '',
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Draggable Actor - باستخدام نسب مئوية
+                    if (!isPlacedCorrectly)
+                      Positioned(
+                        right: screenWidth * (40 / 400),     // 40 ÷ 400 = 0.1
+                        bottom: screenHeight * (-15 / 800),  // -15 ÷ 800 = -0.01875
+                        child: Draggable<String>(
+                          data: actor.targetedZoneId,
+                          feedback: Material(
+                            color: Colors.transparent,
+                            child: Container(
+                              width: screenWidth * (220 / 400), // 220 ÷ 400 = 0.55
+                              height: screenWidth * (220 / 400),
+                              child: Image.network(
+                                actor.imageUrl ?? '',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          childWhenDragging: const SizedBox(),
+                          child: Container(
+                            width: screenWidth * (220 / 400),
+                            height: screenWidth * (220 / 400),
+                            child: Image.network(
+                              actor.imageUrl ?? '',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-
-              /// 👈 نخفي الأصل
-              childWhenDragging: const SizedBox(),
-
-              /// 👈 الشكل قبل السحب
-              child: Image.network(
-                actor.imageUrl ?? '',
-                width: 220,
-              ),
-            ),
-          ),
-      ],
+            );
+          },
+        );
+      },
     );
   }
 }

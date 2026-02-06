@@ -13,7 +13,7 @@ class ActivitiesWidget extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    return InkWell(
+    return GestureDetector(
       onTap: onPressed,
       child: Column(
         children: [

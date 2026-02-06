@@ -17,7 +17,7 @@ class SelectingBoxWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
 
-    return InkWell(
+    return GestureDetector(
       onTap: onTapFunction,
       child: Container(
         child: Column(
