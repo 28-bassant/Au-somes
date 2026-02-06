@@ -15,6 +15,12 @@ class SpatialConceptsScreen extends StatelessWidget {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, AppRoutes.childScreenRouteName);
+          },
+        ),
         backgroundColor: AppColors.lightPastelBlue,
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.blackColor),

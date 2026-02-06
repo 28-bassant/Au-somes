@@ -131,7 +131,7 @@ RightLeftLevel2Stage4(
         actionsPadding: EdgeInsets.symmetric(horizontal: width * .02),
         centerTitle: true,
         actions: [
-          InkWell(
+          GestureDetector(
             onTap: () =>
                 Navigator.pushReplacementNamed(context, AppRoutes.spatialConceptsScreenRouteName),
             child: Container(
@@ -150,7 +150,7 @@ RightLeftLevel2Stage4(
             ),
           ),
         ],
-        leading: InkWell(
+        leading: GestureDetector(
           onTap: goToPreviousActivity,
           child: Row(
             children: [

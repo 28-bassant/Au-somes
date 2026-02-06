@@ -22,9 +22,10 @@ class InsideLevel2Stage2Activity extends StatefulWidget {
 
 class InsideLevel2Stage2ActivityState
     extends State<InsideLevel2Stage2Activity> {
-
-  ActivityResponse? activity;
-  bool isLoading = true;
+  ActivityResponse? _activity;
+  bool _isLoading = true;
+  bool _hasPlayedSound = false;
+  bool _imagesLoaded = false;
   bool isPlacedCorrectly = false;
 
   late AudioPlayer _player;
@@ -37,33 +38,68 @@ class InsideLevel2Stage2ActivityState
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
+    _loadActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
-      ApiConstants.inside_outside_activityId,
-      2,
-      2,
-    );
+  Future<void> _loadActivity() async {
+    try {
+      final response = await ApiManager.getActivity(
+        ApiConstants.inside_outside_activityId,
+        2,
+        2,
+      );
 
-    activity = response;
+      if (mounted) {
+        setState(() {
+          _activity = response;
+        });
 
-    actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
-    shadow = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
-    anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+        // البحث عن العناصر
+        actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
+        shadow = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
+        anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    setState(() {
-      isLoading = false;
-    });
+        // تحميل الصور أولاً
+        await _preloadImages(_activity!);
 
-    playSound();
+        // تشغيل الصوت بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          await playSound();
+          setState(() {
+            _hasPlayedSound = true;
+          });
+        }
+
+        setState(() {
+          _imagesLoaded = true;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> _preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
 
   void repeatSound() => playSound();
@@ -76,90 +112,120 @@ class InsideLevel2Stage2ActivityState
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Stack(
-      children: [
-        /// ===== Anchor (خلفية ثابتة) =====
-        Positioned(
-          left: 5,
-          top: 120,
-          child: Image.network(
-            anchor.imageUrl ?? '',
-            width: 350,
-          ),
-        ),
+    if (_activity == null) {
+      return const Center(child: Text('Error loading activity'));
+    }
 
-        /// ===== Shadow (مكان الإسقاط) =====
-        Positioned(
-          left: 100,
-          top: 320,
-          child: DragTarget<String>(
-            onWillAccept: (data) => data == shadow.id,
-            onAccept: (data) {
-              setState(() {
-                isPlacedCorrectly = true;
-              });
-              WellDoneOverlay.show(context);
-              Future.delayed(const Duration(seconds: 3), () {
-                widget.onNextStage?.call();
-              });
-            },
-            builder: (context, candidateData, rejectedData) {
-              return isPlacedCorrectly
-                  ?  Transform.rotate(
-                angle: .3,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double screenWidth = constraints.maxWidth;
+        final double screenHeight = constraints.maxHeight;
+
+        // افتراض أن التصميم الأصلي على شاشة 400px
+        final double designWidth = 400.0;
+        final double scale = screenWidth / designWidth;
+
+        // تحويل القيم الثابتة إلى قيم متجاوبة
+        final double anchorLeft = 5 * scale;
+        final double anchorTop = 120 * scale;
+        final double anchorWidth = 350 * scale;
+        final double shadowLeft = 100 * scale;
+        final double shadowTop = 320 * scale;
+        final double shadowWidth = 140 * scale;
+        final double actorShadowWidth = 150 * scale;
+        final double actorRight = 20 * scale;
+        final double actorBottom = 70 * scale;
+        final double actorWidth = 160 * scale;
+        final double actorFeedbackWidth = 160 * scale;
+
+        return Stack(
+          children: [
+            /// ===== Anchor (خلفية ثابتة) =====
+            Positioned(
+              left: anchorLeft,
+              top: anchorTop,
+              child: Image.network(
+                anchor.imageUrl ?? '',
+                width: anchorWidth,
+              ),
+            ),
+
+            /// ===== Shadow (مكان الإسقاط) =====
+            Positioned(
+              left: shadowLeft,
+              top: shadowTop,
+              child: DragTarget<String>(
+                onWillAccept: (data) => data == shadow.id,
+                onAccept: (data) {
+                  setState(() {
+                    isPlacedCorrectly = true;
+                  });
+                  WellDoneOverlay.show(context);
+                  Future.delayed(const Duration(seconds: 3), () {
+                    if (mounted) {
+                      widget.onNextStage?.call();
+                    }
+                  });
+                },
+                builder: (context, candidateData, rejectedData) {
+                  return isPlacedCorrectly
+                      ? Transform.rotate(
+                    angle: .3,
                     child: Image.network(
                       actor.imageUrl ?? '',
-                       width: 150,
+                      width: actorShadowWidth,
                     ),
                   )
-                  : Transform.rotate(
-                angle: .3,
-                child: Image.network(
-                  shadow.imageUrl ?? '',
-                  width: 140,
-                ),
-              );
-            },
-          ),
-        ),
+                      : Transform.rotate(
+                    angle: .3,
+                    child: Image.network(
+                      shadow.imageUrl ?? '',
+                      width: shadowWidth,
+                    ),
+                  );
+                },
+              ),
+            ),
 
-        /// ===== Actor (اللي بيتسحب فعليًا) =====
-        if (!isPlacedCorrectly)
-          Positioned(
-            right: 20,
-            bottom: 70,
-            child: Draggable<String>(
-              data: actor.targetedZoneId,
-              /// 👈 ده اللي الطفل شايفه وهو بيسحب
-              feedback: Material(
-                color: Colors.transparent,
-                child: Transform.rotate(
-                  angle: .3,
-                  child: Image.network(
-                    actor.imageUrl ?? '',
-                    width: 160,
+            /// ===== Actor (اللي بيتسحب فعليًا) =====
+            if (!isPlacedCorrectly)
+              Positioned(
+                right: actorRight,
+                bottom: actorBottom,
+                child: Draggable<String>(
+                  data: actor.targetedZoneId,
+                  /// 👈 ده اللي الطفل شايفه وهو بيسحب
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: Transform.rotate(
+                      angle: .3,
+                      child: Image.network(
+                        actor.imageUrl ?? '',
+                        width: actorFeedbackWidth,
+                      ),
+                    ),
+                  ),
+
+                  /// 👈 نخفي الأصل
+                  childWhenDragging: const SizedBox(),
+
+                  /// 👈 الشكل قبل السحب
+                  child: Transform.rotate(
+                    angle: .3,
+                    child: Image.network(
+                      actor.imageUrl ?? '',
+                      width: actorWidth,
+                    ),
                   ),
                 ),
               ),
-
-              /// 👈 نخفي الأصل
-              childWhenDragging: const SizedBox(),
-
-              /// 👈 الشكل قبل السحب
-              child: Transform.rotate(
-                angle: .3,
-                child: Image.network(
-                  actor.imageUrl ?? '',
-                  width: 160,
-                ),
-              ),
-            ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
