@@ -150,9 +150,6 @@ class UpLevel1Stage1ActivityState extends State<UpLevel1Stage1Activity> {
                     Future.delayed(const Duration(seconds: 3), () {
                       widget.onNextStage?.call();
                     });
-                  } else {
-                    // الضغط خارج القطة
-                    DialogUtils.showMsg(context: context, msg: 'Try Again');
                   }
                 },
                 child: Container(color: Colors.transparent),

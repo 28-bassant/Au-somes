@@ -73,10 +73,7 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
           left: 0,
           right: 0,
           top: 70,
-          child: GestureDetector(
-            onTap: () {
-              DialogUtils.showMsg(context: context, msg: 'Try Again');
-            },
+
             child: Container(
               child: Image.network(
                 anchorElement.imageUrl ?? '',
@@ -85,7 +82,7 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
               ),
             ),
           ),
-        ),
+
 
         /// الأكتور (الإجابة الصح)
         Positioned(
