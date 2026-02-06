@@ -1,12 +1,12 @@
+import 'dart:math';
+import 'package:au_somes/api/api_constants.dart';
+import 'package:au_somes/api/api_manager.dart';
+import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../../../api/api_constants.dart';
-import '../../../../../../api/api_manager.dart';
 import '../../../../../../models/activities/activity_response.dart';
-import '../../../../../../utils/dialog_utils.dart';
-import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
+
 class UpLevel1Stage3Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
@@ -16,21 +16,24 @@ class UpLevel1Stage3Activity extends StatefulWidget {
   UpLevel1Stage3ActivityState createState() => UpLevel1Stage3ActivityState();
 }
 
-class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity> {
+class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity>
+    with SingleTickerProviderStateMixin {
   ActivityResponse? activity;
   bool isLoading = true;
   late AudioPlayer _player;
 
-  // نظام المساعدات
-  int wrongAttempts = 0; // عدد المرات اللي ضغط فيها غلط
-  bool showMoveHint = false;
-  bool showBorderHint = false;
-  bool showStrongHint = false;
+  int _wrongAttempts = 0;
+  bool _isAnimatingAnswer = false;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
     fetchActivity();
   }
 
@@ -51,58 +54,44 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity> {
 
   Future<void> playSound() async {
     if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
-
     await _player.stop();
     await _player.play(UrlSource(activity!.audioUrl!));
   }
 
   void repeatSound() => playSound();
 
-  /// ❌ إجابة غلط
-  void handleWrongAnswer() {
-    wrongAttempts++;
+  void _handleWrongAnswer() {
+    setState(() {
+      _wrongAttempts++;
+    });
 
-    if (wrongAttempts == 1) {
-      // أول غلط → صوت فقط
+    if (_wrongAttempts == 1) {
       TryAgainSound.play();
-    } else if (wrongAttempts == 2) {
-      // ثاني غلط → حركة خفيفة للقطه الصح
-      setState(() => showMoveHint = true);
-    } else if (wrongAttempts == 3) {
-      // ثالث غلط → إطار حول القطه الصح
-      setState(() => showBorderHint = true);
-    } else if (wrongAttempts >= 4) {
-      // رابع غلط → توهج قوي + إعادة النشاط إذا ما ضغطش صح بعدها
-      setState(() => showStrongHint = true);
-      Future.delayed(const Duration(seconds: 2), () {
-        resetActivity();
-      });
+    } else if (_wrongAttempts == 2) {
+      _startAnswerAnimation();
     }
   }
 
-  /// ✅ إجابة صح
-  void handleCorrectAnswer() {
-    // الإجابة صحيحة → تنتقل المرحلة التالية مباشرة
-    WellDoneOverlay.show(context);
-    Future.delayed(const Duration(seconds: 3), () {
-      resetActivity(); // نعيد إعداد المساعدات للمرحلة الجديدة
-      widget.onNextStage?.call();
-    });
-  }
+  void _startAnswerAnimation() {
+    if (!_isAnimatingAnswer) {
+      setState(() => _isAnimatingAnswer = true);
 
-  void resetActivity() {
-    setState(() {
-      wrongAttempts = 0;
-      showMoveHint = false;
-      showBorderHint = false;
-      showStrongHint = false;
-    });
-    playSound();
+      _animationController.repeat(reverse: true);
+
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          _animationController.stop();
+          _animationController.value = 0;
+          setState(() => _isAnimatingAnswer = false);
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     _player.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -120,7 +109,8 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity> {
     final actorElement =
     activity!.elements!.firstWhere((e) => e.role == 'Actor');
 
-    return LayoutBuilder(builder: (context, constraints) {
+    return LayoutBuilder(
+        builder: (context, constraints) {
       final screenWidth = constraints.maxWidth;
       final screenHeight = constraints.maxHeight;
 
@@ -148,71 +138,53 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity> {
       final wrongContainerHeight = containerHeight * .75;
       return Stack(
         children: [
-          // 🪑 الكرسي
+          /// 🪑 الكرسي
           Positioned(
             top: anchorTop,
             left: (screenWidth - anchorWidth) / 2 + 15,
-            child: Image.network(anchorElement.imageUrl ?? '',
-                width: anchorWidth, height: anchorHeight, fit: BoxFit.contain),
+            child: Image.network(
+              anchorElement.imageUrl ?? '',
+              width: anchorWidth,
+              height: anchorHeight,
+              fit: BoxFit.contain,
+            ),
           ),
 
-          /// ⭐ القطة الصح + الحركة
+          /// ✅ القطة الصح (مع اهتزاز)
           Positioned(
             top: actorTop,
             left: actorLeft,
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: showMoveHint ? 6 : 0),
-              duration: const Duration(milliseconds: 600),
-              builder: (context, value, child) {
+            child: AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                double shake = 0;
+                if (_isAnimatingAnswer) {
+                  shake = 12 * sin(_animationController.value * pi);
+                }
                 return Transform.translate(
-                  offset: Offset(showMoveHint ? value : 0, 0),
+                  offset: Offset(shake, 0),
                   child: child,
                 );
               },
-              child: Image.network(actorElement.imageUrl ?? '',
-                  width: actorSize, height: actorSize, fit: BoxFit.contain),
+              child: Image.network(
+                actorElement.imageUrl ?? '',
+                width: actorSize,
+                height: actorSize,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
 
-          /// إطار
-          if (showBorderHint)
-            Positioned(
-              top: actorTop - 5,
-              left: actorLeft - 5,
-              child: Container(
-                width: actorSize + 10,
-                height: actorSize + 10,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.yellow, width: 4),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-          /// توهج قوي
-          if (showStrongHint)
-            Positioned(
-              top: actorTop - 10,
-              left: actorLeft - 10,
-              child: Container(
-                width: actorSize + 20,
-                height: actorSize + 20,
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                    color: Colors.yellow.withOpacity(0.8),
-                    blurRadius: 25,
-                    spreadRadius: 8,
-                  )
-                ]),
-              ),
-            ),
-
-          /// القطة الغلط
+          /// ❌ القطة الغلط
           Positioned(
             top: bottomCatTop,
             left: bottomCatLeft,
-            child: Image.network(actorElement.imageUrl ?? '',
-                width: bottomCatSize, height: bottomCatSize, fit: BoxFit.contain),
+            child: Image.network(
+              actorElement.imageUrl ?? '',
+              width: bottomCatSize,
+              height: bottomCatSize,
+              fit: BoxFit.contain,
+            ),
           ),
 
           /// الضغط على الغلط
@@ -220,7 +192,7 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity> {
             left: wrongContainerLeft,
             top: wrongContainerTop,
             child: GestureDetector(
-              onTap: handleWrongAnswer,
+              onTap: _handleWrongAnswer,
               child: Container(
                 width: wrongContainerWidth,
                 height: wrongContainerHeight,
@@ -234,7 +206,21 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity> {
             left: containerLeft,
             top: containerTop,
             child: GestureDetector(
-              onTap: handleCorrectAnswer,
+              onTap: () {
+                _animationController.stop();
+                _animationController.value = 0;
+
+                setState(() {
+                  _wrongAttempts = 0;
+                  _isAnimatingAnswer = false;
+                });
+
+                WellDoneOverlay.show(context);
+
+                Future.delayed(const Duration(seconds: 3), () {
+                  widget.onNextStage?.call();
+                });
+              },
               child: Container(
                 width: containerWidth,
                 height: containerHeight,
@@ -244,6 +230,7 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity> {
           ),
         ],
       );
-    });
+        },
+    );
   }
 }
