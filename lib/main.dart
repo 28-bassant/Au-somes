@@ -13,6 +13,7 @@ import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activ
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/near_and_far_activities/near_far_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/right_and_left_acrivities/right_left_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_base_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_routine/daily_routine_screen.dart';
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.insideBaseActivityScreenRouteName:(context)=>InsideBaseActivityScreen(),
         AppRoutes.rightLeftBaseActivityScreenRouteName:(context)=>RightLeftBaseActivityScreen(),
         AppRoutes.nearFarBaseActivityScreenRouteName:(context)=>NearFarBaseActivityScreen(),
+        AppRoutes.spatialRelationsActivitiesBaseScreenRouteName:(context)=>SpatialRelationsBaseScreen(),
 
       },
       theme: AppTheme.lightTheme,
