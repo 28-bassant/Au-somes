@@ -6,20 +6,20 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class FrontBackLevel2Stage1Activity extends StatefulWidget {
+class Activity5Level1Stage2 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const FrontBackLevel2Stage1Activity({
+  const Activity5Level1Stage2({
     Key? key,
     this.onNextStage,
   }) : super(key: key);
 
   @override
-  State<FrontBackLevel2Stage1Activity> createState() =>
-      FrontBackLevel2Stage1ActivityState();
+  State<Activity5Level1Stage2> createState() =>
+      Activity5Level1Stage2State();
 }
 
-class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Activity> {
+class Activity5Level1Stage2State extends State<Activity5Level1Stage2> {
   late AudioPlayer _player;
   late ActivityResponse _activity;
   bool _imagesLoaded = false;
@@ -33,7 +33,7 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
 
   Future<ActivityResponse> _loadActivity() async {
     _activity = await ApiManager.getActivity(
-      ApiConstants.front_back_activityId,
+      ApiConstants.sr_up_down_activityId,
       2,
       1,
     );
@@ -81,7 +81,6 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
 
         final actor = _activity.elements!.firstWhere((e) => e.role == 'Actor');
         final shadow = _activity.elements!.firstWhere((e) => e.role == 'Shadow');
-        final anchor = _activity.elements!.firstWhere((e) => e.role == 'Anchor');
 
         if (!_hasPlayedSound) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -94,83 +93,101 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
 
         return StatefulBuilder(
           builder: (context, setState) {
-            final screenWidth = MediaQuery.of(context).size.width;
-            final screenHeight = MediaQuery.of(context).size.height;
-
-            // حساب النسب المئوية بناءً على التصميم الأصلي (افترضنا 400×800)
-            final double anchorWidth = screenWidth * (500 / 400);  // 500 ÷ 400 = 1.25
-            final double dragTargetLeft = screenWidth * (100 / 400);  // 100 ÷ 400 = 0.25
-            final double dragTargetTop = screenHeight * (280 / 800);  // 280 ÷ 800 = 0.35
-            final double dragTargetSize = screenWidth * (250 / 400);  // 250 ÷ 400 = 0.625
-            final double draggableRight = screenWidth * (40 / 400);  // 40 ÷ 400 = 0.1
-            final double draggableBottom = screenHeight * (-15 / 800);  // -15 ÷ 800 = -0.01875
-            final double draggableSize = screenWidth * (220 / 400);  // 220 ÷ 400 = 0.55
-
             return Scaffold(
               body: Container(
                 width: double.infinity,
                 height: double.infinity,
                 child: Stack(
                   children: [
-                    // صورة الـ Anchor - في المنتصف
-                    Positioned.fill(
-                      child: Center(
-                        child: Image.network(
-                          anchor.imageUrl ?? '',
-                          width: anchorWidth,
-                          fit: BoxFit.contain,
-                        ),
+                    // صورة الـ Shadow - في الخلفية
+                    Center(
+                      child: Image.network(
+                        shadow.imageUrl ?? '',
+                        width: 500,
+                        height: 500,
+                        fit: BoxFit.contain,
                       ),
                     ),
 
-                    // DragTarget
+                    // DragTarget - حاوية فارغة
                     Positioned(
-                      left: dragTargetLeft,
-                      top: dragTargetTop-40,
-                      child: DragTarget<String>(
-                        onWillAccept: (data) => data == shadow.id,
-                        onAccept: (_) {
-                          setState(() => isPlacedCorrectly = true);
-                          WellDoneOverlay.show(context);
-                          Future.delayed(const Duration(seconds: 3), () {
-                            widget.onNextStage?.call();
-                          });
-                        },
-                        builder: (context, _, __) {
-                          return isPlacedCorrectly
-                              ? Image.network(
-                            actor.imageUrl ?? '',
-                            width: dragTargetSize,
-                            fit: BoxFit.contain,
+                      right: 20,
+                      top: 355,
+                      child: Container(
+                        width: 60,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black
                           )
-                              : Image.network(
-                            shadow.imageUrl ?? '',
-                            width: dragTargetSize,
-                            fit: BoxFit.contain,
-                          );
-                        },
+                        ),
+                        child: DragTarget<String>(
+                          onWillAccept: (data) => data == actor.targetedZoneId,
+                          onAccept: (data) {
+                            setState(() {
+                              isPlacedCorrectly = true;
+                            });
+                            WellDoneOverlay.show(context);
+                            Future.delayed(const Duration(seconds: 3), () {
+                              widget.onNextStage?.call();
+                            });
+                          },
+                          builder: (context, candidateData, rejectedData) {
+                            return Center(
+                              child: isPlacedCorrectly
+                                  ? Image.network(
+                                actor.imageUrl ?? '',
+                                width: 60,
+                                height: 40,
+                                fit: BoxFit.contain,
+                              )
+                                  : Container(
+                                padding: EdgeInsets.all(8),
+
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
 
                     // Draggable العنصر
                     if (!isPlacedCorrectly)
                       Positioned(
-                        right: draggableRight,
-                        bottom: draggableBottom,
+                        right: 40,
+                        bottom: 50,
                         child: Draggable<String>(
                           data: actor.targetedZoneId,
                           feedback: Material(
                             color: Colors.transparent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Image.network(
+                                actor.imageUrl ?? '',
+                                width: 60,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          childWhenDragging: Opacity(
+                            opacity: 0.3,
                             child: Image.network(
                               actor.imageUrl ?? '',
-                              width: draggableSize,
+                              width: 60,
                               fit: BoxFit.contain,
                             ),
                           ),
-                          childWhenDragging: const SizedBox(),
                           child: Image.network(
                             actor.imageUrl ?? '',
-                            width: draggableSize,
+                            width: 60,
                             fit: BoxFit.contain,
                           ),
                         ),

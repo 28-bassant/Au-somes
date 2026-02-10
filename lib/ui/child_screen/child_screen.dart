@@ -43,6 +43,8 @@ class ChildScreen extends StatelessWidget{
                     text: AppLocalizations.of(context)!.spatial_relations,
                     onPressed: () {
                       //todo : Navigate to Spatial Relations
+                      Navigator.pushNamed(context, AppRoutes.spatialRelationsActivitiesBaseScreenRouteName);
+
                     },),
                 SizedBox(width: width * .02,),
                 ActivitiesWidget(
