@@ -1,4 +1,3 @@
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../api/api_constants.dart';
@@ -6,8 +5,10 @@ import '../../../../../../api/api_manager.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../utils/dialog_utils.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
+
 class BetweenLevel1Stage2Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
+
   const BetweenLevel1Stage2Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
@@ -15,34 +16,73 @@ class BetweenLevel1Stage2Activity extends StatefulWidget {
 }
 
 class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity> {
-  ActivityResponse? activity;
-  bool isLoading = true;
+  ActivityResponse? _activity;
+  bool _isLoading = true;
+  bool _hasPlayedSound = false;
+  bool _imagesLoaded = false;
   late AudioPlayer _player;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
+    _loadActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
-      ApiConstants.between_activityId,
-      1,
-      2,
-    );
-    setState(() {
-      activity = response;
-      isLoading = false;
-    });
-    playSound();
+  Future<void> _loadActivity() async {
+    try {
+      final response = await ApiManager.getActivity(
+        ApiConstants.between_activityId,
+        1,
+        2,
+      );
+
+      if (mounted) {
+        setState(() {
+          _activity = response;
+        });
+
+        // تحميل الصور أولاً
+        await _preloadImages(response!);
+
+        // تشغيل الصوت بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          await playSound();
+          setState(() {
+            _hasPlayedSound = true;
+          });
+        }
+
+        setState(() {
+          _imagesLoaded = true;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> _preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
 
   void repeatSound() => playSound();
@@ -55,10 +95,16 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    final actorElement = activity!.elements!.firstWhere((e) => e.role == 'Actor');
-    final anchorElement = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    if (_activity == null) {
+      return const Center(child: Text('Error loading activity'));
+    }
+
+    final actorElement = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
+    final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -78,10 +124,10 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
         final actorLeft = (screenWidth - actorWidth) / 2 + 8;
 
         // 🌟 حجم ومكان الكونتينر الشفاف على الأكتور
-        final containerLeft = actorLeft+actorWidth*.34;
-        final containerTop = actorTop+actorHeight*.1;
-        final containerWidth = actorWidth*.32;
-        final containerHeight = actorHeight*.76;
+        final containerLeft = actorLeft + actorWidth * 0.34;
+        final containerTop = actorTop + actorHeight * 0.1;
+        final containerWidth = actorWidth * 0.32;
+        final containerHeight = actorHeight * 0.76;
 
         final containerRect = Rect.fromLTWH(
           containerLeft,
@@ -115,6 +161,7 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
                 fit: BoxFit.cover,
               ),
             ),
+
             // 🌟 GestureDetector على جزء الأكتور
             Positioned.fill(
               child: GestureDetector(
@@ -126,7 +173,9 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
                   if (containerRect.contains(tap)) {
                     WellDoneOverlay.show(context);
                     Future.delayed(const Duration(seconds: 3), () {
-                      widget.onNextStage?.call();
+                      if (mounted) {
+                        widget.onNextStage?.call();
+                      }
                     });
                   }
                 },
