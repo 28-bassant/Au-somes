@@ -1,4 +1,3 @@
-import 'package:au_somes/utils/app_colors.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../api/api_constants.dart';
@@ -17,37 +16,74 @@ class UpLevel1Stage1Activity extends StatefulWidget {
 }
 
 class UpLevel1Stage1ActivityState extends State<UpLevel1Stage1Activity> {
-  ActivityResponse? activity;
-  bool isLoading = true;
+  ActivityResponse? _activity;
+  bool _isLoading = true;
+  bool _hasPlayedSound = false;
+  bool _imagesLoaded = false;
   late AudioPlayer _player;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    fetchActivity();
+    _loadActivity();
   }
 
-  void fetchActivity() async {
-    final response = await ApiManager.getActivity(
-      ApiConstants.up_down_activityId,
-      1,
-      1,
-    );
+  Future<void> _loadActivity() async {
+    try {
+      final response = await ApiManager.getActivity(
+        ApiConstants.up_down_activityId,
+        1,
+        1,
+      );
 
-    setState(() {
-      activity = response;
-      isLoading = false;
-    });
+      if (mounted) {
+        setState(() {
+          _activity = response;
+        });
 
-    playSound();
+        // تحميل الصور أولاً
+        await _preloadImages(response!);
+
+        // تشغيل الصوت بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          await playSound();
+          setState(() {
+            _hasPlayedSound = true;
+          });
+        }
+
+        setState(() {
+          _imagesLoaded = true;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> _preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
 
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
 
   void repeatSound() => playSound();
@@ -60,23 +96,20 @@ class UpLevel1Stage1ActivityState extends State<UpLevel1Stage1Activity> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    var width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    if (isLoading) {
+    // احتفظ بـ MediaQuery هنا كما في الكود الأصلي
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+
+    if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final anchorElement =
-    activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    if (_activity == null) {
+      return const Center(child: Text('Error loading activity'));
+    }
 
-    final actorElement =
-    activity!.elements!.firstWhere((e) => e.role == 'Actor');
+    final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    final actorElement = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -101,6 +134,7 @@ class UpLevel1Stage1ActivityState extends State<UpLevel1Stage1Activity> {
         final actorLeft = (screenWidth - actorSize) / 2 + 16;
 
         // موقع وحجم الكونتينر الشفاف على القطة
+        // استخدم width و height من MediaQuery كما في الكود الأصلي
         final containerLeft = width * 0.40;
         final containerTop = height * 0.23;
         final containerWidth = width * 0.28;
@@ -148,7 +182,9 @@ class UpLevel1Stage1ActivityState extends State<UpLevel1Stage1Activity> {
                     // الضغط داخل القطة
                     WellDoneOverlay.show(context);
                     Future.delayed(const Duration(seconds: 3), () {
-                      widget.onNextStage?.call();
+                      if (mounted) {
+                        widget.onNextStage?.call();
+                      }
                     });
                   }
                 },

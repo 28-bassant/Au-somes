@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
@@ -24,6 +23,8 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
   ActivityResponse? activity;
   bool isLoading = true;
   bool isPlacedCorrectly = false;
+  bool hasPlayedSound = false;
+  bool imagesLoaded = false;
 
   late AudioPlayer _player;
 
@@ -57,19 +58,55 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
 
   // جلب بيانات النشاط
   void fetchActivity() async {
-    activity = await ApiManager.getActivity(
-      ApiConstants.up_down_activityId,
-      2,
-      4,
-    );
+    try {
+      activity = await ApiManager.getActivity(
+        ApiConstants.up_down_activityId,
+        2,
+        4,
+      );
 
-    actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
-    shadowCorrect = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
-    shadowWrong = activity!.elements!.lastWhere((e) => e.role == 'Shadow');
-    anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+      if (mounted) {
+        actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
+        shadowCorrect = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
+        shadowWrong = activity!.elements!.lastWhere((e) => e.role == 'Shadow');
+        anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    setState(() => isLoading = false);
-    playSound();
+        // Preload الصور أولاً
+        await preloadImages(activity!);
+
+        // تشغيل الصوت بعد تحميل الصور
+        if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
+          await _player.stop();
+          await _player.play(UrlSource(activity!.audioUrl!));
+          setState(() {
+            hasPlayedSound = true;
+          });
+        }
+
+        setState(() {
+          imagesLoaded = true;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
   }
 
   // تشغيل صوت النشاط
@@ -111,9 +148,13 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
   void _handleDragEnd(DraggableDetails details) {
     if (isPlacedCorrectly) return;
 
+    // حساب عامل القياس
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scale = screenWidth / 360.0;
+
     final actorCenter = Offset(
-      details.offset.dx + 200 / 2,
-      details.offset.dy + 200 / 2,
+      details.offset.dx + (200 * scale) / 2, // أصبح متناسباً
+      details.offset.dy + (200 * scale) / 2, // أصبح متناسباً
     );
 
     // Shadow الصح
@@ -137,7 +178,9 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
         });
         WellDoneOverlay.show(context);
         Future.delayed(const Duration(seconds: 3), () {
-          widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
         return;
       }
@@ -159,6 +202,7 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
       }
     }
   }
+
   void showWrongDialog() {
     DialogUtils.showMsg(
       context: context,
@@ -186,6 +230,10 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    // حساب عامل القياس بناءً على حجم الشاشة
+    // 360px هو عرض الشاشة المرجعية (مثل معظم الموبايلات)
+    final scale = screenWidth / 360.0;
+
     // 🪑 حجم الطرابيزة
     final anchorWidth = screenWidth * 2.6;
     final anchorHeight = screenHeight * 0.7;
@@ -207,20 +255,20 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
 
         /// ❌ Shadow الغلط
         Positioned(
-          left: 50,
-          top: 380,
+          left: 40 * scale, // أصبح متناسباً
+          top: 320 * scale, // أصبح متناسباً
           child: Container(
             key: _shadowWrongKey,
-            width: 220,
-            height: 240,
+            width: 220 * scale, // أصبح متناسباً
+            height: 240 * scale, // أصبح متناسباً
             child: Image.network(shadowWrong!.imageUrl ?? '', fit: BoxFit.cover),
           ),
         ),
 
         /// ✅ Shadow الصح مع اهتزاز
         Positioned(
-          left: 100,
-          top: 194,
+          left: 60 * scale, // أصبح متناسباً
+          top: 140 * scale, // أصبح متناسباً
           child: AnimatedBuilder(
             animation: _animationController ?? AlwaysStoppedAnimation(0),
             builder: (context, child) {
@@ -235,25 +283,25 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
             },
             child: Container(
               key: _shadowCorrectKey,
-              width: 250,
-              height: 250,
+              width: 250 * scale, // أصبح متناسباً
+              height: 250 * scale, // أصبح متناسباً
               child: isPlacedCorrectly
                   ? Transform.translate(
-                offset: const Offset(0, -44),
+                offset: Offset(0, -44 * scale), // أصبح متناسباً
                 child: Transform.scale(
                   scale: .86,
                   child: Image.network(
                     actor!.imageUrl ?? '',
-                    width: 250,
-                    height: 250,
+                    width: 250 * scale, // أصبح متناسباً
+                    height: 250 * scale, // أصبح متناسباً
                     fit: BoxFit.cover,
                   ),
                 ),
               )
                   : Image.network(
                 shadowCorrect!.imageUrl ?? '',
-                width: 250,
-                height: 250,
+                width: 250 * scale, // أصبح متناسباً
+                height: 250 * scale, // أصبح متناسباً
                 fit: BoxFit.cover,
               ),
             ),
@@ -264,15 +312,15 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
         if (!isPlacedCorrectly)
           Positioned(
             right: 0,
-            bottom: -15,
+            bottom: -15 * scale, // أصبح متناسباً
             child: Draggable<String>(
               data: actor!.id,
               feedback: Material(
                 color: Colors.transparent,
-                child: Image.network(actor!.imageUrl ?? '', width: 200),
+                child: Image.network(actor!.imageUrl ?? '', width: 200 * scale), // أصبح متناسباً
               ),
               childWhenDragging: const SizedBox(),
-              child: Image.network(actor!.imageUrl ?? '', width: 200),
+              child: Image.network(actor!.imageUrl ?? '', width: 200 * scale), // أصبح متناسباً
               onDragEnd: _handleDragEnd,
             ),
           ),

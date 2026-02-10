@@ -28,6 +28,8 @@ class UpLevel1Stage4ActivityState extends State<UpLevel1Stage4Activity>
     with SingleTickerProviderStateMixin {
   ActivityResponse? activity;
   bool isLoading = true;
+  bool hasPlayedSound = false;
+  bool imagesLoaded = false;
   late AudioPlayer _player;
 
   int _wrongAttempts = 0;
@@ -48,18 +50,54 @@ class UpLevel1Stage4ActivityState extends State<UpLevel1Stage4Activity>
   }
 
   void fetchActivity() async {
-    final response = await ApiManager.getActivity(
-      ApiConstants.up_down_activityId,
-      1,
-      4,
-    );
+    try {
+      final response = await ApiManager.getActivity(
+        ApiConstants.up_down_activityId,
+        1,
+        4,
+      );
 
-    setState(() {
-      activity = response;
-      isLoading = false;
-    });
+      if (mounted) {
+        setState(() {
+          activity = response;
+        });
 
-    playSound();
+        // Preload الصور أولاً
+        await preloadImages(response!);
+
+        // تشغيل الصوت بعد تحميل الصور
+        if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
+          await _player.stop();
+          await _player.play(UrlSource(activity!.audioUrl!));
+          setState(() {
+            hasPlayedSound = true;
+          });
+        }
+
+        setState(() {
+          imagesLoaded = true;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
   }
 
   Future<void> playSound() async {
@@ -232,7 +270,9 @@ class UpLevel1Stage4ActivityState extends State<UpLevel1Stage4Activity>
                 });
                 WellDoneOverlay.show(context);
                 Future.delayed(const Duration(seconds: 2), () {
-                  widget.onNextStage?.call();
+                  if (mounted) {
+                    widget.onNextStage?.call();
+                  }
                 });
               },
               child: Container(

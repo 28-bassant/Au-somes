@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
+
 class UpLevel2Stage1Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
@@ -25,6 +26,8 @@ class UpLevel2Stage1ActivityState
   ActivityResponse? activity;
   bool isLoading = true;
   bool isPlacedCorrectly = false;
+  bool hasPlayedSound = false;
+  bool imagesLoaded = false;
 
   late AudioPlayer _player;
 
@@ -40,23 +43,56 @@ class UpLevel2Stage1ActivityState
   }
 
   void fetchActivity() async {
-    final response = await ApiManager.getActivity(
-      ApiConstants.up_down_activityId,
-      2,
-      1,
-    );
+    try {
+      final response = await ApiManager.getActivity(
+        ApiConstants.up_down_activityId,
+        2,
+        1,
+      );
 
-    activity = response;
+      if (mounted) {
+        activity = response;
 
-    actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
-    shadow = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
-    anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+        actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
+        shadow = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
+        anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    setState(() {
-      isLoading = false;
-    });
+        // Preload الصور أولاً
+        await preloadImages(response!);
 
-    playSound();
+        // تشغيل الصوت بعد تحميل الصور
+        if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
+          await _player.stop();
+          await _player.play(UrlSource(activity!.audioUrl!));
+          setState(() {
+            hasPlayedSound = true;
+          });
+        }
+
+        setState(() {
+          imagesLoaded = true;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
   }
 
   Future<void> playSound() async {
@@ -87,8 +123,6 @@ class UpLevel2Stage1ActivityState
 
     return Stack(
       children: [
-
-
         Positioned(
           top: anchorTop,
           left: (screenWidth - anchorWidth) / 2 + 15,
@@ -102,8 +136,8 @@ class UpLevel2Stage1ActivityState
 
         /// ===== Shadow (مكان الإسقاط) =====
         Positioned(
-          left: 100,
-          top: 120,
+          left: screenWidth * 0.10, // 10% من عرض الشاشة بدلاً من 100px ثابتة
+          top: screenHeight * 0.12,
           child: DragTarget<String>(
             onWillAccept: (data) => data == shadow.id,
             onAccept: (data) {
@@ -114,7 +148,9 @@ class UpLevel2Stage1ActivityState
               WellDoneOverlay.show(context);
 
               Future.delayed(const Duration(seconds: 3), () {
-                widget.onNextStage?.call();
+                if (mounted) {
+                  widget.onNextStage?.call();
+                }
               });
             },
             builder: (context, candidateData, rejectedData) {
@@ -122,10 +158,10 @@ class UpLevel2Stage1ActivityState
                   ? Transform.translate(
                 offset: const Offset(0, 15),
                 child: Image.network(
-                                    actor.imageUrl ?? '',
-                                    width: 250,
-                                  ),
-                  )
+                  actor.imageUrl ?? '',
+                  width: 250,
+                ),
+              )
                   : Image.network(
                 shadow.imageUrl ?? '',
                 width: 250,

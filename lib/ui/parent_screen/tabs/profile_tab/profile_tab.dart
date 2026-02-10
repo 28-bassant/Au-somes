@@ -45,29 +45,31 @@ class ProfileTab extends StatelessWidget{
                   borderRadius: BorderRadius.circular(20),
                   color: AppColors.whiteColor
                 ),
-                child: Column(
-                  children: [
-                    ProfileItem(text: AppLocalizations.of(context)!.edit_profile, image:AppAssets.editIcon,onPressed: () => Navigator.pushNamed(context, AppRoutes.editProfileScreenRouteName),),
-                    SizedBox(height: height*.03,),
-                    ProfileItem(text: AppLocalizations.of(context)!.reset_password, image:AppAssets.resetIcon,onPressed: () => Navigator.pushNamed(context, AppRoutes.forgetPasswordScreen1RouteName),),
-                    SizedBox(height: height*.03),
-                    ProfileItem(text: AppLocalizations.of(context)!.frequently_asked_questions, image:AppAssets.frequentlyQuestionIcon)
-                    ,SizedBox(height: height*.03,),
-                    ProfileItem(text: AppLocalizations.of(context)!.about_us, image:AppAssets.aboutIcon),
-                    SizedBox(height: height*.03),
-                    ProfileItem(text: AppLocalizations.of(context)!.review_au_somes, image:AppAssets.reviewIcon),
-                    SizedBox(height: height*.03),
-                    ProfileItem(text: AppLocalizations.of(context)!.logout, image:languageProvider.isArabic()?AppAssets.logoutArabicIcon:AppAssets.logoutEnglishIcon,
-                      onPressed:() async {
-                        await TokenUtils.clearTokens();
-
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          AppRoutes.loginScreenRouteName,
-                              (route) => false,
-                        );
-                      }, ),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ProfileItem(text: AppLocalizations.of(context)!.edit_profile, image:AppAssets.editIcon,onPressed: () => Navigator.pushNamed(context, AppRoutes.editProfileScreenRouteName),),
+                      SizedBox(height: height*.03,),
+                      ProfileItem(text: AppLocalizations.of(context)!.reset_password, image:AppAssets.resetIcon,onPressed: () => Navigator.pushNamed(context, AppRoutes.forgetPasswordScreen1RouteName),),
+                      SizedBox(height: height*.03),
+                      ProfileItem(text: AppLocalizations.of(context)!.frequently_asked_questions, image:AppAssets.frequentlyQuestionIcon)
+                      ,SizedBox(height: height*.03,),
+                      ProfileItem(text: AppLocalizations.of(context)!.about_us, image:AppAssets.aboutIcon),
+                      SizedBox(height: height*.03),
+                      ProfileItem(text: AppLocalizations.of(context)!.review_au_somes, image:AppAssets.reviewIcon),
+                      SizedBox(height: height*.03),
+                      ProfileItem(text: AppLocalizations.of(context)!.logout, image:languageProvider.isArabic()?AppAssets.logoutArabicIcon:AppAssets.logoutEnglishIcon,
+                        onPressed:() async {
+                          await TokenUtils.clearTokens();
+                  
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            AppRoutes.loginScreenRouteName,
+                                (route) => false,
+                          );
+                        }, ),
+                    ],
+                  ),
                 ),
               ),
 
