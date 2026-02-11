@@ -18,6 +18,12 @@ import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_act
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity5/Level1/activity5_level1_stage3.dart';
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity5/Level1/activity5_level1_stage4.dart';
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity5/Level1/activity5_level1_stage5.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stag4.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage1.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage2.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage3.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage5.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage6.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -54,6 +60,12 @@ class _SpatialRelationsBaseScreenState extends State<SpatialRelationsBaseScreen>
   final stage513Key = GlobalKey<Activity5Level1Stage3State>();
   final stage514Key = GlobalKey<Activity5Level1Stage4State>();
   final stage515Key = GlobalKey<Activity5Level1Stage5State>();
+  final stage611Key = GlobalKey<Activity6Level1Stage1State>();
+  final stage612Key = GlobalKey<Activity6Level1Stage2State>();
+  final stage613Key = GlobalKey<Activity6Level1Stage3State>();
+  final stage614Key = GlobalKey<Activity6Level1Stage4State>();
+  final stage615Key = GlobalKey<Activity6Level1Stage5State>();
+  final stage616Key = GlobalKey<Activity6Level1Stage6State>();
 
 
 
@@ -144,6 +156,25 @@ Activity5Level1Stage5(
         key: stage515Key,
         onNextStage: goToNextActivity,
       ),
+      Activity6Level1Stage1(
+        key: stage611Key,
+        onNextStage: goToNextActivity,
+      ),Activity6Level1Stage2(
+        key: stage612Key,
+        onNextStage: goToNextActivity,
+      ),Activity6Level1Stage3(
+    key: stage613Key,
+    onNextStage: goToNextActivity,
+    ),Activity6Level1Stage4(
+    key: stage614Key,
+    onNextStage: goToNextActivity,
+    ),Activity6Level1Stage5(
+    key: stage615Key,
+    onNextStage: goToNextActivity,
+    ),Activity6Level1Stage6(
+        key: stage616Key,
+        onNextStage: goToNextActivity,
+      ),
 
     ];
   }
@@ -206,6 +237,20 @@ else if (currentActivityIndex == 18) {
     }
 else if (currentActivityIndex == 19) {
      stage515Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 20) {
+      stage611Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 21) {
+      stage612Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 22) {
+      stage613Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 23) {
+      stage613Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 24) {
+      stage614Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 25) {
+      stage615Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 26) {
+      stage616Key.currentState?.repeatSound();
     }
 
   }
