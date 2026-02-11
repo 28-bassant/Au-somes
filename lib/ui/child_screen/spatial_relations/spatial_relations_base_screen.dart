@@ -24,6 +24,7 @@ import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_act
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage3.dart';
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage5.dart';
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/Activity6/level1/activity6_level1_stage6.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_activities/activity7/level1/activity7_level1_stag1.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -66,6 +67,7 @@ class _SpatialRelationsBaseScreenState extends State<SpatialRelationsBaseScreen>
   final stage614Key = GlobalKey<Activity6Level1Stage4State>();
   final stage615Key = GlobalKey<Activity6Level1Stage5State>();
   final stage616Key = GlobalKey<Activity6Level1Stage6State>();
+  final stage711Key = GlobalKey<Activity7Level1Stage1State>();
 
 
 
@@ -174,7 +176,10 @@ Activity5Level1Stage5(
     ),Activity6Level1Stage6(
         key: stage616Key,
         onNextStage: goToNextActivity,
-      ),
+      ),Activity7Level1Stage1(
+    key: stage711Key,
+    onNextStage: goToNextActivity,
+    ),
 
     ];
   }
@@ -251,6 +256,8 @@ else if (currentActivityIndex == 19) {
       stage615Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 26) {
       stage616Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 27) {
+      stage711Key.currentState?.repeatSound();
     }
 
   }
