@@ -268,7 +268,7 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
         /// ✅ Shadow الصح مع اهتزاز
         Positioned(
           left: 60 * scale, // أصبح متناسباً
-          top: 140 * scale, // أصبح متناسباً
+          top: 145* scale, // أصبح متناسباً
           child: AnimatedBuilder(
             animation: _animationController ?? AlwaysStoppedAnimation(0),
             builder: (context, child) {
@@ -283,13 +283,13 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
             },
             child: Container(
               key: _shadowCorrectKey,
-              width: 250 * scale, // أصبح متناسباً
+              width: 230 * scale, // أصبح متناسباً
               height: 250 * scale, // أصبح متناسباً
               child: isPlacedCorrectly
                   ? Transform.translate(
-                offset: Offset(0, -44 * scale), // أصبح متناسباً
+                offset: Offset(0, -40 * scale), // أصبح متناسباً
                 child: Transform.scale(
-                  scale: .86,
+                  scale: .78,
                   child: Image.network(
                     actor!.imageUrl ?? '',
                     width: 250 * scale, // أصبح متناسباً
@@ -300,7 +300,7 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
               )
                   : Image.network(
                 shadowCorrect!.imageUrl ?? '',
-                width: 250 * scale, // أصبح متناسباً
+                width: 230 * scale, // أصبح متناسباً
                 height: 250 * scale, // أصبح متناسباً
                 fit: BoxFit.cover,
               ),

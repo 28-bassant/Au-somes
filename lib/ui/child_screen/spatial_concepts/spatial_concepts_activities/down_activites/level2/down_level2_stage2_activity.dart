@@ -7,21 +7,21 @@ import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class UpLevel2Stage2Activity extends StatefulWidget {
+class DownLevel2Stage2Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const UpLevel2Stage2Activity({
+  const DownLevel2Stage2Activity({
     Key? key,
     this.onNextStage,
   }) : super(key: key);
 
   @override
-  UpLevel2Stage2ActivityState createState() =>
-      UpLevel2Stage2ActivityState();
+  DownLevel2Stage2ActivityState createState() =>
+      DownLevel2Stage2ActivityState();
 }
 
-class UpLevel2Stage2ActivityState
-    extends State<UpLevel2Stage2Activity> {
+class DownLevel2Stage2ActivityState
+    extends State<DownLevel2Stage2Activity> {
 
   ActivityResponse? activity;
   bool isLoading = true;
@@ -118,7 +118,6 @@ class UpLevel2Stage2ActivityState
     final screenHeight = MediaQuery.of(context).size.height;
 
     // حساب عامل القياس بناءً على حجم الشاشة
-    // 360px هو عرض الشاشة المرجعية (مثل معظم الموبايلات)
     final scale = screenWidth / 360.0;
 
     // 🪑 حجم الطرابيزة
@@ -141,8 +140,8 @@ class UpLevel2Stage2ActivityState
 
         /// ===== Shadow (مكان الإسقاط) =====
         Positioned(
-          left: 60 * scale, // أصبح متناسباً
-          top: 100 * scale, // أصبح متناسباً
+          left: 40 * scale, // أصبح متناسباً
+          top: 279 * scale, // أصبح متناسباً
           child: DragTarget<String>(
             onWillAccept: (data) => data == shadow.id,
             onAccept: (data) {
@@ -161,9 +160,9 @@ class UpLevel2Stage2ActivityState
             builder: (context, candidateData, rejectedData) {
               return isPlacedCorrectly
                   ? Transform.translate(
-                  offset: Offset(0, 10 * scale), // أصبح متناسباً
+                  offset: Offset(-10, 14 * scale), // أصبح متناسباً
                   child: Transform.scale(
-                    scale: .78,
+                    scale: .76,
                     child: Image.network(
                       actor.imageUrl ?? '',
                       width: 250 * scale, // أصبح متناسباً
@@ -173,7 +172,7 @@ class UpLevel2Stage2ActivityState
                   ))
                   : Image.network(
                 shadow.imageUrl ?? '',
-                width: 230 * scale, // أصبح متناسباً
+                width: 220 * scale, // أصبح متناسباً
               );
             },
           ),
@@ -192,7 +191,7 @@ class UpLevel2Stage2ActivityState
                 color: Colors.transparent,
                 child: Image.network(
                   actor.imageUrl ?? '',
-                  width: 220 * scale, // أصبح متناسباً
+                  width: 206 * scale, // أصبح متناسباً
                 ),
               ),
 
@@ -202,7 +201,7 @@ class UpLevel2Stage2ActivityState
               /// 👈 الشكل قبل السحب
               child: Image.network(
                 actor.imageUrl ?? '',
-                width: 220 * scale, // أصبح متناسباً
+                width: 206 * scale, // أصبح متناسباً
               ),
             ),
           ),

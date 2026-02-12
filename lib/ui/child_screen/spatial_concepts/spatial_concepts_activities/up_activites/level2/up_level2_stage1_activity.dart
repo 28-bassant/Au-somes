@@ -136,8 +136,8 @@ class UpLevel2Stage1ActivityState
 
         /// ===== Shadow (مكان الإسقاط) =====
         Positioned(
-          left: screenWidth * 0.10, // 10% من عرض الشاشة بدلاً من 100px ثابتة
-          top: screenHeight * 0.12,
+          left: screenWidth * 0.15, // 10% من عرض الشاشة بدلاً من 100px ثابتة
+          top: screenHeight * 0.135,
           child: DragTarget<String>(
             onWillAccept: (data) => data == shadow.id,
             onAccept: (data) {

@@ -1,27 +1,27 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class UpLevel2Stage2Activity extends StatefulWidget {
+class DownLevel2Stage1Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const UpLevel2Stage2Activity({
+  const DownLevel2Stage1Activity({
     Key? key,
     this.onNextStage,
   }) : super(key: key);
 
   @override
-  UpLevel2Stage2ActivityState createState() =>
-      UpLevel2Stage2ActivityState();
+  DownLevel2Stage1ActivityState createState() =>
+      DownLevel2Stage1ActivityState();
 }
 
-class UpLevel2Stage2ActivityState
-    extends State<UpLevel2Stage2Activity> {
+class DownLevel2Stage1ActivityState
+    extends State<DownLevel2Stage1Activity> {
 
   ActivityResponse? activity;
   bool isLoading = true;
@@ -47,7 +47,7 @@ class UpLevel2Stage2ActivityState
       final response = await ApiManager.getActivity(
         ApiConstants.up_down_activityId,
         2,
-        2,
+        1,
       );
 
       if (mounted) {
@@ -116,15 +116,10 @@ class UpLevel2Stage2ActivityState
     }
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    // حساب عامل القياس بناءً على حجم الشاشة
-    // 360px هو عرض الشاشة المرجعية (مثل معظم الموبايلات)
-    final scale = screenWidth / 360.0;
-
     // 🪑 حجم الطرابيزة
-    final anchorWidth = screenWidth * 2.6;
+    final anchorWidth = screenWidth * 3.0;
     final anchorHeight = screenHeight * 0.7;
-    final anchorTop = screenHeight * 0.01;
+    final anchorTop = screenHeight * 0.0001;
 
     return Stack(
       children: [
@@ -141,8 +136,8 @@ class UpLevel2Stage2ActivityState
 
         /// ===== Shadow (مكان الإسقاط) =====
         Positioned(
-          left: 60 * scale, // أصبح متناسباً
-          top: 100 * scale, // أصبح متناسباً
+          left: screenWidth * 0.10, // 10% من عرض الشاشة بدلاً من 100px ثابتة
+          top: screenHeight * 0.350,
           child: DragTarget<String>(
             onWillAccept: (data) => data == shadow.id,
             onAccept: (data) {
@@ -161,19 +156,15 @@ class UpLevel2Stage2ActivityState
             builder: (context, candidateData, rejectedData) {
               return isPlacedCorrectly
                   ? Transform.translate(
-                  offset: Offset(0, 10 * scale), // أصبح متناسباً
-                  child: Transform.scale(
-                    scale: .78,
-                    child: Image.network(
-                      actor.imageUrl ?? '',
-                      width: 250 * scale, // أصبح متناسباً
-                      height: 250 * scale, // أصبح متناسباً
-                      fit: BoxFit.cover,
-                    ),
-                  ))
+                offset: const Offset(0, 15),
+                child: Image.network(
+                  actor.imageUrl ?? '',
+                  width: 250,
+                ),
+              )
                   : Image.network(
                 shadow.imageUrl ?? '',
-                width: 230 * scale, // أصبح متناسباً
+                width: 250,
               );
             },
           ),
@@ -183,16 +174,15 @@ class UpLevel2Stage2ActivityState
         if (!isPlacedCorrectly)
           Positioned(
             right: 0,
-            bottom: -15 * scale, // أصبح متناسباً
+            bottom: -15,
             child: Draggable<String>(
               data: actor.targetedZoneId,
-
               /// 👈 ده اللي الطفل شايفه وهو بيسحب
               feedback: Material(
                 color: Colors.transparent,
                 child: Image.network(
                   actor.imageUrl ?? '',
-                  width: 220 * scale, // أصبح متناسباً
+                  width: 220,
                 ),
               ),
 
@@ -202,7 +192,7 @@ class UpLevel2Stage2ActivityState
               /// 👈 الشكل قبل السحب
               child: Image.network(
                 actor.imageUrl ?? '',
-                width: 220 * scale, // أصبح متناسباً
+                width: 220,
               ),
             ),
           ),

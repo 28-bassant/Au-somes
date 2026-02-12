@@ -9,15 +9,15 @@ import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class UpLevel2Stage3Activity extends StatefulWidget {
+class DownLevel2Stage3Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
-  const UpLevel2Stage3Activity({Key? key, this.onNextStage}) : super(key: key);
+  const DownLevel2Stage3Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  State<UpLevel2Stage3Activity> createState() => UpLevel2Stage3ActivityState();
+  State<DownLevel2Stage3Activity> createState() => DownLevel2Stage3ActivityState();
 }
 
-class UpLevel2Stage3ActivityState extends State<UpLevel2Stage3Activity>
+class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
     with SingleTickerProviderStateMixin {
   // 🔹 النشاط نفسه
   ActivityResponse? activity;
@@ -258,18 +258,6 @@ class UpLevel2Stage3ActivityState extends State<UpLevel2Stage3Activity>
         Positioned(
           left: 40 * scale, // أصبح متناسباً
           top: 320 * scale, // أصبح متناسباً
-          child: Container(
-            key: _shadowWrongKey,
-            width: 230 * scale, // أصبح متناسباً
-            height: 250 * scale, // أصبح متناسباً
-            child: Image.network(shadowWrong!.imageUrl ?? '', fit: BoxFit.cover),
-          ),
-        ),
-
-        /// ✅ Shadow الصح مع الاهتزاز
-        Positioned(
-          left: 60 * scale, // أصبح متناسباً
-          top: 140 * scale, // أصبح متناسباً
           child: AnimatedBuilder(
             animation: _animationController,
             builder: (context, child) {
@@ -291,11 +279,11 @@ class UpLevel2Stage3ActivityState extends State<UpLevel2Stage3Activity>
                   ? Transform.translate(
                 offset: Offset(0, -40 * scale), // أصبح متناسباً
                 child: Transform.scale(
-                  scale: .78,
+                  scale: .77,
                   child: Image.network(
                     actor!.imageUrl ?? '',
-                    width: 300 * scale, // أصبح متناسباً
-                    height: 300 * scale, // أصبح متناسباً
+                    width: 230 * scale, // أصبح متناسباً
+                    height: 250 * scale, // أصبح متناسباً
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -307,6 +295,18 @@ class UpLevel2Stage3ActivityState extends State<UpLevel2Stage3Activity>
                 fit: BoxFit.cover,
               ),
             ),
+          ),
+        ),
+
+        /// ✅ Shadow الصح مع الاهتزاز
+        Positioned(
+          left: 60 * scale, // أصبح متناسباً
+          top: 140 * scale, // أصبح متناسباً
+          child: Container(
+            key: _shadowWrongKey,
+            width: 230 * scale, // أصبح متناسباً
+            height: 250 * scale, // أصبح متناسباً
+            child: Image.network(shadowWrong!.imageUrl ?? '', fit: BoxFit.cover),
           ),
         ),
 
