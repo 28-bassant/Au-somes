@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget{
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      initialRoute: AppRoutes.selectScreenRouteName,
+      initialRoute: AppRoutes.splashScreenRouteName,
       routes:  {
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),
