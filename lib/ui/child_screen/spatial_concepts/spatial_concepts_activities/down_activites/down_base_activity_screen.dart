@@ -5,31 +5,31 @@ import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
-import 'level1/up_level1_stage2_activity.dart';
-import 'level1/up_level1_stage3_activity.dart';
-import 'level1/up_level1_stage4_activity.dart';
-import 'level2/up_level2_stage1_activity.dart';
-import 'level2/up_level2_stage2_activity.dart';
-import 'level2/up_level2_stage3_activity.dart';
-import 'level2/up_level2_stage4_activity.dart';
-class UpBaseActivityScreen extends StatefulWidget {
+import 'level1/down_level1_stage1_activity.dart';
+import 'level1/down_level1_stage2_activity.dart';
+import 'level1/down_level1_stage3_activity.dart';
+import 'level1/down_level1_stage4_activity.dart';
+import 'level2/down_level2_stage1_activity.dart';
+import 'level2/down_level2_stage2_activity.dart';
+import 'level2/down_level2_stage3_activity.dart';
+import 'level2/down_level2_stage4_activity.dart';
+
+class DownBaseActivityScreen extends StatefulWidget {
   @override
-  _UpBaseActivityScreenState createState() =>
-      _UpBaseActivityScreenState();
+  _DownBaseActivityScreenState createState() =>
+      _DownBaseActivityScreenState();
 }
 
-class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
-  final stage11Key = GlobalKey<UpLevel1Stage1ActivityState>();
-  final stage12Key = GlobalKey<UpLevel1Stage2ActivityState>();
-  final stage13Key = GlobalKey<UpLevel1Stage3ActivityState>();
+class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
+  final stage11Key = GlobalKey<DownLevel1Stage1ActivityState>();
+  final stage12Key = GlobalKey<DownLevel1Stage2ActivityState>();
+  final stage13Key = GlobalKey<DownLevel1Stage3ActivityState>();
+  final stage14Key = GlobalKey<DownLevel1Stage4ActivityState>();
 
-  final stage14Key = GlobalKey<UpLevel1Stage4ActivityState>();
-
-  final stage21Key = GlobalKey<UpLevel2Stage1ActivityState>();
-
-  final stage22Key = GlobalKey<UpLevel2Stage2ActivityState>();
-  final stage23Key = GlobalKey<UpLevel2Stage3ActivityState>();
-  final stage24Key = GlobalKey<UpLevel2Stage4ActivityState>();
+  final stage21Key = GlobalKey<DownLevel2Stage1ActivityState>();
+  final stage22Key = GlobalKey<DownLevel2Stage2ActivityState>();
+  final stage23Key = GlobalKey<DownLevel2Stage3ActivityState>();
+  final stage24Key = GlobalKey<DownLevel2Stage4ActivityState>();
 
 
   late final List<Widget> activities;
@@ -39,39 +39,39 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
   void initState() {
     super.initState();
     activities = [
-      UpLevel1Stage1Activity(
+      DownLevel1Stage1Activity(
         key: stage11Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel1Stage2Activity(
+      DownLevel1Stage2Activity(
         key: stage12Key,
         onNextStage: goToNextActivity,
       ),
 
-      UpLevel1Stage3Activity(
+      DownLevel1Stage3Activity(
         key: stage13Key,
         onNextStage: goToNextActivity,
       ),
 
-      UpLevel1Stage4Activity(
+      DownLevel1Stage4Activity(
         key: stage14Key,
         onNextStage: goToNextActivity,
       ),
 
-      UpLevel2Stage1Activity(
+      DownLevel2Stage1Activity(
         key: stage21Key,
         onNextStage: goToNextActivity,
       ),
 
-      UpLevel2Stage2Activity(
+      DownLevel2Stage2Activity(
         key: stage22Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel2Stage3Activity(
+      DownLevel2Stage3Activity(
         key: stage23Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel2Stage4Activity(
+      DownLevel2Stage4Activity(
         key: stage24Key,
         onNextStage: goToNextActivity,
       ),
@@ -86,7 +86,6 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
     } else if (currentActivityIndex == 1) {
       stage12Key.currentState?.repeatSound();
     }
-
     else if (currentActivityIndex == 2) {
       stage13Key.currentState?.repeatSound();
     }
@@ -106,6 +105,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
     else if (currentActivityIndex == 7) {
       stage24Key.currentState?.repeatSound();
     }
+
   }
 
   void goToNextActivity() {
@@ -114,12 +114,8 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
         currentActivityIndex++;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت انشطة فوق ")),
+          const SnackBar(content: Text("خلصت كل الأنشطة!")),
         );
-          /*
-        Navigator.pushNamed(context, AppRoutes.downBaseActivityScreenRouteName);
-
-           */
       }
     });
   }
@@ -129,9 +125,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
-        );
+        Navigator.pop(context);
       }
     });
   }
