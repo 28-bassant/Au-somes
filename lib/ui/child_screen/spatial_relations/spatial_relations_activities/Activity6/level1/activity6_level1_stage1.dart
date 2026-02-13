@@ -6,9 +6,6 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-
 class Activity6Level1Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
@@ -17,6 +14,7 @@ class Activity6Level1Stage1 extends StatefulWidget {
   @override
   State createState() => Activity6Level1Stage1State();
 }
+
 class Activity6Level1Stage1State extends State<Activity6Level1Stage1> {
   late AudioPlayer _player;
   late ActivityResponse _activity;
@@ -50,6 +48,13 @@ class Activity6Level1Stage1State extends State<Activity6Level1Stage1> {
       await precacheImage(NetworkImage(url!), context);
     }
     _imagesLoaded = true;
+
+    // ✅ تشغيل الصوت بعد تحميل الصور
+    if (!_hasPlayedSound) {
+      await playSound();
+      _hasPlayedSound = true;
+    }
+
     return _activity;
   }
 
@@ -58,7 +63,9 @@ class Activity6Level1Stage1State extends State<Activity6Level1Stage1> {
     await _player.stop();
     await _player.play(UrlSource(_activity.audioUrl!));
   }
+
   void repeatSound() => playSound();
+
   @override
   void dispose() {
     _player.dispose();

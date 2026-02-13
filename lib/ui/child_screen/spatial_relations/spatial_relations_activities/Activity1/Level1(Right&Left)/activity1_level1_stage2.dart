@@ -167,74 +167,113 @@ class Activity1Level1Stage2State extends State<Activity1Level1Stage2>
     final correctElement = _activity!.elements!
         .firstWhere((e) => e.isCorrect == true);
 
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // حساب النسب المئوية بناءً على أبعاد الشاشة
+            final double anchorWidthPercent = 180 / 400;    // 45% من العرض المرجعي
+            final double optionWidthPercent = 80 / 400;     // 20% من العرض المرجعي
+            final double topPaddingPercent = 180 / 800;     // 22.5% من الارتفاع المرجعي
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
+            // حساب الأحجام الفعلية
+            final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
+            final double optionWidth = constraints.maxWidth * optionWidthPercent;
+            final double topPadding = constraints.maxHeight * topPaddingPercent;
 
-        // ✅ الإجابة الغلط (الشمال) – نازلة لتحت
-        Padding(
-          padding: const EdgeInsets.only(top: 180),
-          child: GestureDetector(
-            onTap: _handleWrongAnswer,
-            child: Image.network(
-              wrongElement.imageUrl ?? '',
-              width: 80,
-            ),
-          ),
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                // ❌ الإجابة الغلط (الشمال) – نازلة لتحت
+                Padding(
+                  padding: EdgeInsets.only(top: topPadding),
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Image.network(
+                      wrongElement.imageUrl ?? '',
+                      width: optionWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: optionWidth,
+                          height: optionWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                // ⚓ الـ Anchor (ثابت في النص)
+                Image.network(
+                  anchorElement.imageUrl ?? '',
+                  width: anchorWidth,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: anchorWidth,
+                      height: anchorWidth,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error),
+                    );
+                  },
+                ),
+
+                // ✅ الإجابة الصح (اليمين) – نازلة لتحت
+                Padding(
+                  padding: EdgeInsets.only(top: topPadding),
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = 20 * sin(_animationController!.value * pi);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+                        _animationController?.stop();
+                        _animationController?.value = 0;
+
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) {
+                            widget.onNextStage?.call();
+                          }
+                        });
+                      },
+                      child: Image.network(
+                        correctElement.imageUrl ?? '',
+                        width: optionWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: optionWidth,
+                            height: optionWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
-
-
-        // ⚓ الـ Anchor (ثابت في النص)
-        Image.network(
-          anchorElement.imageUrl ?? '',
-          width: 180,
-        ),
-
-        // ❌ الإجابة الصح (اليمين) – نازلة لتحت
-        Padding(
-          padding: const EdgeInsets.only(top: 180),
-          child: AnimatedBuilder(
-            animation: _animationController!,
-            builder: (context, child) {
-              double shakeValue = 0;
-              if (_isAnimatingAnswer) {
-                shakeValue = 20 * sin(_animationController!.value *  pi);
-              }
-
-              return Transform.translate(
-                offset: Offset(shakeValue, 0),
-                child: child,
-              );
-            },
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _wrongAttempts = 0;
-                  _isAnimatingAnswer = false;
-                });
-                _animationController?.stop();
-                _animationController?.value = 0;
-
-                WellDoneOverlay.show(context);
-                Future.delayed(const Duration(seconds: 3), () {
-                  if (mounted) {
-                    widget.onNextStage?.call();
-                  }
-                });
-              },
-              child: Image.network(
-                correctElement.imageUrl ?? '',
-                width: 80,
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
-
-
-
   }
 }
