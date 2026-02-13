@@ -23,7 +23,7 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
   bool _isLoading = true;
   bool _hasPlayedSound = false;
 
-  int _wrongAttempts = 0; // لتتبع الأخطاء
+  int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
 
@@ -134,151 +134,304 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
     final actorElement = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
     final shadowElement = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
 
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // ⚓ Anchor
-          Positioned(
-            top: 240,
-            child: Image.network(
-              anchorElement.imageUrl ?? '',
-              width: 250,
-            ),
-          ),
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // حساب النسب المئوية بناءً على أبعاد الشاشة
+            final double anchorWidthPercent = 250 / 400;        // 62.5% من العرض المرجعي
+            final double shadowWidthPercent = 100 / 400;        // 25% من العرض المرجعي
+            final double actorWidthPercent = 60 / 400;          // 15% من العرض المرجعي
+            final double smallActorWidthPercent = 50 / 400;     // 12.5% من العرض المرجعي
 
-          // ✅ DragTarget مع الصورة تحت الشادو (من الكود الأول)
-          Positioned(
-            left: 20,
-            top: 20,
-            child: DragTarget<String>(
-              builder: (context, candidateData, rejectedData) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // الصورة الصحيحة تحت الشادو (لو تم إسقاطها)
-                    if (isCorrectPlaced)
-                      Positioned(
-                        top: 40, // أسفل الشادو
-                        child: Image.network(actorElement.imageUrl ?? '', width: 60),
-                      ),
-                    // الشادو فوق
-                    Image.network(shadowElement.imageUrl ?? '', width: 100),
-                  ],
-                );
-              },
-              onWillAccept: (_) => true,
-              onAccept: (data) {
-                if (data == 'correct') {
-                  setState(() {
-                    isCorrectPlaced = true;
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) widget.onNextStage?.call();
-                  });
-                } else {
-                  _handleWrongAnswer(); // من الكود الثاني
-                }
-              },
-            ),
-          ),
+            // نسب المواقع من الكود الأصلي
+            final double anchorTopPercent = 240 / 800;          // 30% من الارتفاع
 
-          // ❌ العناصر الخاطئة الثلاث
-          Positioned(
-            right: 20,
-            top: 300,
-            child: Draggable(
-              data: 'wrong1',
-              feedback: Image.network(actorElement.imageUrl ?? '', width: 60),
-              childWhenDragging: Opacity(
-                opacity: 0.5,
-                child: Image.network(actorElement.imageUrl ?? '', width: 60),
-              ),
-              child: Image.network(actorElement.imageUrl ?? '', width: 60),
-              onDragEnd: (_) {},
-            ),
-          ),
-          Positioned(
-            left: 20,
-            top: 300,
-            child: Draggable(
-              data: 'wrong2',
-              feedback: Transform.flip(
-                flipX: true,
-                child: Image.network(actorElement.imageUrl ?? '', width: 60),
-              ),
-              childWhenDragging: Opacity(
-                opacity: 0.5,
-                child: Transform.flip(
-                  flipX: true,
-                  child: Image.network(actorElement.imageUrl ?? '', width: 60),
-                ),
-              ),
-              child: Transform.flip(
-                flipX: true,
-                child: Image.network(actorElement.imageUrl ?? '', width: 60),
-              ),
-              onDragEnd: (_) {},
-            ),
-          ),
-          Positioned(
-            left: 110,
-            bottom: 180,
-            child: Draggable(
-              data: 'wrong3',
-              feedback: Transform.flip(
-                flipX: true,
-                child: Image.network(actorElement.imageUrl ?? '', width: 50),
-              ),
-              childWhenDragging: Opacity(
-                opacity: 0.5,
-                child: Transform.flip(
-                  flipX: true,
-                  child: Image.network(actorElement.imageUrl ?? '', width: 50),
-                ),
-              ),
-              child: Transform.flip(
-                flipX: true,
-                child: Image.network(actorElement.imageUrl ?? '', width: 50),
-              ),
-              onDragEnd: (_) {},
-            ),
-          ),
+            final double dragTargetLeftPercent = 20 / 400;      // 5% من العرض
+            final double dragTargetTopPercent = 20 / 800;       // 2.5% من الارتفاع
+            final double actorTopInShadowPercent = 40 / 800;    // 5% من الارتفاع
 
-          // ✅ العنصر الصحيح مع Animation (من الكود الثاني)
-          if (!isCorrectPlaced)
-            Positioned(
-              left: 180,
-              top: 150,
-              child: AnimatedBuilder(
-                animation: _animationController!,
-                builder: (context, child) {
-                  double shakeValue = 0;
-                  if (_isAnimatingAnswer) {
-                    shakeValue = 20 * sin(_animationController!.value * pi);
-                  }
-                  return Transform.translate(
-                    offset: Offset(shakeValue, 0),
-                    child: child,
-                  );
-                },
-                child: Draggable(
-                  data: 'correct',
-                  feedback: Image.network(actorElement.imageUrl ?? '', width: 60),
-                  childWhenDragging: Opacity(
-                    opacity: 0.5,
-                    child: Image.network(actorElement.imageUrl ?? '', width: 60),
+            final double wrong1RightPercent = 20 / 400;         // 5% من العرض
+            final double wrong1TopPercent = 300 / 800;          // 37.5% من الارتفاع
+
+            final double wrong2LeftPercent = 20 / 400;          // 5% من العرض
+            final double wrong2TopPercent = 300 / 800;          // 37.5% من الارتفاع
+
+            final double wrong3LeftPercent = 110 / 400;         // 27.5% من العرض
+            final double wrong3BottomPercent = 180 / 800;       // 22.5% من الارتفاع
+
+            final double correctLeftPercent = 180 / 400;        // 45% من العرض
+            final double correctTopPercent = 150 / 800;         // 18.75% من الارتفاع
+
+            // حساب الأحجام والمواقع الفعلية
+            final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
+            final double shadowWidth = constraints.maxWidth * shadowWidthPercent;
+            final double actorWidth = constraints.maxWidth * actorWidthPercent;
+            final double smallActorWidth = constraints.maxWidth * smallActorWidthPercent;
+
+            final double anchorTop = constraints.maxHeight * anchorTopPercent;
+
+            final double dragTargetLeft = constraints.maxWidth * dragTargetLeftPercent;
+            final double dragTargetTop = constraints.maxHeight * dragTargetTopPercent;
+            final double actorTopInShadow = constraints.maxHeight * actorTopInShadowPercent;
+
+            final double wrong1Right = constraints.maxWidth * wrong1RightPercent;
+            final double wrong1Top = constraints.maxHeight * wrong1TopPercent;
+
+            final double wrong2Left = constraints.maxWidth * wrong2LeftPercent;
+            final double wrong2Top = constraints.maxHeight * wrong2TopPercent;
+
+            final double wrong3Left = constraints.maxWidth * wrong3LeftPercent;
+            final double wrong3Bottom = constraints.maxHeight * wrong3BottomPercent;
+
+            final double correctLeft = constraints.maxWidth * correctLeftPercent;
+            final double correctTop = constraints.maxHeight * correctTopPercent;
+
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                // ⚓ Anchor
+                Positioned(
+                  top: anchorTop,
+                  child: Image.network(
+                    anchorElement.imageUrl ?? '',
+                    width: anchorWidth,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: anchorWidth,
+                        height: anchorWidth,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.error),
+                      );
+                    },
                   ),
-                  child: Image.network(actorElement.imageUrl ?? '', width: 60),
                 ),
-              ),
-            ),
-        ],
+
+                // ✅ DragTarget مع الصورة تحت الشادو
+                Positioned(
+                  left: dragTargetLeft,
+                  top: dragTargetTop,
+                  child: DragTarget<String>(
+                    builder: (context, candidateData, rejectedData) {
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (isCorrectPlaced)
+                            Positioned(
+                              top: actorTopInShadow,
+                              child: Image.network(
+                                actorElement.imageUrl ?? '',
+                                width: actorWidth,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: actorWidth,
+                                    height: actorWidth,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.error),
+                                  );
+                                },
+                              ),
+                            ),
+                          Image.network(
+                            shadowElement.imageUrl ?? '',
+                            width: shadowWidth,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: shadowWidth,
+                                height: shadowWidth,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.error),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                    onWillAccept: (_) => true,
+                    onAccept: (data) {
+                      if (data == 'correct') {
+                        setState(() {
+                          isCorrectPlaced = true;
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) widget.onNextStage?.call();
+                        });
+                      } else {
+                        _handleWrongAnswer();
+                      }
+                    },
+                  ),
+                ),
+
+                // ❌ العناصر الخاطئة الثلاث
+                Positioned(
+                  right: wrong1Right,
+                  top: wrong1Top,
+                  child: Draggable(
+                    data: 'wrong1',
+                    feedback: Image.network(
+                      actorElement.imageUrl ?? '',
+                      width: actorWidth,
+                    ),
+                    childWhenDragging: Opacity(
+                      opacity: 0.5,
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: actorWidth,
+                      ),
+                    ),
+                    child: Image.network(
+                      actorElement.imageUrl ?? '',
+                      width: actorWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: actorWidth,
+                          height: actorWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                    onDragEnd: (_) {},
+                  ),
+                ),
+
+                Positioned(
+                  left: wrong2Left,
+                  top: wrong2Top,
+                  child: Draggable(
+                    data: 'wrong2',
+                    feedback: Transform.flip(
+                      flipX: true,
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: actorWidth,
+                      ),
+                    ),
+                    childWhenDragging: Opacity(
+                      opacity: 0.5,
+                      child: Transform.flip(
+                        flipX: true,
+                        child: Image.network(
+                          actorElement.imageUrl ?? '',
+                          width: actorWidth,
+                        ),
+                      ),
+                    ),
+                    child: Transform.flip(
+                      flipX: true,
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: actorWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: actorWidth,
+                            height: actorWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                    onDragEnd: (_) {},
+                  ),
+                ),
+
+                Positioned(
+                  left: wrong3Left,
+                  bottom: wrong3Bottom,
+                  child: Draggable(
+                    data: 'wrong3',
+                    feedback: Transform.flip(
+                      flipX: true,
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: smallActorWidth,
+                      ),
+                    ),
+                    childWhenDragging: Opacity(
+                      opacity: 0.5,
+                      child: Transform.flip(
+                        flipX: true,
+                        child: Image.network(
+                          actorElement.imageUrl ?? '',
+                          width: smallActorWidth,
+                        ),
+                      ),
+                    ),
+                    child: Transform.flip(
+                      flipX: true,
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: smallActorWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: smallActorWidth,
+                            height: smallActorWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                    onDragEnd: (_) {},
+                  ),
+                ),
+
+                // ✅ العنصر الصحيح مع Animation
+                if (!isCorrectPlaced)
+                  Positioned(
+                    left: correctLeft,
+                    top: correctTop,
+                    child: AnimatedBuilder(
+                      animation: _animationController!,
+                      builder: (context, child) {
+                        double shakeValue = 0;
+                        if (_isAnimatingAnswer) {
+                          shakeValue = 15 * sin(_animationController!.value * pi);
+                        }
+                        return Transform.translate(
+                          offset: Offset(shakeValue, 0),
+                          child: child,
+                        );
+                      },
+                      child: Draggable(
+                        data: 'correct',
+                        feedback: Image.network(
+                          actorElement.imageUrl ?? '',
+                          width: actorWidth,
+                        ),
+                        childWhenDragging: Opacity(
+                          opacity: 0.5,
+                          child: Image.network(
+                            actorElement.imageUrl ?? '',
+                            width: actorWidth,
+                          ),
+                        ),
+                        child: Image.network(
+                          actorElement.imageUrl ?? '',
+                          width: actorWidth,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: actorWidth,
+                              height: actorWidth,
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.error),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

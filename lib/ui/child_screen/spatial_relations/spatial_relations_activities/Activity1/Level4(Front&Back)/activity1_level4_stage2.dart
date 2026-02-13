@@ -167,80 +167,124 @@ class Activity1Level4Stage2State extends State<Activity1Level4Stage2>
     final wrongElement = _activity!.elements!
         .firstWhere((e) => e.isCorrect == false);
 
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // حساب النسب المئوية بناءً على أبعاد الشاشة
+            final double anchorHeightPercent = 200 / 800;    // 25% من الارتفاع المرجعي
+            final double optionWidthPercent = 200 / 400;     // 50% من العرض المرجعي
 
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // ✅ الإجابة الصح (يمين + نازلة + animation)
-          Positioned(
-            right: 20,
-            top: 100,
-            child: AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                double shakeValue = 0;
-                if (_isAnimatingAnswer) {
-                  shakeValue = 20 * sin(_animationController!.value * pi);
-                }
+            // نسب المواقع من الكود الأصلي
+            final double rightPositionPercent = 20 / 400;        // 5% من العرض
+            final double leftPositionPercent = 10 / 400;         // 2.5% من العرض
+            final double topCorrectPositionPercent = 100 / 800;  // 12.5% من الارتفاع
+            final double topWrongPositionPercent = 150 / 800;    // 18.75% من الارتفاع
 
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  _animationController?.stop();
-                  _animationController?.value = 0;
+            // حساب الأحجام والمواقع الفعلية
+            final double anchorHeight = constraints.maxHeight * anchorHeightPercent;
+            final double optionWidth = constraints.maxWidth * optionWidthPercent;
 
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
-                },
-                child: Image.network(
-                  correctElement.imageUrl ?? '',
-                  width: 200,
+            final double rightPosition = constraints.maxWidth * rightPositionPercent;
+            final double leftPosition = constraints.maxWidth * leftPositionPercent;
+            final double topCorrectPosition = constraints.maxHeight * topCorrectPositionPercent;
+            final double topWrongPosition = constraints.maxHeight * topWrongPositionPercent;
+
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+
+                // ✅ الإجابة الصح (يمين + نازلة + animation)
+                Positioned(
+                  right: rightPosition,
+                  top: topCorrectPosition,
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = 15 * sin(_animationController!.value * pi);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+                        _animationController?.stop();
+                        _animationController?.value = 0;
+
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) {
+                            widget.onNextStage?.call();
+                          }
+                        });
+                      },
+                      child: Image.network(
+                        correctElement.imageUrl ?? '',
+                        width: optionWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: optionWidth,
+                            height: optionWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
 
-          // ⚓ Anchor (في النص)
-          Image.network(
-            anchorElement.imageUrl ?? '',
-            width: double.infinity,
-            height: 200,
-          ),
+                // ⚓ Anchor (في النص)
+                Image.network(
+                  anchorElement.imageUrl ?? '',
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: anchorHeight,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error),
+                    );
+                  },
+                ),
 
-          // ❌ الإجابة الغلط (شمال + نازلة)
-
-          Positioned(
-            left: 10,
-            top: 150,
-            child: GestureDetector(
-              onTap: _handleWrongAnswer,
-              child: Image.network(
-                wrongElement.imageUrl ?? '',
-                width: 200,
-              ),
-            ),
-
-          ),
-        ],
+                // ❌ الإجابة الغلط (شمال + نازلة)
+                Positioned(
+                  left: leftPosition,
+                  top: topWrongPosition+15,
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Image.network(
+                      wrongElement.imageUrl ?? '',
+                      width: optionWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: optionWidth,
+                          height: optionWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
-
-
-
   }
 }

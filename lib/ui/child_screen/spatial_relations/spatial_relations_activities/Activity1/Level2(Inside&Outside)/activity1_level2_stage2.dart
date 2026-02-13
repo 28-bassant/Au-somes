@@ -146,73 +146,122 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
     final actorElement =
     _activity!.elements!.firstWhere((e) => e.isCorrect == true);
 
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // حساب النسب المئوية بناءً على أبعاد الشاشة
+            final double anchorWidthPercent = 300 / 400;    // 75% من العرض المرجعي
+            final double optionWidthPercent = 80 / 400;     // 20% من العرض المرجعي
 
-          // ⚓ Anchor في النص
-          Image.network(
-            anchorElement.imageUrl ?? '',
-            width: 300,
-          ),
+            // نسب المواقع من الكود الأصلي
+            final double leftPositionPercent = 40 / 400;        // 10% من العرض
+            final double rightPositionPercent = 160 / 400;      // 40% من العرض
+            final double topFirstPositionPercent = 420 / 800;   // 52.5% من الارتفاع
+            final double topSecondPositionPercent = 260 / 800;  // 32.5% من الارتفاع
 
-          // ✅ الشمال = إجابة صح
-          Positioned(
-            left: 40,
-            top: 420,
-            child: AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                double shakeValue = 0;
-                if (_isAnimatingAnswer) {
-                  shakeValue = 20 * sin(_animationController!.value * pi);
-                }
+            // حساب الأحجام والمواقع الفعلية
+            final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
+            final double optionWidth = constraints.maxWidth * optionWidthPercent;
 
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  _animationController?.stop();
-                  _animationController?.value = 0;
+            final double leftPosition = constraints.maxWidth * leftPositionPercent;
+            final double rightPosition = constraints.maxWidth * rightPositionPercent;
+            final double topFirstPosition = constraints.maxHeight * topFirstPositionPercent;
+            final double topSecondPosition = constraints.maxHeight * topSecondPositionPercent;
 
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
-                },
-                child: Image.network(
-                  actorElement.imageUrl ?? '',
-                  width: 80,
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+
+                // ⚓ Anchor في النص
+                Image.network(
+                  anchorElement.imageUrl ?? '',
+                  width: anchorWidth,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: anchorWidth,
+                      height: anchorWidth,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error),
+                    );
+                  },
                 ),
-              ),
-            ),
-          ),
 
-          // ❌ اليمين = إجابة غلط + animation
-          Positioned(
-            right: 160,
-            top: 260,
-            child: GestureDetector(
-              onTap: _handleWrongAnswer,
-              child: Image.network(
-                actorElement.imageUrl ?? '',
-                width: 80,
-              ),
-            ),
-          ),
-        ],
+                // ✅ الشمال = إجابة صح + Animation
+                Positioned(
+                  left: leftPosition,
+                  top: topFirstPosition,
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = 20 * sin(_animationController!.value * pi);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+                        _animationController?.stop();
+                        _animationController?.value = 0;
+
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) {
+                            widget.onNextStage?.call();
+                          }
+                        });
+                      },
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: optionWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: optionWidth,
+                            height: optionWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+
+                // ❌ اليمين = إجابة غلط
+                Positioned(
+                  right: rightPosition,
+                  top: topSecondPosition+36,
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Image.network(
+                      actorElement.imageUrl ?? '',
+                      width: optionWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: optionWidth,
+                          height: optionWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

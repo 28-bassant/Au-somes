@@ -97,102 +97,169 @@ class Activity5Level1Stage1State extends State<Activity5Level1Stage1> {
               body: Container(
                 width: double.infinity,
                 height: double.infinity,
-                child: Stack(
-                  children: [
-                    // صورة الـ Shadow - في الخلفية
-                    Center(
-                      child: Image.network(
-                        shadow.imageUrl ?? '',
-                        width: 500,
-                        height: 500,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // حساب النسب المئوية بناءً على أبعاد الشاشة
+                    final double shadowSizePercent = 500 / 400;     // 125% من العرض المرجعي (أكبر من الشاشة)
+                    final double targetSizePercent = 40 / 400;      // 10% من العرض المرجعي
+                    final double actorSizePercent = 40 / 400;       // 10% من العرض المرجعي
 
-                    // DragTarget - حاوية فارغة
-                    Positioned(
-                      left: 210,
-                      top: 330,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.black
-                            )
+                    // نسب المواقع من الكود الأصلي
+                    final double targetLeftPercent = 210 / 400;     // 52.5% من العرض
+                    final double targetTopPercent = 330 / 680;      // 41.25% من الارتفاع
+
+                    final double actorRightPercent = 40 / 400;      // 10% من العرض
+                    final double actorBottomPercent = 50 / 800;     // 6.25% من الارتفاع
+
+                    // حساب الأحجام والمواقع الفعلية
+                    final double shadowSize = constraints.maxWidth * shadowSizePercent;
+                    final double targetSize = constraints.maxWidth * targetSizePercent;
+                    final double actorSize = constraints.maxWidth * actorSizePercent;
+
+                    final double targetLeft = constraints.maxWidth * targetLeftPercent;
+                    final double targetTop = constraints.maxHeight * targetTopPercent;
+
+                    final double actorRight = constraints.maxWidth * actorRightPercent;
+                    final double actorBottom = constraints.maxHeight * actorBottomPercent;
+
+                    return Stack(
+                      children: [
+                        // صورة الـ Shadow - في الخلفية
+                        Center(
+                          child: Image.network(
+                            shadow.imageUrl ?? '',
+                            width: shadowSize,
+                            height: shadowSize,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: shadowSize,
+                                height: shadowSize,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.error),
+                              );
+                            },
+                          ),
                         ),
-                        child: DragTarget<String>(
-                          onWillAccept: (data) => data == actor.targetedZoneId,
-                          onAccept: (data) {
-                            setState(() {
-                              isPlacedCorrectly = true;
-                            });
-                            WellDoneOverlay.show(context);
-                            Future.delayed(const Duration(seconds: 3), () {
-                              widget.onNextStage?.call();
-                            });
-                          },
-                          builder: (context, candidateData, rejectedData) {
-                            return Center(
-                              child: isPlacedCorrectly
-                                  ? Image.network(
-                                actor.imageUrl ?? '',
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.contain,
-                              )
-                                  : Container(
-                                padding: EdgeInsets.all(8),
 
-                              ),
-                            );
-                          },
+                        // DragTarget - حاوية فارغة
+                        Positioned(
+                          left: targetLeft,
+                          top: targetTop,
+                          child: Container(
+                            width: targetSize,
+                            height: targetSize,
+                            // decoration: BoxDecoration(
+                            //   border: Border.all(
+                            //     color: Colors.black,
+                            //     width: 2.0,
+                            //   ),
+                            // ),
+                            child: DragTarget<String>(
+                              onWillAccept: (data) => data == actor.targetedZoneId,
+                              onAccept: (data) {
+                                setState(() {
+                                  isPlacedCorrectly = true;
+                                });
+                                WellDoneOverlay.show(context);
+                                Future.delayed(const Duration(seconds: 3), () {
+                                  if (mounted) {
+                                    widget.onNextStage?.call();
+                                  }
+                                });
+                              },
+                              builder: (context, candidateData, rejectedData) {
+                                return Center(
+                                  child: isPlacedCorrectly
+                                      ? Image.network(
+                                    actor.imageUrl ?? '',
+                                    width: targetSize,
+                                    height: targetSize,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: targetSize,
+                                        height: targetSize,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.error),
+                                      );
+                                    },
+                                  )
+                                      : Container(),
+                                );
+                              },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
 
-                    // Draggable العنصر
-                    if (!isPlacedCorrectly)
-                      Positioned(
-                        right: 40,
-                        bottom: 50,
-                        child: Draggable<String>(
-                          data: actor.targetedZoneId,
-                          feedback: Material(
-                            color: Colors.transparent,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 10,
-                                    spreadRadius: 2,
+                        // Draggable العنصر
+                        if (!isPlacedCorrectly)
+                          Positioned(
+                            right: actorRight,
+                            bottom: actorBottom,
+                            child: Draggable<String>(
+                              data: actor.targetedZoneId,
+                              feedback: Material(
+                                color: Colors.transparent,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                  child: Image.network(
+                                    actor.imageUrl ?? '',
+                                    width: actorSize,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: actorSize,
+                                        height: actorSize,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.error),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              childWhenDragging: Opacity(
+                                opacity: 0.3,
+                                child: Image.network(
+                                  actor.imageUrl ?? '',
+                                  width: actorSize,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: actorSize,
+                                      height: actorSize,
+                                      color: Colors.grey[300],
+                                      child: const Icon(Icons.error),
+                                    );
+                                  },
+                                ),
                               ),
                               child: Image.network(
                                 actor.imageUrl ?? '',
-                                width: 40,
+                                width: actorSize,
                                 fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: actorSize,
+                                    height: actorSize,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.error),
+                                  );
+                                },
                               ),
                             ),
                           ),
-                          childWhenDragging: Opacity(
-                            opacity: 0.3,
-                            child: Image.network(
-                              actor.imageUrl ?? '',
-                              width: 40,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          child: Image.network(
-                            actor.imageUrl ?? '',
-                            width: 40,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                  ],
+                      ],
+                    );
+                  },
                 ),
               ),
             );

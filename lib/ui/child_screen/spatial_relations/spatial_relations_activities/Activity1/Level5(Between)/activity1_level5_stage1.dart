@@ -174,87 +174,163 @@ class Activity1Level5Stage1State extends State<Activity1Level5Stage1>
       return const Center(child: Text('يجب أن يكون هناك anchorين'));
     }
 
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          // Anchor الأول (على اليسار)
-          Positioned(
-            left: MediaQuery.of(context).size.width * 0.25 - 80,
-            child: Image.network(
-              anchorElements[0].imageUrl ?? '',
-              width: 100,
-              fit: BoxFit.contain,
-            ),
-          ),
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // حساب النسب المئوية بناءً على أبعاد الشاشة
+            final double anchor1WidthPercent = 100 / 400;    // 25% من العرض المرجعي
+            final double anchor2WidthPercent = 120 / 400;    // 30% من العرض المرجعي
+            final double optionWidthPercent = 60 / 400;      // 15% من العرض المرجعي
 
-          // Anchor الثاني (على اليمين)
-          Positioned(
-            right: MediaQuery.of(context).size.width * 0.25 - 40,
-            top: 230,
-            child: Image.network(
-              anchorElements[1].imageUrl ?? '',
-              width: 120,
-              fit: BoxFit.contain,
-            ),
-          ),
+            // نسب المواقع من الكود الأصلي
+            final double anchor1LeftPercent = 0.25;          // 25% من العرض
+            final double anchor1OffsetPercent = 80 / 400;    // 20% من العرض (للتصحيح)
 
-          // ❌ الإجابة الخاطئة (كرة خضراء - على اليمين)
-          Positioned(
-            right: 20,
-            top: MediaQuery.of(context).size.height * 0.45,
-            child: GestureDetector(
-              onTap: _handleWrongAnswer,
-              child: Image.network(
-                wrongActor.imageUrl ?? '',
-                width: 60,
-              ),
-            ),
-          ),
+            final double anchor2RightPercent = 0.25;         // 25% من العرض
+            final double anchor2OffsetPercent = 40 / 400;    // 10% من العرض (للتصحيح)
+            final double anchor2TopPercent = 230 / 800;      // 28.75% من الارتفاع
 
-          // ✅ الإجابة الصحيحة (كرة برتقالية - بين Anchorين)
-          Positioned(
-            left: MediaQuery.of(context).size.width * 0.5 - 60,
-            top: MediaQuery.of(context).size.height * 0.45,
-            child: AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                double shakeValue = 0;
-                if (_isAnimatingAnswer) {
-                  shakeValue = 20 * sin(_animationController!.value * pi);
-                }
+            final double wrongRightPercent = 20 / 400;       // 5% من العرض
+            final double wrongTopPercent = 0.55;             // 45% من الارتفاع
 
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  _animationController?.stop();
-                  _animationController?.value = 0;
+            final double correctLeftPercent = 0.5;           // 50% من العرض
+            final double correctOffsetPercent = 60 / 400;    // 15% من العرض (للتصحيح)
+            final double correctTopPercent = 0.55;           // 45% من الارتفاع
 
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
-                },
-                child: Image.network(
-                  correctActor.imageUrl ?? '',
-                  width: 60,
+            // حساب الأحجام والمواقع الفعلية
+            final double anchor1Width = constraints.maxWidth * anchor1WidthPercent;
+            final double anchor2Width = constraints.maxWidth * anchor2WidthPercent;
+            final double optionWidth = constraints.maxWidth * optionWidthPercent;
+
+            final double anchor1Left = (constraints.maxWidth * anchor1LeftPercent) -
+                (constraints.maxWidth * anchor1OffsetPercent);
+            final double anchor2Right = (constraints.maxWidth * anchor2RightPercent) -
+                (constraints.maxWidth * anchor2OffsetPercent);
+            final double anchor2Top = constraints.maxHeight * anchor2TopPercent;
+
+            final double wrongRight = constraints.maxWidth * wrongRightPercent;
+            final double wrongTop = constraints.maxHeight * wrongTopPercent;
+
+            final double correctLeft = (constraints.maxWidth * correctLeftPercent) -
+                (constraints.maxWidth * correctOffsetPercent);
+            final double correctTop = constraints.maxHeight * correctTopPercent;
+
+            return Stack(
+              alignment: Alignment.centerLeft,
+              children: [
+                // Anchor الأول (على اليسار)
+                Positioned(
+                  left: anchor1Left,
+                  child: Image.network(
+                    anchorElements[0].imageUrl ?? '',
+                    width: anchor1Width,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: anchor1Width,
+                        height: anchor1Width,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.error),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ],
+
+                // Anchor الثاني (على اليمين)
+                Positioned(
+                  right: anchor2Right,
+                  top: anchor2Top+30,
+                  child: Image.network(
+                    anchorElements[1].imageUrl ?? '',
+                    width: anchor2Width,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: anchor2Width,
+                        height: anchor2Width,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.error),
+                      );
+                    },
+                  ),
+                ),
+
+                // ❌ الإجابة الخاطئة (كرة خضراء - على اليمين)
+                Positioned(
+                  right: wrongRight,
+                  top: wrongTop,
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Image.network(
+                      wrongActor.imageUrl ?? '',
+                      width: optionWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: optionWidth,
+                          height: optionWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                // ✅ الإجابة الصحيحة (كرة برتقالية - بين Anchorين)
+                Positioned(
+                  left: correctLeft,
+                  top: correctTop,
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = 15 * sin(_animationController!.value * pi);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+                        _animationController?.stop();
+                        _animationController?.value = 0;
+
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) {
+                            widget.onNextStage?.call();
+                          }
+                        });
+                      },
+                      child: Image.network(
+                        correctActor.imageUrl ?? '',
+                        width: optionWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: optionWidth,
+                            height: optionWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

@@ -164,112 +164,181 @@ class Activity2Level1Stage1State extends State<Activity2Level1Stage1>
     final actorElement = _activity!.elements!
         .firstWhere((e) => e.isCorrect == true);
 
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // حساب النسب المئوية بناءً على أبعاد الشاشة
+            final double anchorWidthPercent = 250 / 400;    // 62.5% من العرض المرجعي
+            final double optionWidthPercent = 50 / 400;     // 12.5% من العرض المرجعي
 
+            // نسب المواقع من الكود الأصلي
+            final double rightPositionPercent = 20 / 400;       // 5% من العرض
+            final double leftPositionPercent = 20 / 400;        // 5% من العرض
+            final double bottomPositionPercent = 180 / 800;     // 22.5% من الارتفاع
+            final double correctPositionPercent = 160 / 400;    // 40% من العرض
 
+            final double topRightPositionPercent = 280 / 800;   // 35% من الارتفاع
+            final double topLeftPositionPercent = 240 / 800;    // 30% من الارتفاع
+            final double bottomLeftPositionPercent = 110 / 400; // 27.5% من العرض
+            final double topCorrectPositionPercent = 120 / 800; // 15% من الارتفاع
 
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
+            // حساب الأحجام والمواقع الفعلية
+            final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
+            final double optionWidth = constraints.maxWidth * optionWidthPercent;
 
-          // ⚓ Anchor (في النص)
-          Image.network(
-            anchorElement.imageUrl ?? '',
-            width: 250,
-          ),
+            final double rightPosition = constraints.maxWidth * rightPositionPercent;
+            final double leftPosition = constraints.maxWidth * leftPositionPercent;
+            final double bottomPosition = constraints.maxHeight * bottomPositionPercent;
+            final double correctPosition = constraints.maxWidth * correctPositionPercent;
 
-          // ❌ الإجابة الغلط (يمين)
-          Positioned(
-            right: 20,
-            top: 280,
-            child: GestureDetector(
-              onTap: _handleWrongAnswer,
-              child: Image.network(
-                actorElement.imageUrl ?? '',
-                width: 50,
-              ),
-            ),
-          ),
-          // ❌ الإجابة الغلط (شمال )
-          Positioned(
-            left: 20,
-            top: 240,
-            child: GestureDetector(
-              onTap: _handleWrongAnswer,
-              child: Transform.flip(
-                flipX: true, // عكس على المحور X (يمين ↔ يسار)
-                // flipY: true, // إذا أردت عكس على المحور Y (أعلى ↔ أسفل)
-                child: Image.network(
-                  actorElement.imageUrl ?? '',
-                  width: 50,
+            final double topRightPosition = constraints.maxHeight * topRightPositionPercent;
+            final double topLeftPosition = constraints.maxHeight * topLeftPositionPercent;
+            final double bottomLeftPosition = constraints.maxWidth * bottomLeftPositionPercent;
+            final double topCorrectPosition = constraints.maxHeight * topCorrectPositionPercent;
+
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+
+                // ⚓ Anchor (في النص)
+                Image.network(
+                  anchorElement.imageUrl ?? '',
+                  width: anchorWidth,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: anchorWidth,
+                      height: anchorWidth,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error),
+                    );
+                  },
                 ),
-              ),
-            ),
-          ),
-          // ❌ الإجابة الغلط (تحت)
-          Positioned(
-            left: 110,
-            bottom: 180,
-            child: GestureDetector(
-              onTap: _handleWrongAnswer,
-              child: Transform.flip(
-                flipX: true, // عكس على المحور X (يمين ↔ يسار)
-                // flipY: true, // إذا أردت عكس على المحور Y (أعلى ↔ أسفل)
-                child: Image.network(
-                  actorElement.imageUrl ?? '',
-                  width: 50,
+
+                // ❌ الإجابة الغلط (يمين)
+                Positioned(
+                  right: rightPosition,
+                  top: topRightPosition,
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Image.network(
+                      actorElement.imageUrl ?? '',
+                      width: optionWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: optionWidth,
+                          height: optionWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
 
-          // ✅ الإجابة الصح (فوق)
-          Positioned(
-            right: 160,
-            top: 120,
-            child: AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                double shakeValue = 0;
-                if (_isAnimatingAnswer) {
-                  shakeValue = 20 * sin(_animationController!.value * pi);
-                }
-
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  _animationController?.stop();
-                  _animationController?.value = 0;
-
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
-                },
-                child: Image.network(
-                  actorElement.imageUrl ?? '',
-                  width: 50,
+                // ❌ الإجابة الغلط (شمال)
+                Positioned(
+                  left: leftPosition,
+                  top: topLeftPosition,
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Transform.flip(
+                      flipX: true,
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: optionWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: optionWidth,
+                            height: optionWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ],
+
+                // ❌ الإجابة الغلط (تحت)
+                Positioned(
+                  left: bottomLeftPosition,
+                  bottom: bottomPosition,
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Transform.flip(
+                      flipX: true,
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: optionWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: optionWidth,
+                            height: optionWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+
+                // ✅ الإجابة الصح (فوق)
+                Positioned(
+                  right: correctPosition,
+                  top: topCorrectPosition,
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = 15 * sin(_animationController!.value * pi);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+                        _animationController?.stop();
+                        _animationController?.value = 0;
+
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) {
+                            widget.onNextStage?.call();
+                          }
+                        });
+                      },
+                      child: Image.network(
+                        actorElement.imageUrl ?? '',
+                        width: optionWidth,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: optionWidth,
+                            height: optionWidth,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
-
-
-
   }
 }
