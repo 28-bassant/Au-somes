@@ -268,7 +268,7 @@ class Activity1Level3Stage2State extends State<Activity1Level3Stage2>
                       },
                       child: Image.network(
                         correctElement.imageUrl ?? '',
-                        width: correctOptionWidth,
+                        width: correctOptionWidth*1.5,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: correctOptionWidth,

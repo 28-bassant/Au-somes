@@ -158,11 +158,24 @@ class Activity4Level1Stage2State extends State<Activity4Level1Stage2>
       return const Center(child: Text('Error loading activity'));
     }
 
-    final anchorElement = _activity!.elements!
-        .firstWhere((e) => e.role == 'Anchor');
+    final elements = _activity!.elements!;
 
-    final actorElement = _activity!.elements!
-        .firstWhere((e) => e.isCorrect == true);
+// Anchor
+    final anchorElement =
+    elements.firstWhere((e) => e.role == 'Anchor');
+
+// Correct Actor
+    final correctActor =
+    elements.firstWhere((e) =>
+    e.role == 'Actor' && e.isCorrect == true);
+
+// Wrong Actors (كلهم)
+    final wrongActors =
+    elements.where((e) =>
+    e.role == 'Actor' && e.isCorrect == false)
+        .toList();
+    final wrongActor1 = wrongActors[0];
+    final wrongActor2 = wrongActors[1];
 
     return Scaffold(
       body: Container(
@@ -172,7 +185,7 @@ class Activity4Level1Stage2State extends State<Activity4Level1Stage2>
           builder: (context, constraints) {
             // حساب النسب المئوية بناءً على أبعاد الشاشة
             final double anchorWidthPercent = 400 / 400;        // 100% من العرض المرجعي
-            final double mediumOptionWidthPercent = 40 / 400;   // 10% من العرض المرجعي
+            final double mediumOptionWidthPercent = 40 / 220;   // 10% من العرض المرجعي
             final double smallOptionWidthPercent = 25 / 400;    // 6.25% من العرض المرجعي
 
             // نسب المواقع من الكود الأصلي
@@ -220,13 +233,13 @@ class Activity4Level1Stage2State extends State<Activity4Level1Stage2>
                 // ❌ الإجابة الغلط (فوق السرير)
                 Positioned(
                   right: wrong1Right,
-                  top: wrong1Top,
+                  top: wrong1Top+10,
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Transform.flip(
                       flipX: true,
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
+                        wrongActor2.imageUrl ?? '',
                         width: mediumOptionWidth,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -243,14 +256,14 @@ class Activity4Level1Stage2State extends State<Activity4Level1Stage2>
 
                 // ❌ الإجابة الغلط (تحت السرير)
                 Positioned(
-                  right: wrong2Right,
-                  bottom: wrong2Bottom,
+                  right: wrong2Right-20,
+                  bottom: wrong2Bottom-10,
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Transform.flip(
                       flipX: true,
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
+                        wrongActor1.imageUrl ?? '',
                         width: mediumOptionWidth,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -299,7 +312,7 @@ class Activity4Level1Stage2State extends State<Activity4Level1Stage2>
                         });
                       },
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
+                        correctActor.imageUrl ?? '',
                         width: smallOptionWidth,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(

@@ -220,7 +220,7 @@ class Activity1Level3Stage1State extends State<Activity1Level3Stage1>
                     onTap: _handleWrongAnswer,
                     child: Image.network(
                       wrongElement.imageUrl ?? '',
-                      width: wrongOptionWidth,
+                      width: wrongOptionWidth*1.5,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           width: wrongOptionWidth,

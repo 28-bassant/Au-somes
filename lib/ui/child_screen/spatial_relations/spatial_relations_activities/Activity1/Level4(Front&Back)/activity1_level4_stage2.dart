@@ -262,13 +262,13 @@ class Activity1Level4Stage2State extends State<Activity1Level4Stage2>
 
                 // ❌ الإجابة الغلط (شمال + نازلة)
                 Positioned(
-                  left: leftPosition,
-                  top: topWrongPosition+15,
+                  left: leftPosition+40,
+                  top: topWrongPosition+15+50,
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Image.network(
                       wrongElement.imageUrl ?? '',
-                      width: optionWidth,
+                      width: optionWidth*.5,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           width: optionWidth,

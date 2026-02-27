@@ -101,7 +101,7 @@ class Activity5Level1Stage2State extends State<Activity5Level1Stage2> {
                   builder: (context, constraints) {
                     // حساب النسب المئوية بناءً على أبعاد الشاشة
                     final double shadowSizePercent = 500 / 400;     // 125% من العرض المرجعي
-                    final double targetWidthPercent = 60 / 400;     // 15% من العرض المرجعي
+                    final double targetWidthPercent = 120 / 400;     // 15% من العرض المرجعي
                     final double targetHeightPercent = 40 / 800;    // 5% من الارتفاع المرجعي
                     final double actorSizePercent = 60 / 400;       // 15% من العرض المرجعي
 
@@ -171,12 +171,13 @@ class Activity5Level1Stage2State extends State<Activity5Level1Stage2> {
                                 });
                               },
                               builder: (context, candidateData, rejectedData) {
-                                return Center(
+                                return Align(
+                                    alignment: Alignment.centerRight,
                                   child: isPlacedCorrectly
                                       ? Image.network(
                                     actor.imageUrl ?? '',
-                                    width: targetWidth,
-                                    height: targetHeight,
+                                    width: actorSize,   // 👈 نفس حجمها الأصلي
+                                    height: actorSize,
                                     fit: BoxFit.contain,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Container(
@@ -187,7 +188,7 @@ class Activity5Level1Stage2State extends State<Activity5Level1Stage2> {
                                       );
                                     },
                                   )
-                                      : Container(),
+                                      : Container()
                                 );
                               },
                             ),

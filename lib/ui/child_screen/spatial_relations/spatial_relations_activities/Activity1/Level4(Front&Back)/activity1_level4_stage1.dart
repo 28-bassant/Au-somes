@@ -234,8 +234,8 @@ class Activity1Level4Stage1State extends State<Activity1Level4Stage1>
 
                 // ✅ الإجابة الصح (يسار + نازلة + animation)
                 Positioned(
-                  left: leftPosition,
-                  top: topCorrectPosition+15,
+                  left: leftPosition+40,
+                  top: topCorrectPosition+50,
                   child: AnimatedBuilder(
                     animation: _animationController!,
                     builder: (context, child) {
@@ -267,7 +267,7 @@ class Activity1Level4Stage1State extends State<Activity1Level4Stage1>
                       },
                       child: Image.network(
                         correctElement.imageUrl ?? '',
-                        width: optionWidth,
+                        width: optionWidth*.5,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: optionWidth,
