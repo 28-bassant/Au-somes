@@ -161,8 +161,15 @@ class Activity2Level1Stage2State extends State<Activity2Level1Stage2>
     final anchorElement = _activity!.elements!
         .firstWhere((e) => e.role == 'Anchor');
 
-    final actorElement = _activity!.elements!
+    final correctElement = _activity!.elements!
         .firstWhere((e) => e.isCorrect == true);
+    final wrongActors =
+    _activity!.elements!
+        .where((e) => e.role == 'Actor' && e.isCorrect == false)
+        .toList();
+    final firstWrong = wrongActors[0];
+    final secondWrong = wrongActors[1];
+    final thirdWrong = wrongActors[2];
 
     return Scaffold(
       body: Container(
@@ -174,15 +181,16 @@ class Activity2Level1Stage2State extends State<Activity2Level1Stage2>
             final double anchorWidthPercent = 250 / 400;    // 62.5% من العرض المرجعي
             final double optionWidthPercent = 50 / 400;     // 12.5% من العرض المرجعي
 
-            // نسب المواقع من الكود الأصلي
+            // نسب المواقع من الكود الأصلي'
+
             final double topWrongPositionPercent = 120 / 800;     // 15% من الارتفاع
             final double leftWrongPositionPercent = 20 / 400;     // 5% من العرض
-            final double topLeftPositionPercent = 240 / 800;      // 30% من الارتفاع
+            final double topLeftPositionPercent = 240 / 550;      // 30% من الارتفاع
             final double bottomLeftPositionPercent = 110 / 400;   // 27.5% من العرض
             final double bottomPositionPercent = 180 / 800;       // 22.5% من الارتفاع
 
             final double rightCorrectPositionPercent = 20 / 400;   // 5% من العرض
-            final double topCorrectPositionPercent = 280 / 800;    // 35% من الارتفاع
+            final double topCorrectPositionPercent = 280 / 650;    // 35% من الارتفاع
 
             final double rightTopPositionPercent = 160 / 400;      // 40% من العرض
 
@@ -226,7 +234,7 @@ class Activity2Level1Stage2State extends State<Activity2Level1Stage2>
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Image.network(
-                      actorElement.imageUrl ?? '',
+                      secondWrong.imageUrl ?? '',
                       width: optionWidth,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -243,14 +251,14 @@ class Activity2Level1Stage2State extends State<Activity2Level1Stage2>
                 // ❌ الإجابة الغلط (شمال)
                 Positioned(
                   left: leftWrongPosition,
-                  top: topLeftPosition,
+                  top: topLeftPosition-20,
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Transform.flip(
                       flipX: true,
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: optionWidth,
+                        firstWrong.imageUrl ?? '',
+                        width: optionWidth*1.3,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: optionWidth,
@@ -273,8 +281,8 @@ class Activity2Level1Stage2State extends State<Activity2Level1Stage2>
                     child: Transform.flip(
                       flipX: true,
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: optionWidth,
+                        thirdWrong.imageUrl ?? '',
+                        width: optionWidth*1.5,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: optionWidth,
@@ -290,7 +298,7 @@ class Activity2Level1Stage2State extends State<Activity2Level1Stage2>
 
                 // ✅ الإجابة الصح (يمين)
                 Positioned(
-                  right: rightCorrectPosition,
+                  right: rightCorrectPosition-10,
                   top: topCorrectPosition,
                   child: AnimatedBuilder(
                     animation: _animationController!,
@@ -322,8 +330,8 @@ class Activity2Level1Stage2State extends State<Activity2Level1Stage2>
                         });
                       },
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: optionWidth,
+                        correctElement.imageUrl ?? '',
+                        width: optionWidth*1.6,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: optionWidth,

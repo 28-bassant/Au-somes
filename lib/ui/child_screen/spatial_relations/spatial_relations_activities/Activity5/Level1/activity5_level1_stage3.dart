@@ -71,7 +71,8 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
     return FutureBuilder<ActivityResponse>(
       future: _loadActivity(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting || !_imagesLoaded) {
+        if (snapshot.connectionState == ConnectionState.waiting ||
+            !_imagesLoaded) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -80,7 +81,8 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
         }
 
         final actor = _activity.elements!.firstWhere((e) => e.role == 'Actor');
-        final shadow = _activity.elements!.firstWhere((e) => e.role == 'Shadow');
+        final shadow = _activity.elements!.firstWhere((e) =>
+        e.role == 'Shadow');
 
         if (!_hasPlayedSound) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -100,29 +102,44 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     // حساب النسب المئوية بناءً على أبعاد الشاشة
-                    final double shadowSizePercent = 500 / 400;     // 125% من العرض المرجعي
-                    final double targetWidthPercent = 60 / 400;     // 15% من العرض المرجعي
-                    final double targetHeightPercent = 40 / 800;    // 5% من الارتفاع المرجعي
-                    final double actorSizePercent = 60 / 400;       // 15% من العرض المرجعي
+                    final double shadowSizePercent = 500 /
+                        400; // 125% من العرض المرجعي
+                    final double targetWidthPercent = 120 /
+                        400; // 15% من العرض المرجعي
+                    final double targetHeightPercent = 40 /
+                        800; // 5% من الارتفاع المرجعي
+                    final double actorSizePercent = 60 /
+                        400; // 15% من العرض المرجعي
 
                     // نسب المواقع من الكود الأصلي
-                    final double targetLeftPercent = 270 / 400;     // 67.5% من العرض
-                    final double targetTopPercent = 330 / 680;      // 41.25% من الارتفاع
+                    final double targetLeftPercent = 270 /
+                        400; // 67.5% من العرض
+                    final double targetTopPercent = 330 /
+                        680; // 41.25% من الارتفاع
 
-                    final double actorRightPercent = 40 / 400;      // 10% من العرض
-                    final double actorBottomPercent = 50 / 800;     // 6.25% من الارتفاع
+                    final double actorRightPercent = 40 / 400; // 10% من العرض
+                    final double actorBottomPercent = 50 /
+                        800; // 6.25% من الارتفاع
 
                     // حساب الأحجام والمواقع الفعلية
-                    final double shadowSize = constraints.maxWidth * shadowSizePercent;
-                    final double targetWidth = constraints.maxWidth * targetWidthPercent;
-                    final double targetHeight = constraints.maxHeight * targetHeightPercent;
-                    final double actorSize = constraints.maxWidth * actorSizePercent;
+                    final double shadowSize = constraints.maxWidth *
+                        shadowSizePercent;
+                    final double targetWidth = constraints.maxWidth *
+                        targetWidthPercent;
+                    final double targetHeight = constraints.maxHeight *
+                        targetHeightPercent;
+                    final double actorSize = constraints.maxWidth *
+                        actorSizePercent;
 
-                    final double targetLeft = constraints.maxWidth * targetLeftPercent;
-                    final double targetTop = constraints.maxHeight * targetTopPercent;
+                    final double targetLeft = constraints.maxWidth *
+                        targetLeftPercent;
+                    final double targetTop = constraints.maxHeight *
+                        targetTopPercent;
 
-                    final double actorRight = constraints.maxWidth * actorRightPercent;
-                    final double actorBottom = constraints.maxHeight * actorBottomPercent;
+                    final double actorRight = constraints.maxWidth *
+                        actorRightPercent;
+                    final double actorBottom = constraints.maxHeight *
+                        actorBottomPercent;
 
                     return Stack(
                       children: [
@@ -158,7 +175,8 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
                             //   ),
                             // ),
                             child: DragTarget<String>(
-                              onWillAccept: (data) => data == actor.targetedZoneId,
+                              onWillAccept: (data) =>
+                              data == actor.targetedZoneId,
                               onAccept: (data) {
                                 setState(() {
                                   isPlacedCorrectly = true;
@@ -171,12 +189,13 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
                                 });
                               },
                               builder: (context, candidateData, rejectedData) {
-                                return Center(
+                                return Align(
+                                  alignment: Alignment.centerLeft,
                                   child: isPlacedCorrectly
                                       ? Image.network(
                                     actor.imageUrl ?? '',
-                                    width: targetWidth,
-                                    height: targetHeight,
+                                    width: actorSize, // 👈 نفس حجمها الأصلي
+                                    height: actorSize,
                                     fit: BoxFit.contain,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Container(
@@ -270,4 +289,5 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
       },
     );
   }
+
 }

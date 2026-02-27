@@ -140,11 +140,14 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
       return const Center(child: Text('Error loading activity'));
     }
 
-    final anchorElement =
-    _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    final anchorElement = _activity!.elements!
+        .firstWhere((e) => e.role == 'Anchor');
 
-    final actorElement =
-    _activity!.elements!.firstWhere((e) => e.isCorrect == true);
+    final correctElement = _activity!.elements!
+        .firstWhere((e) => e.isCorrect == true);
+
+    final wrongElement = _activity!.elements!
+        .firstWhere((e) => e.isCorrect == false);
 
     return Scaffold(
       body: Container(
@@ -223,8 +226,8 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
                         });
                       },
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: optionWidth,
+                        correctElement.imageUrl ?? '',
+                        width: optionWidth*1.3,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: optionWidth,
@@ -241,11 +244,11 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
                 // ❌ اليمين = إجابة غلط
                 Positioned(
                   right: rightPosition,
-                  top: topSecondPosition+36,
+                  top: topSecondPosition+55,
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Image.network(
-                      actorElement.imageUrl ?? '',
+                      wrongElement.imageUrl ?? '',
                       width: optionWidth,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(

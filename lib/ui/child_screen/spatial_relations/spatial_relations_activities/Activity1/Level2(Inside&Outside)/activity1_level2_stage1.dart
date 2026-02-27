@@ -161,8 +161,11 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
     final anchorElement = _activity!.elements!
         .firstWhere((e) => e.role == 'Anchor');
 
-    final actorElement = _activity!.elements!
+    final correctElement = _activity!.elements!
         .firstWhere((e) => e.isCorrect == true);
+
+    final wrongElement = _activity!.elements!
+        .firstWhere((e) => e.isCorrect == false);
 
     return Scaffold(
       body: Container(
@@ -214,8 +217,8 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Image.network(
-                      actorElement.imageUrl ?? '',
-                      width: optionWidth,
+                      wrongElement.imageUrl ?? '',
+                      width: optionWidth*1.3,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           width: optionWidth,
@@ -231,7 +234,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
                 // ✅ الإجابة الصح (يمين + نازلة + animation)
                 Positioned(
                   right: rightPosition,
-                  top: topSecondPosition+36,
+                  top: topSecondPosition+55,
                   child: AnimatedBuilder(
                     animation: _animationController!,
                     builder: (context, child) {
@@ -262,7 +265,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
                         });
                       },
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
+                        correctElement.imageUrl ?? '',
                         width: optionWidth,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
