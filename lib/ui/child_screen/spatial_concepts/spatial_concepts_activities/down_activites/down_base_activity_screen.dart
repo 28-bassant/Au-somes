@@ -31,52 +31,48 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
   final stage23Key = GlobalKey<DownLevel2Stage3ActivityState>();
   final stage24Key = GlobalKey<DownLevel2Stage4ActivityState>();
 
-
   late final List<Widget> activities;
   int currentActivityIndex = 0;
-
   @override
   void initState() {
     super.initState();
+
+    currentActivityIndex = 0; // إعادة ضبط النشاط الحالي
+
+    // إنشاء أنشطة جديدة مع GlobalKey جديدة لكل واحدة
     activities = [
       DownLevel1Stage1Activity(
-        key: stage11Key,
+        key: GlobalKey<DownLevel1Stage1ActivityState>(),
         onNextStage: goToNextActivity,
       ),
       DownLevel1Stage2Activity(
-        key: stage12Key,
+        key: GlobalKey<DownLevel1Stage2ActivityState>(),
         onNextStage: goToNextActivity,
       ),
-
       DownLevel1Stage3Activity(
-        key: stage13Key,
+        key: GlobalKey<DownLevel1Stage3ActivityState>(),
         onNextStage: goToNextActivity,
       ),
-
       DownLevel1Stage4Activity(
-        key: stage14Key,
+        key: GlobalKey<DownLevel1Stage4ActivityState>(),
         onNextStage: goToNextActivity,
       ),
-
       DownLevel2Stage1Activity(
-        key: stage21Key,
+        key: GlobalKey<DownLevel2Stage1ActivityState>(),
         onNextStage: goToNextActivity,
       ),
-
       DownLevel2Stage2Activity(
-        key: stage22Key,
+        key: GlobalKey<DownLevel2Stage2ActivityState>(),
         onNextStage: goToNextActivity,
       ),
       DownLevel2Stage3Activity(
-        key: stage23Key,
+        key: GlobalKey<DownLevel2Stage3ActivityState>(),
         onNextStage: goToNextActivity,
       ),
       DownLevel2Stage4Activity(
-        key: stage24Key,
+        key: GlobalKey<DownLevel2Stage4ActivityState>(),
         onNextStage: goToNextActivity,
       ),
-
-
     ];
   }
 

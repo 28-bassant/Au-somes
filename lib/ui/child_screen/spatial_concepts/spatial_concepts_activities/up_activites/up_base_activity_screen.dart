@@ -22,11 +22,8 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
   final stage11Key = GlobalKey<UpLevel1Stage1ActivityState>();
   final stage12Key = GlobalKey<UpLevel1Stage2ActivityState>();
   final stage13Key = GlobalKey<UpLevel1Stage3ActivityState>();
-
   final stage14Key = GlobalKey<UpLevel1Stage4ActivityState>();
-
   final stage21Key = GlobalKey<UpLevel2Stage1ActivityState>();
-
   final stage22Key = GlobalKey<UpLevel2Stage2ActivityState>();
   final stage23Key = GlobalKey<UpLevel2Stage3ActivityState>();
   final stage24Key = GlobalKey<UpLevel2Stage4ActivityState>();
@@ -116,10 +113,9 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("خلصت انشطة فوق ")),
         );
-          /*
+
         Navigator.pushNamed(context, AppRoutes.downBaseActivityScreenRouteName);
 
-           */
       }
     });
   }

@@ -19,6 +19,7 @@ class AppRoutes {
   static String downBaseActivityScreenRouteName = "down_base_activity_screen";
   static String betweenBaseActivityScreenRouteName = "between_base_activity_screen";
   static String insideBaseActivityScreenRouteName = "inside_base_activity_screen";
+  static String outsideBaseActivityScreenRouteName = "outside_base_activity_screen";
   static String rightLeftBaseActivityScreenRouteName = "right_left_base_activity_screen";
   static String nearFarBaseActivityScreenRouteName = "near_far_base_activity_screen";
   static String spatialRelationsActivitiesBaseScreenRouteName = "spatial_relations_base_activity_screen";

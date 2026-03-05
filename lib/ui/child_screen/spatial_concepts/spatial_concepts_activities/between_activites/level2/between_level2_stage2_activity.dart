@@ -180,142 +180,142 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
       return Stack(
         children: [
 
-        /// ===== Anchor =====
-        Positioned(
-        top: anchorTop,
-        left: 0,
-        child: Image.network(
-          anchor.imageUrl ?? '',
-          width: anchorWidth,
-          fit: BoxFit.contain,
-        ),
-      ),
+          /// ===== Anchor =====
+          Positioned(
+            top: anchorTop,
+            left: 0,
+            child: Image.network(
+              anchor.imageUrl ?? '',
+              width: anchorWidth,
+              fit: BoxFit.contain,
+            ),
+          ),
 
-    /// ===== Shadow الغلط =====
-    Positioned(
-    top: shadowTop,
-    left: shadowLeft * 6,
-    child: Container(
-    key: _shadowWrongKey,
-    width: shadowWidth,
-    child: Image.network(
-    shadowWrong.imageUrl ?? '',
-    fit: BoxFit.contain,
-    ),
-    ),
-    ),
+          /// ===== Shadow الغلط =====
+          Positioned(
+            top: shadowTop,
+            left: shadowLeft * 6,
+            child: Container(
+              key: _shadowWrongKey,
+              width: shadowWidth,
+              child: Image.network(
+                shadowWrong.imageUrl ?? '',
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
 
-    /// ===== Shadow الصح =====
-    Positioned(
-    left: shadowLeft,
-    top: shadowTop,
-    child: Container(
-    key: _shadowCorrectKey,
-    width: shadowWidth,
-    child: AnimatedBuilder(
-    animation: _animationController,
-    builder: (context, child) {
-    double shake = 0;
-    if (_isAnimatingShadow) {
-    shake = shakeIntensity * sin(_animationController.value * 2 * pi);
-    }
-    return Transform.translate(
-    offset: Offset(shake, 0),
-    child: child,
-    );
-    },
-    child: isPlacedCorrectly
-    ? Transform.translate(
-    offset: Offset(actorPlacedOffset, -22*scale),
-    child: Transform.scale(
-    scale: 1.9,
-    child: Image.network(
-    actor.imageUrl ?? '',
-    width: actorPlacedWidth,
-    ),
-    ),
-    )
-        : Image.network(
-    shadowCorrect.imageUrl ?? '',
-    width: shadowWidth,
-    ),
-    ),
-    ),
-    ),
+          /// ===== Shadow الصح =====
+          Positioned(
+            left: shadowLeft,
+            top: shadowTop,
+            child: Container(
+              key: _shadowCorrectKey,
+              width: shadowWidth,
+              child: AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  double shake = 0;
+                  if (_isAnimatingShadow) {
+                    shake = shakeIntensity * sin(_animationController.value * 2 * pi);
+                  }
+                  return Transform.translate(
+                    offset: Offset(shake, 0),
+                    child: child,
+                  );
+                },
+                child: isPlacedCorrectly
+                    ? Transform.translate(
+                  offset: Offset(actorPlacedOffset, -22*scale),
+                  child: Transform.scale(
+                    scale: 1.9,
+                    child: Image.network(
+                      actor.imageUrl ?? '',
+                      width: actorPlacedWidth,
+                    ),
+                  ),
+                )
+                    : Image.network(
+                  shadowCorrect.imageUrl ?? '',
+                  width: shadowWidth,
+                ),
+              ),
+            ),
+          ),
 
-    /// ===== Actor =====
-    if (!isPlacedCorrectly)
-    Positioned(
-    right: actorRight,
-    bottom: actorBottom,
-    child: Draggable<String>(
-    data: actor.id,
-    feedback: Material(
-    color: Colors.transparent,
-    child: Transform.scale(
-    scale: scaleFactor,
-    child: Image.network(
-    actor.imageUrl ?? '',
-    width: actorFeedbackWidth,
-    ),
-    ),
-    ),
-    childWhenDragging: const SizedBox(),
-    child: Transform.scale(
-    scale: scaleFactor,
-    child: Image.network(
-    actor.imageUrl ?? '',
-    width: actorWidth,
-    ),
-    ),
-    onDragEnd: (details) {
+          /// ===== Actor =====
+          if (!isPlacedCorrectly)
+            Positioned(
+              right: actorRight,
+              bottom: actorBottom,
+              child: Draggable<String>(
+                data: actor.id,
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: Transform.scale(
+                    scale: scaleFactor,
+                    child: Image.network(
+                      actor.imageUrl ?? '',
+                      width: actorFeedbackWidth,
+                    ),
+                  ),
+                ),
+                childWhenDragging: const SizedBox(),
+                child: Transform.scale(
+                  scale: scaleFactor,
+                  child: Image.network(
+                    actor.imageUrl ?? '',
+                    width: actorWidth,
+                  ),
+                ),
+                onDragEnd: (details) {
 
-    final actorCenter = Offset(
-    details.offset.dx + actorWidth / 2,
-    details.offset.dy + actorWidth / 2,
-    );
+                  final actorCenter = Offset(
+                    details.offset.dx + actorWidth / 2,
+                    details.offset.dy + actorWidth / 2,
+                  );
 
-    /// ===== Check Shadow الصح =====
-    final correctBox = _shadowCorrectKey.currentContext?.findRenderObject() as RenderBox?;
-    if (correctBox != null) {
-      final pos = correctBox.localToGlobal(Offset.zero);
-      final rect = Rect.fromLTWH(
-        pos.dx,
-        pos.dy,
-        correctBox.size.width,
-        correctBox.size.height,
-      );
-      if (rect.contains(actorCenter)) {
-        setState(() {
-          isPlacedCorrectly = true;
-          _wrongAttempts = 0;
-        });
-        WellDoneOverlay.show(context);
-        Future.delayed(const Duration(seconds: 3), () {
-          if (mounted) widget.onNextStage?.call();
-        });
-        return;
-      }
-    }
+                  /// ===== Check Shadow الصح =====
+                  final correctBox = _shadowCorrectKey.currentContext?.findRenderObject() as RenderBox?;
+                  if (correctBox != null) {
+                    final pos = correctBox.localToGlobal(Offset.zero);
+                    final rect = Rect.fromLTWH(
+                      pos.dx,
+                      pos.dy,
+                      correctBox.size.width,
+                      correctBox.size.height,
+                    );
+                    if (rect.contains(actorCenter)) {
+                      setState(() {
+                        isPlacedCorrectly = true;
+                        _wrongAttempts = 0;
+                      });
+                      WellDoneOverlay.show(context);
+                      Future.delayed(const Duration(seconds: 3), () {
+                        if (mounted) widget.onNextStage?.call();
+                      });
+                      return;
+                    }
+                  }
 
-    /// ===== Check Shadow الغلط =====
-    final wrongBox = _shadowWrongKey.currentContext?.findRenderObject() as RenderBox?;
-    if (wrongBox != null) {
-      final pos = wrongBox.localToGlobal(Offset.zero);
-      final rect = Rect.fromLTWH(
-        pos.dx,
-        pos.dy,
-        wrongBox.size.width,
-        wrongBox.size.height,
-      );
-      if (rect.contains(actorCenter)) {
-        _handleWrongAnswer();
-      }
-    }
+                  /// ===== Check Shadow الغلط =====
+                  final wrongBox = _shadowWrongKey.currentContext?.findRenderObject() as RenderBox?;
+                  if (wrongBox != null) {
+                    final pos = wrongBox.localToGlobal(Offset.zero);
+                    final rect = Rect.fromLTWH(
+                      pos.dx,
+                      pos.dy,
+                      wrongBox.size.width,
+                      wrongBox.size.height,
+                    );
+                    if (rect.contains(actorCenter)) {
+                      _handleWrongAnswer();
+                    }
+                  }
 
-    },
-    ),
-    ),
+                },
+              ),
+            ),
         ],
       );
         },

@@ -58,7 +58,7 @@ class DownLevel1Stage3ActivityState extends State<DownLevel1Stage3Activity>
         // تشغيل الصوت بعد تحميل الصور
         if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
           await _player.stop();
-          await _player.play(UrlSource(activity!.audioUrl!));
+          await _player.play(UrlSource(activity!.deceptionInstructions!.first));
           setState(() {
             hasPlayedSound = true;
           });
@@ -91,10 +91,15 @@ class DownLevel1Stage3ActivityState extends State<DownLevel1Stage3Activity>
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (activity?.deceptionInstructions == null ||
+        activity!.deceptionInstructions!.isEmpty) return;
+
+    final deceptionUrl = activity!.deceptionInstructions!.first;
+
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(deceptionUrl));
   }
+
 
   void repeatSound() => playSound();
 
@@ -161,19 +166,19 @@ class DownLevel1Stage3ActivityState extends State<DownLevel1Stage3Activity>
         final actorTop = seatLevel - actorSize * 0.85;
         final actorLeft = (screenWidth - actorSize) / 2 + 16;
 
-        final bottomCatSize = actorSize * 0.85;
+        final bottomCatSize = actorSize * 0.87;
         final bottomCatTop = anchorTop + anchorHeight - bottomCatSize * 1.2;
         final bottomCatLeft = (screenWidth - bottomCatSize) / 2.9;
 
-        final wrongContainerLeft = width * 0.40;
-        final wrongContainerTop = height * 0.258;
-        final wrongContainerWidth = width * 0.28;
-        final wrongContainerHeight = height * 0.172;
+        final containerLeft = width * 0.40;
+        final containerTop = height * 0.254;
+        final containerWidth = width * 0.28;
+        final containerHeight = height * 0.176;
 
-        final containerLeft = bottomCatLeft + 40;
-        final containerTop = bottomCatTop + 39;
-        final containerWidth = wrongContainerWidth * .9;
-        final containerHeight = wrongContainerHeight * .89;
+        final wrongContainerLeft = bottomCatLeft + 40;
+        final wrongContainerTop = bottomCatTop + 41;
+        final wrongContainerWidth = containerWidth * .9;
+        final wrongContainerHeight = containerHeight * .82;
         return Stack(
           children: [
             /// 🪑 الكرسي
@@ -188,7 +193,7 @@ class DownLevel1Stage3ActivityState extends State<DownLevel1Stage3Activity>
               ),
             ),
 
-            /// القطة الغلط
+            /// ✅ القطة الصح (مع اهتزاز)
             Positioned(
               top: actorTop,
               left: actorLeft,
@@ -200,12 +205,13 @@ class DownLevel1Stage3ActivityState extends State<DownLevel1Stage3Activity>
                 ),
               ),
 
-            /// القطة الصح(مع اهتزاز)
+
+            /// ❌ القطة الغلط
             Positioned(
               top: bottomCatTop,
               left: bottomCatLeft,
               child: AnimatedBuilder(
-                animation: _animationController,
+              animation: _animationController,
                 builder: (context, child) {
                   double shake = 0;
                   if (_isAnimatingAnswer) {
@@ -222,31 +228,16 @@ class DownLevel1Stage3ActivityState extends State<DownLevel1Stage3Activity>
                 height: bottomCatSize,
                 fit: BoxFit.contain,
               ),
-            ),),
+            )),
 
-            /// الضغط على الصح
+            /// الضغط على الغلط
             Positioned(
               left: wrongContainerLeft,
               top: wrongContainerTop,
               child: GestureDetector(
-                onTap: _handleWrongAnswer,
-                child: Container(
-                  width: wrongContainerWidth,
-                  height: wrongContainerHeight,
-                  color: Colors.transparent,
-                ),
-              ),
-            ),
-
-            /// الضغط على الغلط
-            Positioned(
-              left: containerLeft,
-              top: containerTop,
-              child: GestureDetector(
                 onTap: () {
                   _animationController.stop();
                   _animationController.value = 0;
-
                   setState(() {
                     _wrongAttempts = 0;
                     _isAnimatingAnswer = false;
@@ -260,6 +251,20 @@ class DownLevel1Stage3ActivityState extends State<DownLevel1Stage3Activity>
                     }
                   });
                 },
+                child: Container(
+                  width: wrongContainerWidth,
+                  height: wrongContainerHeight,
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+
+            /// الضغط على الصح
+            Positioned(
+              left: containerLeft,
+              top: containerTop,
+              child: GestureDetector(
+                onTap: _handleWrongAnswer,
                 child: Container(
                   width: containerWidth,
                   height: containerHeight,

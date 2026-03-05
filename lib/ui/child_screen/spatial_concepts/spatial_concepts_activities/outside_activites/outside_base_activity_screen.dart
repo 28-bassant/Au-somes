@@ -9,30 +9,30 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
-import 'level1/inside_level1_stage1_activity.dart';
-import 'level1/inside_level1_stage2_activity.dart';
-import 'level1/inside_level1_stage3_activity.dart';
-import 'level1/inside_level1_stage4_activity.dart';
-import 'level2/inside_level2_stage1_activity.dart';
-import 'level2/inside_level2_stage2_activity.dart';
-import 'level2/inside_level2_stage3_activity.dart';
-import 'level2/inside_level2_stage4_activity.dart';
+import 'level1/outside_level1_stage1_activity.dart';
+import 'level1/outside_level1_stage2_activity.dart';
+import 'level1/outside_level1_stage3_activity.dart';
+import 'level1/outside_level1_stage4_activity.dart';
+import 'level2/outside_level2_stage1_activity.dart';
+import 'level2/outside_level2_stage2_activity.dart';
+import 'level2/outside_level2_stage3_activity.dart';
+import 'level2/outside_level2_stage4_activity.dart';
 
-class InsideBaseActivityScreen extends StatefulWidget {
+class OutsideBaseActivityScreen extends StatefulWidget {
   @override
-  _InsideBaseActivityScreenState createState() =>
-      _InsideBaseActivityScreenState();
+  _OutsideBaseActivityScreenState createState() =>
+      _OutsideBaseActivityScreenState();
 }
 
-class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
-  final stage11Key = GlobalKey<InsideLevel1Stage1ActivityState>();
-  final stage12Key = GlobalKey<InsideLevel1Stage2ActivityState>();
-  final stage13Key = GlobalKey<InsideLevel1Stage3ActivityState>();
-  final stage14Key = GlobalKey<InsideLevel1Stage4ActivityState>();
-  final stage21Key = GlobalKey<InsideLevel2Stage1ActivityState>();
-  final stage22Key = GlobalKey<InsideLevel2Stage2ActivityState>();
-  final stage23Key = GlobalKey<InsideLevel2Stage3ActivityState>();
-  final stage24Key = GlobalKey<InsideLevel2Stage4ActivityState>();
+class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
+  final stage11Key = GlobalKey<OutsideLevel1Stage1ActivityState>();
+  final stage12Key = GlobalKey<OutsideLevel1Stage2ActivityState>();
+  final stage13Key = GlobalKey<OutsideLevel1Stage3ActivityState>();
+  final stage14Key = GlobalKey<OutsideLevel1Stage4ActivityState>();
+  final stage21Key = GlobalKey<OutsideLevel2Stage1ActivityState>();
+  final stage22Key = GlobalKey<OutsideLevel2Stage2ActivityState>();
+  final stage23Key = GlobalKey<OutsideLevel2Stage3ActivityState>();
+  final stage24Key = GlobalKey<OutsideLevel2Stage4ActivityState>();
 
   late final List<Widget> activities;
   int currentActivityIndex = 0;
@@ -41,35 +41,35 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
   void initState() {
     super.initState();
     activities = [
-      InsideLevel1Stage1Activity(
+      OutsideLevel1Stage1Activity(
         key: stage11Key,
         onNextStage: goToNextActivity,
       ),
-      InsideLevel1Stage2Activity(
+      OutsideLevel1Stage2Activity(
         key: stage12Key,
         onNextStage: goToNextActivity,
       ),
-      InsideLevel1Stage3Activity(
+      OutsideLevel1Stage3Activity(
         key: stage13Key,
         onNextStage: goToNextActivity,
       ),
-      InsideLevel1Stage4Activity(
+      OutsideLevel1Stage4Activity(
         key: stage14Key,
         onNextStage: goToNextActivity,
       ),
-      InsideLevel2Stage1Activity(
+      OutsideLevel2Stage1Activity(
         key: stage21Key,
         onNextStage: goToNextActivity,
       ),
-      InsideLevel2Stage2Activity(
+      OutsideLevel2Stage2Activity(
         key: stage22Key,
         onNextStage: goToNextActivity,
       ),
-      InsideLevel2Stage3Activity(
+      OutsideLevel2Stage3Activity(
         key: stage23Key,
         onNextStage: goToNextActivity,
       ),
-      InsideLevel2Stage4Activity(
+      OutsideLevel2Stage4Activity(
         key: stage24Key,
         onNextStage: goToNextActivity,
       ),
@@ -104,11 +104,8 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
         currentActivityIndex++;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت انشطة في الداخل ")),
+          const SnackBar(content: Text("خلصت كل الأنشطة!")),
         );
-
-        Navigator.pushNamed(context, AppRoutes.outsideBaseActivityScreenRouteName);
-
       }
     });
   }
@@ -118,9 +115,7 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
-        );
+        Navigator.pop(context);
       }
     });
   }
@@ -191,7 +186,7 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
+          SizedBox(height: height * .04),
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: const Center(
