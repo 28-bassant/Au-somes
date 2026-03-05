@@ -173,7 +173,7 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
         final double wrong1Width = 300 * scale;
         final double wrong1Height = 300 * scale;
         final double wrong2Left = 5 * scale;
-        final double wrong2Top = 200 * scale;
+        final double wrong2Top = 450* scale;
         final double wrong2Width = 180 * scale;
         final double wrong2Height = 170 * scale;
         final double correctRight = 110 * scale;

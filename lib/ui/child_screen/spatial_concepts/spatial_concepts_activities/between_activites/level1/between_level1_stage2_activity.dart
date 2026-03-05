@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../api/api_constants.dart';
@@ -14,20 +17,31 @@ class BetweenLevel1Stage2Activity extends StatefulWidget {
   @override
   BetweenLevel1Stage2ActivityState createState() => BetweenLevel1Stage2ActivityState();
 }
+class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity>
+    with SingleTickerProviderStateMixin {
 
-class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity> {
   ActivityResponse? _activity;
   bool _isLoading = true;
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
   late AudioPlayer _player;
 
+  // 👇 لإدارة الأخطاء والتحريك
+  int _wrongAttempts = 0;
+  bool _isAnimatingAnswer = false;
+  late AnimationController _animationController;
+
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
     _loadActivity();
   }
+
 
   Future<void> _loadActivity() async {
     try {
@@ -87,104 +101,145 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
 
   void repeatSound() => playSound();
 
+  void _handleWrongAnswer() {
+    if (_wrongAttempts >= 2) return; // بعد المرة الثانية مش يحصل حاجة
+    _wrongAttempts++;
+
+    if (_wrongAttempts == 1) {
+      // المرة الأولى: صوت Try Again
+     TryAgainSound.play();
+    } else if (_wrongAttempts == 2) {
+      // المرة الثانية: اهتزاز الأكتور الصح
+      _startAnswerAnimation();
+    }
+  }
+
+  void _startAnswerAnimation() {
+    if (!_isAnimatingAnswer) {
+      setState(() => _isAnimatingAnswer = true);
+      _animationController.repeat(reverse: true);
+      Future.delayed(const Duration(seconds: 3), () {
+        _animationController.stop();
+        _animationController.value = 0;
+        setState(() => _isAnimatingAnswer = false);
+      });
+    }
+  }
+
   @override
   void dispose() {
     _player.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_activity == null) return const Center(child: Text('Error loading activity'));
 
-    if (_activity == null) {
-      return const Center(child: Text('Error loading activity'));
-    }
-
-    final actorElement = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
+    final firstElement = _activity!.elements!.first;  // الأكتور الصح
+    final lastElement = _activity!.elements!.last;    // الأكتور الخطأ
     final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
     return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = constraints.maxWidth;
-        final screenHeight = constraints.maxHeight;
+        builder: (context, constraints) {
+      final screenWidth = constraints.maxWidth;
+      final screenHeight = constraints.maxHeight;
 
-        // 🪑 حجم ومكان الأنكور
-        final anchorWidth = screenWidth * 2.6;
-        final anchorHeight = screenHeight * 0.7;
-        final anchorTop = screenHeight * 0.14;
-        final anchorLeft = (screenWidth - anchorWidth) / 2 + 6;
+      // Anchor
+      final anchorWidth = screenWidth * 1.8;
+      final anchorHeight = screenHeight * 0.6;
+      final anchorTop = screenHeight * 0.19;
+      final anchorLeft = (screenWidth - anchorWidth) / 2 - (screenWidth * .098);
 
-        // 🐱 حجم ومكان الأكتور
-        final actorWidth = screenWidth * 0.7;  // نسبة من عرض الشاشة
-        final actorHeight = actorWidth * 220 / 300; // الحفاظ على نسبة الصورة الأصلية
-        final actorTop = anchorTop + anchorHeight * 0.53 - actorHeight * 0.35;
-        final actorLeft = (screenWidth - actorWidth) / 2 + 8;
+      // Actor
+      final actorWidth = screenWidth * 0.7;
+      final actorHeight = actorWidth * 220 / 300;
+      final actorTop = anchorTop + anchorHeight * 0.53 - actorHeight * 0.35;
+      final actorLeft = (screenWidth - actorWidth) / 2 - (screenWidth * .09);
 
-        // 🌟 حجم ومكان الكونتينر الشفاف على الأكتور
-        final containerLeft = actorLeft + actorWidth * 0.34;
-        final containerTop = actorTop + actorHeight * 0.1;
-        final containerWidth = actorWidth * 0.32;
-        final containerHeight = actorHeight * 0.76;
+      // Container على الأكتور الصح
+      final containerLeft = actorLeft + actorWidth * 0.364;
+      final containerTop = actorTop + actorHeight * 0.16;
+      final containerWidth = actorWidth * 0.26;
+      final containerHeight = actorHeight * 0.64;
+      final containerRect = Rect.fromLTWH(containerLeft, containerTop, containerWidth, containerHeight);
 
-        final containerRect = Rect.fromLTWH(
-          containerLeft,
-          containerTop,
-          containerWidth,
-          containerHeight,
-        );
+      return Stack(
+        children: [
+        // Anchor
+        Positioned(
+        top: anchorTop,
+        left: anchorLeft,
+        child: Image.network(
+          anchorElement.imageUrl ?? '',
+          width: anchorWidth,
+          height: anchorHeight,
+          fit: BoxFit.contain,
+        ),
+      ),
 
-        return Stack(
-          children: [
-            // 🪑 Anchor
-            Positioned(
-              top: anchorTop,
-              left: anchorLeft,
+    // Actor الصح مع اهتزاز
+    Positioned(
+    top: actorTop,
+    left: actorLeft,
+    child: AnimatedBuilder(
+    animation: _animationController,
+    builder: (context, child) {
+      double shakeValue = 0;
+      if (_isAnimatingAnswer) {
+        shakeValue = 12 * sin(_animationController.value * pi);
+      }
+      return Transform.translate(
+        offset: Offset(shakeValue, 0),
+        child: child,
+      );
+    },
+      child: Image.network(
+        firstElement.imageUrl ?? '',
+        width: actorWidth,
+        height: actorHeight,
+        fit: BoxFit.cover,
+      ),
+    ),
+    ),
+
+          // Actor الخطأ
+          Positioned(
+            top: actorTop,
+            right: screenWidth * 0.02,
+            child: GestureDetector(
+              onTap: _handleWrongAnswer,
               child: Image.network(
-                anchorElement.imageUrl ?? '',
-                width: anchorWidth,
-                height: anchorHeight,
-                fit: BoxFit.contain,
-              ),
-            ),
-
-            // 🐱 Actor
-            Positioned(
-              top: actorTop,
-              left: actorLeft,
-              child: Image.network(
-                actorElement.imageUrl ?? '',
-                width: actorWidth,
+                lastElement.imageUrl ?? '',
+                width: actorWidth * 0.27,
                 height: actorHeight,
-                fit: BoxFit.cover,
               ),
             ),
+          ),
 
-            // 🌟 GestureDetector على جزء الأكتور
-            Positioned.fill(
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (details) {
-                  final box = context.findRenderObject() as RenderBox;
-                  final tap = box.globalToLocal(details.globalPosition);
-
-                  if (containerRect.contains(tap)) {
-                    WellDoneOverlay.show(context);
-                    Future.delayed(const Duration(seconds: 3), () {
-                      if (mounted) {
-                        widget.onNextStage?.call();
-                      }
-                    });
-                  }
-                },
-                child: Container(color: Colors.transparent),
+          // GestureDetector على الكونتينر الصح
+          Positioned(
+            left: containerLeft,
+            top: containerTop,
+            child: GestureDetector(
+              onTap: () {
+                WellDoneOverlay.show(context);
+                Future.delayed(const Duration(seconds: 3), () {
+                  if (mounted) widget.onNextStage?.call();
+                });
+              },
+              child: Container(
+                width: containerWidth,
+                height: containerHeight,
+                color: Colors.transparent, // لو عايزة تشوفيه خليها Colors.red.withOpacity(.3)
               ),
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      );
+        },
     );
   }
 }

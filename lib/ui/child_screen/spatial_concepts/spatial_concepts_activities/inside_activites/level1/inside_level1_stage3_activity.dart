@@ -179,7 +179,7 @@ class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
         final double correctTop = 230 * scale;
         final double correctWidth = 120 * scale;
         final double correctHeight = 120 * scale;
-        final double shakeIntensity = 12 * scale;
+        final double shakeIntensity = 22* scale*.09;
 
         return Stack(
           alignment: Alignment.center,
@@ -224,7 +224,7 @@ class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
 
             /// العنصر الصحيح مع الحركة
             Positioned(
-              left: correctLeft-10,
+              left: correctLeft-7,
               top: correctTop,
               child: AnimatedBuilder(
                 animation: _animationController!,

@@ -161,19 +161,19 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity>
         final actorTop = seatLevel - actorSize * 0.85;
         final actorLeft = (screenWidth - actorSize) / 2 + 16;
 
-        final bottomCatSize = actorSize * 0.8;
+        final bottomCatSize = actorSize * 0.87;
         final bottomCatTop = anchorTop + anchorHeight - bottomCatSize * 1.2;
         final bottomCatLeft = (screenWidth - bottomCatSize) / 2.9;
 
         final containerLeft = width * 0.40;
-        final containerTop = height * 0.23;
+        final containerTop = height * 0.254;
         final containerWidth = width * 0.28;
-        final containerHeight = height * 0.2;
+        final containerHeight = height * 0.176;
 
         final wrongContainerLeft = bottomCatLeft + 40;
-        final wrongContainerTop = bottomCatTop + 35;
+        final wrongContainerTop = bottomCatTop + 41;
         final wrongContainerWidth = containerWidth * .9;
-        final wrongContainerHeight = containerHeight * .75;
+        final wrongContainerHeight = containerHeight * .82;
         return Stack(
           children: [
             /// 🪑 الكرسي
