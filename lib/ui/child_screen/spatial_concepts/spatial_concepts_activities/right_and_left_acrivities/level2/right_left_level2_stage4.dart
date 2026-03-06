@@ -251,15 +251,15 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
         final double scale = screenWidth / designWidth;
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double anchorWidth = 300 * scale;
+        final double anchorWidth = 350 * scale;
         final double anchorLeft = 80 * scale;
         final double anchorBottom = 100 * scale;
         final double shadow2Right = 200 * scale;
-        final double shadowTop = 300 * scale;
+        final double shadowTop = 250 * scale;
         final double shadowWidth = 250 * scale;
         final double shadow1Left = 210 * scale;
-        final double actorRight = 20 * scale;
-        final double actorBottom = -20 * scale;
+        final double actorRight = 170 * scale;
+        final double actorBottom =  scale;
         final double actorChildWidth = 150 * scale;
         final double actorFeedbackWidth = 250 * scale;
         final double shadowBigWidth = 300 * scale;
@@ -284,9 +284,7 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
             ),
 
             /// ===== الخلفية =====
-            Positioned(
-              left: anchorLeft,
-              bottom: anchorBottom,
+            Center(
               child: Image.network(
                 anchor.imageUrl ?? '',
                 width: anchorWidth,

@@ -21,13 +21,18 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
   late AudioPlayer _player;
   ActivityResponse? _activity;
   bool _isLoading = true;
-  bool _hasPlayedSound = false;
+  bool _hasPlayedDeceptionSound = false;
+  bool _hasPlayedAudioSound = false;
 
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
 
   bool isCorrectPlaced = false;
+  bool isCorrectSelected = false;
+
+  // متغيرات لتخزين العناصر
+  late Map<String, dynamic> elements;
 
   @override
   void initState() {
@@ -52,13 +57,14 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
       if (mounted) {
         setState(() {
           _activity = activity;
+          _extractElements(activity);
         });
 
         await _preloadImages(activity);
 
-        if (!_hasPlayedSound) {
-          await playSound();
-          _hasPlayedSound = true;
+        if (!_hasPlayedDeceptionSound) {
+          await playDeceptionSound();
+          _hasPlayedDeceptionSound = true;
         }
 
         setState(() {
@@ -69,6 +75,31 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
       if (mounted) setState(() => _isLoading = false);
       print('Error loading activity: $e');
     }
+  }
+
+  void _extractElements(ActivityResponse activity) {
+    final anchor = activity.elements!.firstWhere((e) => e.role == 'Anchor');
+    final shadow = activity.elements!.firstWhere((e) => e.role == 'Shadow');
+
+    final allActors = activity.elements!
+        .where((e) => e.role == 'Actor')
+        .toList();
+
+    final correct = allActors.firstWhere(
+          (e) => e.targetedZoneId != null,
+      orElse: () => allActors[0],
+    );
+
+    final wrong = allActors
+        .where((e) => e.id != correct.id)
+        .toList();
+
+    elements = {
+      'anchor': anchor,
+      'shadow': shadow,
+      'correct': correct,
+      'wrong': wrong,
+    };
   }
 
   Future<void> _preloadImages(ActivityResponse activity) async {
@@ -82,20 +113,49 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
     }
   }
 
-  Future<void> playSound() async {
+  Future<void> playDeceptionSound() async {
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+    await _player.stop();
+    await _player.play(UrlSource(_activity!.deceptionInstructions![0]));
+  }
+
+  Future<void> playAudioSound() async {
     if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
   }
-  void repeatSound() => playSound();
+
+  void repeatSound() {
+    if (isCorrectSelected) {
+      playAudioSound();
+    } else {
+      playDeceptionSound();
+    }
+  }
 
   void _handleWrongAnswer() {
-    if (_wrongAttempts == 0) {
+    setState(() {
+      _wrongAttempts++;
+    });
+
+    if (_wrongAttempts == 1) {
       TryAgainSound.play();
-    } else if (_wrongAttempts == 1) {
+    } else if (_wrongAttempts == 2) {
       _startAnswerAnimation();
     }
-    _wrongAttempts++;
+  }
+
+  void _handleCorrectSelection() {
+    setState(() {
+      isCorrectSelected = true;
+      _wrongAttempts = 0;
+      _isAnimatingAnswer = false;
+    });
+    _animationController?.stop();
+    _animationController?.value = 0;
+
+    playAudioSound();
   }
 
   void _startAnswerAnimation() {
@@ -129,10 +189,12 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_activity == null) return const Center(child: Text('Error loading activity'));
+    if (elements.isEmpty) return const Center(child: Text('Error loading elements'));
 
-    final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
-    final actorElement = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
-    final shadowElement = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
+    final anchorElement = elements['anchor'];
+    final shadowElement = elements['shadow'];
+    final correctElement = elements['correct'];
+    final wrongElements = elements['wrong'] as List;
 
     return Scaffold(
       body: Container(
@@ -140,36 +202,34 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
         height: double.infinity,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // حساب النسب المئوية بناءً على أبعاد الشاشة
-            final double anchorWidthPercent = 250 / 400;        // 62.5% من العرض المرجعي
-            final double shadowWidthPercent = 100 / 400;        // 25% من العرض المرجعي
-            final double actorWidthPercent = 60 / 400;          // 15% من العرض المرجعي
-            final double smallActorWidthPercent = 50 / 400;     // 12.5% من العرض المرجعي
+            final double anchorWidthPercent = 250 / 400;
+            final double shadowWidthPercent = 100 / 400;
+            final double actorWidthPercent = 60 / 400;
+            final double smallActorWidthPercent = 50 / 400;
+            final double optionWidthPercent = 50 / 400;
 
-            // نسب المواقع من الكود الأصلي
-            final double anchorTopPercent = 240 / 800;          // 30% من الارتفاع
+            final double anchorTopPercent = 240 / 800;
 
-            final double dragTargetLeftPercent = 20 / 400;      // 5% من العرض
-            final double dragTargetTopPercent = 20 / 800;       // 2.5% من الارتفاع
-            final double actorTopInShadowPercent = 40 / 800;    // 5% من الارتفاع
+            final double dragTargetLeftPercent = 20 / 400;
+            final double dragTargetTopPercent = 20 / 800;
+            final double actorTopInShadowPercent = 40 / 800;
 
-            final double wrong1RightPercent = 20 / 400;         // 5% من العرض
-            final double wrong1TopPercent = 300 / 800;          // 37.5% من الارتفاع
+            final double topWrongPositionPercent = 120 / 800;
+            final double leftWrongPositionPercent = 20 / 400;
+            final double topLeftPositionPercent = 240 / 550;
+            final double bottomLeftPositionPercent = 110 / 400;
+            final double bottomPositionPercent = 180 / 800;
 
-            final double wrong2LeftPercent = 20 / 400;          // 5% من العرض
-            final double wrong2TopPercent = 300 / 800;          // 37.5% من الارتفاع
+            final double rightTopPositionPercent = 160 / 400;
 
-            final double wrong3LeftPercent = 110 / 400;         // 27.5% من العرض
-            final double wrong3BottomPercent = 180 / 800;       // 22.5% من الارتفاع
+            final double rightCorrectPositionPercent = 20 / 400;
+            final double topCorrectPositionPercent = 280 / 650;
 
-            final double correctLeftPercent = 180 / 400;        // 45% من العرض
-            final double correctTopPercent = 150 / 800;         // 18.75% من الارتفاع
-
-            // حساب الأحجام والمواقع الفعلية
             final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
             final double shadowWidth = constraints.maxWidth * shadowWidthPercent;
             final double actorWidth = constraints.maxWidth * actorWidthPercent;
             final double smallActorWidth = constraints.maxWidth * smallActorWidthPercent;
+            final double optionWidth = constraints.maxWidth * optionWidthPercent;
 
             final double anchorTop = constraints.maxHeight * anchorTopPercent;
 
@@ -177,39 +237,41 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
             final double dragTargetTop = constraints.maxHeight * dragTargetTopPercent;
             final double actorTopInShadow = constraints.maxHeight * actorTopInShadowPercent;
 
-            final double wrong1Right = constraints.maxWidth * wrong1RightPercent;
-            final double wrong1Top = constraints.maxHeight * wrong1TopPercent;
+            final double topWrongPosition = constraints.maxHeight * topWrongPositionPercent;
+            final double leftWrongPosition = constraints.maxWidth * leftWrongPositionPercent;
+            final double topLeftPosition = constraints.maxHeight * topLeftPositionPercent;
+            final double bottomLeftPosition = constraints.maxWidth * bottomLeftPositionPercent;
+            final double bottomPosition = constraints.maxHeight * bottomPositionPercent;
 
-            final double wrong2Left = constraints.maxWidth * wrong2LeftPercent;
-            final double wrong2Top = constraints.maxHeight * wrong2TopPercent;
+            final double rightTopPosition = constraints.maxWidth * rightTopPositionPercent;
 
-            final double wrong3Left = constraints.maxWidth * wrong3LeftPercent;
-            final double wrong3Bottom = constraints.maxHeight * wrong3BottomPercent;
-
-            final double correctLeft = constraints.maxWidth * correctLeftPercent;
-            final double correctTop = constraints.maxHeight * correctTopPercent;
+            final double rightCorrectPosition = constraints.maxWidth * rightCorrectPositionPercent;
+            final double topCorrectPosition = constraints.maxHeight * topCorrectPositionPercent;
 
             return Stack(
-              alignment: Alignment.center,
               children: [
-                // ⚓ Anchor
+                // Anchor
                 Positioned(
                   top: anchorTop,
-                  child: Image.network(
-                    anchorElement.imageUrl ?? '',
-                    width: anchorWidth,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: anchorWidth,
-                        height: anchorWidth,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.error),
-                      );
-                    },
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Image.network(
+                      anchorElement.imageUrl ?? '',
+                      width: anchorWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: anchorWidth,
+                          height: anchorWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
                   ),
                 ),
 
-                // ✅ DragTarget مع الصورة تحت الشادو
+                // Shadow (القفص)
                 Positioned(
                   left: dragTargetLeft,
                   top: dragTargetTop,
@@ -222,7 +284,7 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
                             Positioned(
                               top: actorTopInShadow,
                               child: Image.network(
-                                actorElement.imageUrl ?? '',
+                                correctElement.imageUrl ?? '',
                                 width: actorWidth,
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
@@ -249,145 +311,99 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
                         ],
                       );
                     },
-                    onWillAccept: (_) => true,
+                    onWillAccept: (data) {
+                      return data == 'correct' && isCorrectSelected && !isCorrectPlaced;
+                    },
                     onAccept: (data) {
-                      if (data == 'correct') {
-                        setState(() {
-                          isCorrectPlaced = true;
-                          _wrongAttempts = 0;
-                          _isAnimatingAnswer = false;
-                        });
-                        WellDoneOverlay.show(context);
-                        Future.delayed(const Duration(seconds: 3), () {
-                          if (mounted) widget.onNextStage?.call();
-                        });
-                      } else {
-                        _handleWrongAnswer();
-                      }
+                      setState(() {
+                        isCorrectPlaced = true;
+                      });
+
+                      WellDoneOverlay.show(context);
+                      Future.delayed(const Duration(seconds: 3), () {
+                        if (mounted) widget.onNextStage?.call();
+                      });
                     },
                   ),
                 ),
 
-                // ❌ العناصر الخاطئة الثلاث
-                Positioned(
-                  right: wrong1Right,
-                  top: wrong1Top,
-                  child: Draggable(
-                    data: 'wrong1',
-                    feedback: Image.network(
-                      actorElement.imageUrl ?? '',
-                      width: actorWidth,
-                    ),
-                    childWhenDragging: Opacity(
-                      opacity: 0.5,
+                // أول عنصر غلط (فوق - يمين)
+                if (wrongElements.length > 0)
+                  Positioned(
+                    right: rightCorrectPosition,
+                    top: topCorrectPosition,
+                    child: GestureDetector(
+                      onTap: !isCorrectSelected ? _handleWrongAnswer : null,
                       child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: actorWidth,
-                      ),
-                    ),
-                    child: Image.network(
-                      actorElement.imageUrl ?? '',
-                      width: actorWidth,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: actorWidth,
-                          height: actorWidth,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.error),
-                        );
-                      },
-                    ),
-                    onDragEnd: (_) {},
-                  ),
-                ),
-
-                Positioned(
-                  left: wrong2Left,
-                  top: wrong2Top,
-                  child: Draggable(
-                    data: 'wrong2',
-                    feedback: Transform.flip(
-                      flipX: true,
-                      child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: actorWidth,
-                      ),
-                    ),
-                    childWhenDragging: Opacity(
-                      opacity: 0.5,
-                      child: Transform.flip(
-                        flipX: true,
-                        child: Image.network(
-                          actorElement.imageUrl ?? '',
-                          width: actorWidth,
-                        ),
-                      ),
-                    ),
-                    child: Transform.flip(
-                      flipX: true,
-                      child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: actorWidth,
+                        wrongElements[0].imageUrl ?? '',
+                        width: optionWidth * 1.5,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            width: actorWidth,
-                            height: actorWidth,
+                            width: optionWidth,
+                            height: optionWidth,
                             color: Colors.grey[300],
                             child: const Icon(Icons.error),
                           );
                         },
                       ),
                     ),
-                    onDragEnd: (_) {},
                   ),
-                ),
 
-                Positioned(
-                  left: wrong3Left,
-                  bottom: wrong3Bottom,
-                  child: Draggable(
-                    data: 'wrong3',
-                    feedback: Transform.flip(
-                      flipX: true,
-                      child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: smallActorWidth,
-                      ),
-                    ),
-                    childWhenDragging: Opacity(
-                      opacity: 0.5,
+                // تاني عنصر غلط (شمال)
+                if (wrongElements.length > 1)
+                  Positioned(
+                    left: leftWrongPosition,
+                    top: topLeftPosition - 20,
+                    child: GestureDetector(
+                      onTap: !isCorrectSelected ? _handleWrongAnswer : null,
                       child: Transform.flip(
                         flipX: true,
                         child: Image.network(
-                          actorElement.imageUrl ?? '',
-                          width: smallActorWidth,
+                          wrongElements[2].imageUrl ?? '',
+                          width: optionWidth * 1.3,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: optionWidth * 1.3,
+                              height: optionWidth * 1.3,
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.error),
+                            );
+                          },
                         ),
                       ),
                     ),
-                    child: Transform.flip(
-                      flipX: true,
-                      child: Image.network(
-                        actorElement.imageUrl ?? '',
-                        width: smallActorWidth,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: smallActorWidth,
-                            height: smallActorWidth,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.error),
-                          );
-                        },
+                  ),
+
+                // تالت عنصر غلط (تحت)
+                if (wrongElements.length > 2)
+                  Positioned(
+                    left: bottomLeftPosition,
+                    bottom: bottomPosition,
+                    child: GestureDetector(
+                      onTap: !isCorrectSelected ? _handleWrongAnswer : null,
+                      child: Transform.flip(
+                        flipX: true,
+                        child: Image.network(
+                          wrongElements[1].imageUrl ?? '',
+                          width: optionWidth * 1.5,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: optionWidth * 1.5,
+                              height: optionWidth * 1.5,
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.error),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                    onDragEnd: (_) {},
                   ),
-                ),
 
-                // ✅ العنصر الصحيح مع Animation
+                // العنصر الصحيح (فوق)
                 if (!isCorrectPlaced)
                   Positioned(
-                    left: correctLeft,
-                    top: correctTop,
+                    right: rightTopPosition,
+                    top: topWrongPosition,
                     child: AnimatedBuilder(
                       animation: _animationController!,
                       builder: (context, child) {
@@ -400,26 +416,42 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
                           child: child,
                         );
                       },
-                      child: Draggable(
+                      child: isCorrectSelected
+                          ? Draggable(
                         data: 'correct',
                         feedback: Image.network(
-                          actorElement.imageUrl ?? '',
-                          width: actorWidth,
+                          correctElement.imageUrl ?? '',
+                          width: optionWidth * 1.5,
                         ),
                         childWhenDragging: Opacity(
                           opacity: 0.5,
                           child: Image.network(
-                            actorElement.imageUrl ?? '',
-                            width: actorWidth,
+                            correctElement.imageUrl ?? '',
+                            width: optionWidth * 1.5,
                           ),
                         ),
                         child: Image.network(
-                          actorElement.imageUrl ?? '',
-                          width: actorWidth,
+                          correctElement.imageUrl ?? '',
+                          width: optionWidth * 1.5,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              width: actorWidth,
-                              height: actorWidth,
+                              width: optionWidth * 1.5,
+                              height: optionWidth * 1.5,
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.error),
+                            );
+                          },
+                        ),
+                      )
+                          : GestureDetector(
+                        onTap: _handleCorrectSelection,
+                        child: Image.network(
+                          correctElement.imageUrl ?? '',
+                          width: optionWidth * 1.5,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: optionWidth * 1.5,
+                              height: optionWidth * 1.5,
                               color: Colors.grey[300],
                               child: const Icon(Icons.error),
                             );
