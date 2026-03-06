@@ -292,7 +292,6 @@ class OutsideLevel2Stage4ActivityState
         child: DragTarget<String>(
         onWillAccept: (data) => data == actor.id,
         onAccept: (_) {
-        _handleWrongAnswer();
         },
         builder: (context, _, __) {
         return Transform.rotate(

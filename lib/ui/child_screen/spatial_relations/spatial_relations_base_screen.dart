@@ -366,9 +366,7 @@ else if (currentActivityIndex == 19) {
           //     child: Icon(Icons.add),
           //   ),
           // ),
-          IconButton(onPressed: (){
-            goToNextActivity();
-          }, icon: Icon(Icons.add))
+
         ],
       ),
     );

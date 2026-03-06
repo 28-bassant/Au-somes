@@ -187,6 +187,7 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
             ),
           ),
           SizedBox(height: height * .04),
+
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: const Center(

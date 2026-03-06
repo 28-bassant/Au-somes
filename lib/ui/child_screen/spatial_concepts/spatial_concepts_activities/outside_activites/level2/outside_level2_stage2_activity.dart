@@ -317,7 +317,7 @@ class OutsideLevel2Stage2ActivityState
             if (!isPlacedCorrectly)
               Positioned(
                 left: actorLeft,
-                bottom: actorBottom-80,
+                bottom: actorBottom-120,
                 child: Draggable<String>(
                   data: actor.id,
                   feedback: Material(

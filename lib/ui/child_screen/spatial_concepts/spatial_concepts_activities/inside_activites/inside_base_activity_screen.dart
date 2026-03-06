@@ -191,7 +191,8 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
+          SizedBox(height: height * .04),
+
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: const Center(
