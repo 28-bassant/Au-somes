@@ -42,9 +42,9 @@ class _FrontBackBaseActivityScreenState extends State<FrontBackBaseActivityScree
       FrontBackLevel1Stage2Activity(key: stage12Key,
         onNextStage: goToNextActivity,
       ),
-      FrontBackLevel1Stage3Activity(key: stage13Key,
-        onNextStage: goToNextActivity,
-      ),
+      // FrontBackLevel1Stage3Activity(key: stage13Key,
+      //   onNextStage: goToNextActivity,
+      // ),
        FrontBackLevel1Stage4Activity(key: stage14Key,
         onNextStage: goToNextActivity,
       ),
@@ -67,10 +67,12 @@ class _FrontBackBaseActivityScreenState extends State<FrontBackBaseActivityScree
       stage11Key.currentState?.repeatSound();
     } else if (currentActivityIndex == 1) {
       stage12Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 2) {
-      stage13Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 3) {
-      stage14Key.currentState?.repeatSound();
+    }
+    // else if (currentActivityIndex == 2) {
+    //   stage13Key.currentState?.repeatSound();}
+    else if (currentActivityIndex == 3) {
+        stage14Key.currentState?.repeatSound();
+
     }else if (currentActivityIndex == 4) {
       stage21Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 5) {

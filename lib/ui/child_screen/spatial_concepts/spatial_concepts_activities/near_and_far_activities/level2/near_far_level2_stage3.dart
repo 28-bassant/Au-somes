@@ -7,91 +7,90 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
-import '../../../../../../utils/app_assets.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
 class NearFarLevel2Stage3 extends StatefulWidget {
   final VoidCallback? onNextStage;
-  const NearFarLevel2Stage3({Key? key, this.onNextStage}) : super(key: key);
+
+  const NearFarLevel2Stage3({
+    Key? key,
+    this.onNextStage,
+  }) : super(key: key);
 
   @override
-  State<NearFarLevel2Stage3> createState() => NearFarLevel2Stage3State();
+  NearFarLevel2Stage3State createState() => NearFarLevel2Stage3State();
 }
 
 class NearFarLevel2Stage3State extends State<NearFarLevel2Stage3>
     with SingleTickerProviderStateMixin {
-  ActivityResponse? activity;
-  bool isLoading = true;
+  late AudioPlayer _player;
+  ActivityResponse? _activity;
+  bool _isLoading = true;
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
   bool isPlacedCorrectly = false;
 
-  late AudioPlayer _player;
-  late ActivityElement actor;
-  late ActivityElement correctShadow;
-  late ActivityElement wrongShadow;
-  late ActivityElement anchor;
-
-  final GlobalKey _correctShadowKey = GlobalKey();
-  final GlobalKey _wrongShadowKey = GlobalKey();
-  static const double actorSize = 200;
-
-  // متغيرات جديدة للإدارة
+  // لإدارة المحاولات
   int _wrongAttempts = 0;
-  bool _isAnimatingShadow = false;
+  bool _isAnimatingShadow = false; // تغيير الاسم من _isAnimatingActor إلى _isAnimatingShadow
   AnimationController? _animationController;
+
+  late ActivityElement actor;
+  late ActivityElement shadow;
+  late ActivityElement anchor;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
-    _loadActivity();
-
-    // تهيئة المتحكم في الحركة
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
       vsync: this,
+      duration: const Duration(milliseconds: 800),
     );
+
+    // تحميل النشاط مرة واحدة
+    _loadActivity();
   }
 
   Future<void> _loadActivity() async {
     try {
-      activity = await ApiManager.getActivity(
+      final activity = await ApiManager.getActivity(
         ApiConstants.near_far_activityId,
         2,
         3,
       );
 
-      actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
-      final shadows = activity!.elements!.where((e) => e.role == 'Shadow').toList();
-      correctShadow = shadows.first;
-      wrongShadow = shadows.last;
-      anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
-
       if (mounted) {
-        // تحميل الصور
-        await _preloadImages();
+        setState(() {
+          _activity = activity;
+        });
 
-        // تشغيل الصوت بعد تحميل الصور
+        // حفظ العناصر
+        actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
+        shadow = activity.elements!.firstWhere((e) => e.role == 'Shadow');
+        anchor = activity.elements!.firstWhere((e) => e.role == 'Anchor');
+
+
+        await _preloadImages(activity);
+
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
         }
 
-        setState(() => isLoading = false);
+        setState(() {
+          _isLoading = false;
+        });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
       print('Error loading activity: $e');
     }
   }
 
-  Future<void> _preloadImages() async {
-    final images = activity!.elements!
+  Future<void> _preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
         .map((e) => e.imageUrl)
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
@@ -104,76 +103,40 @@ class NearFarLevel2Stage3State extends State<NearFarLevel2Stage3>
   }
 
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
 
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
-  void _handleWrongAnswer() {
-    setState(() {
-      _wrongAttempts++;
-    });
-
+  void _handleWrongDrop() {
+    _wrongAttempts++;
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
+      // المرة الأولى: صوت Try Again
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الـ Shadow الصحيح
-      _startShadowAnimation();
+      // المرة الثانية: هزة Shadow الصحيح
+      _startShadowShake(); // تغيير اسم الدالة
     }
   }
 
-  // دالة لبدء حركة الـ Shadow الصحيح
-  void _startShadowAnimation() {
-    if (!_isAnimatingShadow && _animationController != null) {
+  void _startShadowShake() { // تغيير اسم الدالة
+    if (!_isAnimatingShadow && _animationController != null) { // تغيير الشرط
       setState(() {
-        _isAnimatingShadow = true;
+        _isAnimatingShadow = true; // تغيير القيمة
       });
-
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted && _isAnimatingShadow) {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
           setState(() {
-            _isAnimatingShadow = false;
+            _isAnimatingShadow = false; // تغيير القيمة
           });
           _animationController!.stop();
           _animationController!.value = 0;
         }
       });
-    }
-  }
-
-  // دالة التعامل مع نهاية السحب
-  void _handleDragEnd(DraggableDetails details, double actorSizeValue) {
-    if (isPlacedCorrectly) return;
-
-    final actorCenter = Offset(
-      details.offset.dx + actorSizeValue / 2,
-      details.offset.dy + actorSizeValue / 2,
-    );
-
-    // Shadow الغلط
-    final wrongBox = _wrongShadowKey.currentContext?.findRenderObject() as RenderBox?;
-
-    if (wrongBox != null) {
-      final wrongPos = wrongBox.localToGlobal(Offset.zero);
-      final wrongRect = Rect.fromLTWH(
-        wrongPos.dx,
-        wrongPos.dy,
-        wrongBox.size.width,
-        wrongBox.size.height,
-      );
-
-      if (wrongRect.contains(actorCenter)) {
-        _handleWrongAnswer();
-        return;
-      }
     }
   }
 
@@ -186,175 +149,118 @@ class NearFarLevel2Stage3State extends State<NearFarLevel2Stage3>
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_activity == null) return const Center(child: Text('Error loading activity'));
 
-    // استخدام LayoutBuilder للحصول على حجم الشاشة
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double screenWidth = constraints.maxWidth;
-        final double screenHeight = constraints.maxHeight;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double scale = screenWidth / 400.0;
 
-        // افتراض أن التصميم الأصلي على شاشة 400px
-        final double designWidth = 400.0;
-        final double scale = screenWidth / designWidth;
+    final double anchorWidth = 250 * scale;
+    final double shadowLeft = 150 * scale;
+    final double shadowTop = 360 * scale;
+    final double shadowWidth = 80 * scale;
+    final double shadowBallWidth = 70 * scale;
+    final double actorRight = 165 * scale;
+    final double actorBottom = -15 * scale;
+    final double actorWidth = 70 * scale;
+    final double actorFeedbackWidth = 80 * scale;
+    final double wrongShadowLeft = screenWidth - 90 * scale;
+    final double wrongShadowTop = shadowTop;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double anchorWidth = 250 * scale;
-        final double anchorTop = 200 * scale;
+    return Stack(
+      children: [
+        /// ===== Anchor =====
+        Align(
+          alignment: Alignment.centerRight,
+          child: Image.network(
+            anchor.imageUrl ?? '',
+            width: anchorWidth,
+            fit: BoxFit.contain,
+          ),
+        ),
 
-        final double wrongShadowRight = 50 * scale;
-        final double wrongShadowTop = 150 * scale;
-        final double wrongShadowWidth = 50 * scale;
-        final double wrongShadowHeight = 50 * scale;
-        final double wrongBallWidth = 80 * scale;
-
-        final double correctShadowLeft = 240 * scale;
-        final double correctShadowTop = 360 * scale;
-        final double correctShadowWidth = 100 * scale;
-        final double correctShadowHeight = 120 * scale;
-        final double correctBallWidth = 80 * scale;
-
-        final double actorRight = 40 * scale;
-        final double actorBottom = 0 * scale;
-        final double actorSizeValue = 120 * scale;
-
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: anchorTop,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Image.network(
-                  anchor.imageUrl ?? '',
-                  width: anchorWidth,
-                  fit: BoxFit.contain,
-                ),
-              ),
+        /// ===== Shadow صح =====
+        Positioned(
+          right: shadowLeft,
+          top: shadowTop,
+          child: AnimatedBuilder( // إضافة AnimatedBuilder لتحريك Shadow
+            animation: _animationController!,
+            builder: (context, child) {
+              double shakeOffset = 0;
+              if (_isAnimatingShadow) { // استخدام _isAnimatingShadow بدلاً من _isAnimatingActor
+                shakeOffset = 12 * sin(_animationController!.value * pi);
+              }
+              return Transform.translate(
+                offset: Offset(shakeOffset, 0),
+                child: child,
+              );
+            },
+            child: DragTarget<String>(
+              onWillAccept: (data) => data == shadow.id,
+              onAccept: (data) {
+                setState(() {
+                  isPlacedCorrectly = true;
+                });
+                WellDoneOverlay.show(context);
+                Future.delayed(const Duration(seconds: 3), () {
+                  if (mounted) widget.onNextStage?.call();
+                });
+              },
+              builder: (context, candidateData, rejectedData) {
+                return isPlacedCorrectly
+                    ? Container(
+                  width: shadowWidth,
+                  height: shadowWidth,
+                  child: Image.network(actor.imageUrl ?? '',
+                      fit: BoxFit.contain),
+                )
+                    : Image.network(shadow.imageUrl ?? '', width: shadowBallWidth);
+              },
             ),
+          ),
+        ),
 
-            // Shadow الغلط
-            Positioned(
-              right: wrongShadowRight,
-              top: wrongShadowTop,
-              child: Container(
-                key: _wrongShadowKey,
-                width: wrongShadowWidth,
-                height: wrongShadowHeight,
-                child: Image.asset(
-                  AppAssets.ball_image,
-                  width: wrongBallWidth,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
+        /// ===== Shadow غلط =====
+        Positioned(
+          right: wrongShadowLeft,
+          top: wrongShadowTop,
+          child: DragTarget<String>(
+            onWillAccept: (data) => data == shadow.id,
+            onAccept: (data) {
+              _handleWrongDrop();
+            },
+            builder: (context, candidateData, rejectedData) {
+              return Image.network(shadow.imageUrl ?? '', width: shadowBallWidth);
+            },
+          ),
+        ),
 
-            // Shadow الصح مع الحركة
-            Positioned(
-              left: correctShadowLeft,
-              top: correctShadowTop,
-              child: AnimatedBuilder(
-                animation: _animationController!,
-                builder: (context, child) {
-                  // حساب قيمة الحركة للاهتزاز بشكل متجاوب
-                  double shakeValue = 0;
-                  if (_isAnimatingShadow) {
-                    // استخدام نسبة من الشاشة للاهتزاز
-                    shakeValue = screenWidth * 0.05 * sin(_animationController!.value *  pi);
-                  }
-
-                  return Transform.translate(
-                    offset: Offset(shakeValue, 0),
-                    child: child,
-                  );
-                },
+        /// ===== Actor =====
+        if (!isPlacedCorrectly)
+          Positioned(
+            right: actorRight,
+            bottom: actorBottom + 20,
+            child: Draggable<String>( // إزالة AnimatedBuilder من هنا
+              data: actor.targetedZoneId,
+              feedback: Material(
+                color: Colors.transparent,
                 child: Container(
-                  key: _correctShadowKey,
-                  width: correctShadowWidth,
-                  height: correctShadowHeight,
-                  child: DragTarget<String>(
-                    onWillAccept: (data) => data == actor.id,
-                    onAccept: (_) {
-                      setState(() {
-                        isPlacedCorrectly = true;
-                        _wrongAttempts = 0;
-                        _isAnimatingShadow = false;
-                      });
-
-                      _animationController?.stop();
-                      _animationController?.value = 0;
-
-                      WellDoneOverlay.show(context);
-                      Future.delayed(const Duration(seconds: 3), () {
-                        if (mounted) {
-                          widget.onNextStage?.call();
-                        }
-                      });
-                    },
-                    builder: (context, _, __) {
-                      return Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: correctBallWidth,
-                            height: correctBallWidth,
-                            child: Image.asset(
-                              AppAssets.ball_image,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          if (isPlacedCorrectly)
-                            Container(
-                              width: actorSizeValue,
-                              height: actorSizeValue,
-                              child: Image.network(
-                                actor.imageUrl ?? '',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+                  width: actorFeedbackWidth,
+                  height: actorFeedbackWidth,
+                  child: Image.network(actor.imageUrl ?? '',
+                      fit: BoxFit.contain),
                 ),
+              ),
+              childWhenDragging: const SizedBox(),
+              child: Container(
+                width: actorWidth,
+                height: actorWidth,
+                child: Image.network(actor.imageUrl ?? '', fit: BoxFit.contain),
               ),
             ),
-
-            if (!isPlacedCorrectly)
-              Positioned(
-                right: actorRight,
-                bottom: actorBottom,
-                child: Draggable<String>(
-                  data: actor.id,
-                  feedback: Material(
-                    color: Colors.transparent,
-                    child: Container(
-                      width: actorSizeValue,
-                      height: actorSizeValue,
-                      child: Image.network(
-                        actor.imageUrl ?? '',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  childWhenDragging: const SizedBox(),
-                  child: Container(
-                    width: actorSizeValue,
-                    height: actorSizeValue,
-                    child: Image.network(
-                      actor.imageUrl ?? '',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  onDragEnd: (details) {
-                    _handleDragEnd(details, actorSizeValue);
-                  },
-                ),
-              ),
-          ],
-        );
-      },
+          ),
+      ],
     );
   }
 }

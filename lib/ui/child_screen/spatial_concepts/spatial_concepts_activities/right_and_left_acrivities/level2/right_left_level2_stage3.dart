@@ -257,9 +257,9 @@ class RightLeftLevel2Stage3State extends State<RightLeftLevel2Stage3>
         final double shadowTop = 300 * scale;
         final double shadowWidth = 250 * scale;
         final double shadow1Left = 210 * scale;
-        final double actorRight = 40 * scale;
-        final double actorBottom = -15 * scale;
-        final double actorWidth = 200 * scale;
+        final double actorRight = 120 * scale;
+        final double actorBottom =  scale;
+        final double actorWidth = 180 * scale;
         final double actorFeedbackWidth = 200 * scale;
         final double shadowBigWidth = 300 * scale;
         final double shakeIntensity = 20 * scale;
@@ -338,8 +338,8 @@ class RightLeftLevel2Stage3State extends State<RightLeftLevel2Stage3>
                       return isPlacedCorrectly
                           ? Image.network(
                         actor.imageUrl ?? '',
-                        width: shadowBigWidth,
-                        height: shadowBigWidth,
+                        width: shadowBigWidth*.6,
+                        height: shadowBigWidth*.6,
                         fit: BoxFit.cover,
                       )
                           : Image.network(

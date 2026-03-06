@@ -144,11 +144,11 @@ class Activity5Level1Stage1State extends State<Activity5Level1Stage1> {
 
                         // DragTarget - حاوية فارغة
                         Positioned(
-                          left: targetLeft,
-                          top: targetTop,
+                          left: targetLeft-20,
+                          top: targetTop-15,
                           child: Container(
-                            width: targetSize,
-                            height: targetSize,
+                            width: targetSize*1.5,
+                            height: targetSize*1.7,
                             // decoration: BoxDecoration(
                             //   border: Border.all(
                             //     color: Colors.black,

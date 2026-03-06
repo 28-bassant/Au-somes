@@ -178,7 +178,7 @@ class RightLeftLevel1Stage3State extends State<RightLeftLevel1Stage3>
               Center(
                 child: Image.network(
                   anchorElement.imageUrl ?? '',
-                  width: 250 * scale,
+                  width: 320 * scale,
                   fit: BoxFit.contain,
                 ),
               ),

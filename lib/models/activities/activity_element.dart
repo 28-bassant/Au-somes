@@ -6,7 +6,8 @@ class ActivityElement {
     this.y,
     this.role,
     this.isCorrect,
-    this.targetedZoneId,});
+    this.targetedZoneId,
+  });
 
   ActivityElement.fromJson(dynamic json) {
     id = json['id'];
@@ -17,6 +18,7 @@ class ActivityElement {
     isCorrect = json['isCorrect'];
     targetedZoneId = json['targetedZoneId'];
   }
+
   String? id;
   String? imageUrl;
   int? x;
@@ -36,5 +38,4 @@ class ActivityElement {
     map['targetedZoneId'] = targetedZoneId;
     return map;
   }
-
 }

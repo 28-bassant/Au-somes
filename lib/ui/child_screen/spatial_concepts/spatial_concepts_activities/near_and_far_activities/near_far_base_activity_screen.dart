@@ -134,7 +134,7 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
         actionsPadding: EdgeInsets.symmetric(horizontal: width * .02),
         centerTitle: true,
         actions: [
-          InkWell(
+          GestureDetector(
             onTap: () =>
                 Navigator.pushReplacementNamed(context, AppRoutes.spatialConceptsScreenRouteName),
             child: Container(
@@ -153,7 +153,7 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
             ),
           ),
         ],
-        leading: InkWell(
+        leading: GestureDetector(
           onTap: goToPreviousActivity,
           child: Row(
             children: [
