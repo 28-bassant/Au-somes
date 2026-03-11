@@ -22,6 +22,8 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
   ActivityResponse? _activity;
   bool _isLoading = true;
   bool _hasPlayedSound = false;
+  bool _imagesLoaded = false;
+  bool _dataLoaded = false;
 
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
@@ -51,8 +53,17 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
 
       setState(() {
         _activity = activity;
+        _dataLoaded = true;
       });
 
+      // تحميل جميع الصور أولاً
+      await _preloadImages(activity);
+
+      setState(() {
+        _imagesLoaded = true;
+      });
+
+      // بعد تحميل الصور، نشغل الصوت
       if (!_hasPlayedSound) {
         await playSound();
         _hasPlayedSound = true;
@@ -62,18 +73,55 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _dataLoaded = true;
+          _imagesLoaded = true;
+        });
+      }
+      print('Error loading activity: $e');
     }
   }
 
   Future<void> playSound() async {
+    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
+    if (!_dataLoaded || !_imagesLoaded) {
+      print('Waiting for data and images to load before playing sound');
+      return;
+    }
+
     if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+
+    try {
+      await _player.stop();
+      await _player.play(UrlSource(_activity!.audioUrl!));
+      print('Sound played successfully after data and images loaded');
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
-  void repeatSound() => playSound();
+
+  void repeatSound() {
+    if (_dataLoaded && _imagesLoaded) {
+      playSound();
+    }
+  }
+
+  Future<void> _preloadImages(ActivityResponse activity) async {
+    final images = activity.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
+
+    final List<Future> precacheFutures = [];
+    for (final url in images) {
+      precacheFutures.add(precacheImage(NetworkImage(url!), context));
+    }
+
+    await Future.wait(precacheFutures);
+    print('All images preloaded successfully');
+  }
 
   void _handleWrongAnswer() {
     setState(() {
@@ -163,7 +211,7 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
             final double leftPositionPercent = 40 / 400;        // 10% من العرض
             final double rightPositionPercent = 160 / 400;      // 40% من العرض
             final double topFirstPositionPercent = 420 / 800;   // 52.5% من الارتفاع
-            final double topSecondPositionPercent = 260 / 800;  // 32.5% من الارتفاع
+            final double topSecondPositionPercent = 320 / 800;  // 32.5% من الارتفاع
 
             // حساب الأحجام والمواقع الفعلية
             final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
@@ -210,21 +258,7 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
                       );
                     },
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _wrongAttempts = 0;
-                          _isAnimatingAnswer = false;
-                        });
-                        _animationController?.stop();
-                        _animationController?.value = 0;
-
-                        WellDoneOverlay.show(context);
-                        Future.delayed(const Duration(seconds: 3), () {
-                          if (mounted) {
-                            widget.onNextStage?.call();
-                          }
-                        });
-                      },
+                      onTap: _handleCorrectAnswer,
                       child: Image.network(
                         correctElement.imageUrl ?? '',
                         width: optionWidth*1.3,
@@ -244,7 +278,7 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
                 // ❌ اليمين = إجابة غلط
                 Positioned(
                   right: rightPosition,
-                  top: topSecondPosition+55,
+                  top: topSecondPosition,
                   child: GestureDetector(
                     onTap: _handleWrongAnswer,
                     child: Image.network(

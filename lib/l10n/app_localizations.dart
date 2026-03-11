@@ -859,6 +859,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Level'**
   String get level;
+
+  /// No description provided for @complete_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done 👏\nYou completed all the activities'**
+  String get complete_activity;
 }
 
 class _AppLocalizationsDelegate

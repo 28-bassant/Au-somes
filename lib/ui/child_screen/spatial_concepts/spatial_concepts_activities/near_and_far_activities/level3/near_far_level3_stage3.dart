@@ -7,16 +7,16 @@ import 'dart:math';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class NearFarLevel1Stage4 extends StatefulWidget {
+class NearFarLevel3Stage3 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const NearFarLevel1Stage4({Key? key, this.onNextStage}) : super(key: key);
+  const NearFarLevel3Stage3({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  NearFarLevel1Stage4State createState() => NearFarLevel1Stage4State();
+  NearFarLevel3Stage3State createState() => NearFarLevel3Stage3State();
 }
 
-class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
+class NearFarLevel3Stage3State extends State<NearFarLevel3Stage3>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -49,7 +49,7 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
       final activity = await ApiManager.getActivity(
         ApiConstants.near_far_activityId,
         1,
-        4,
+        3,
       );
 
       if (mounted) {
@@ -94,9 +94,13 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
 
   void repeatSound() => playSound();
@@ -158,8 +162,8 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
       return const Center(child: Text('Error loading activity'));
     }
 
-    final firstElement = _activity!.elements!.first; // الصورة الغلط (الكبيرة)
-    final lastElement = _activity!.elements!.last;   // الصورة الصح (الصغيرة)
+    final firstElement = _activity!.elements!.first; // الصورة الغلط
+    final lastElement = _activity!.elements!.last;   // الصورة الصح
 
     // استخدام LayoutBuilder للحصول على حجم الشاشة
     return LayoutBuilder(
@@ -171,32 +175,33 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
         final double scale = screenWidth / 400;
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double wrongImageWidth = 300 * scale;  // الصورة الكبيرة
-        final double correctImageWidth = 200 * scale; // الصورة الصغيرة
+        final double correctImageWidth = 200 * scale;
+        final double wrongImageWidth = 300 * scale;
         final double spacingHeight = 30 * scale;
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ❌ الصورة الغلط (الأولى - الكبيرة)
-            GestureDetector(
-              onTap: () {
-                // عند النقر على الإجابة الخاطئة
-                _handleWrongAnswer();
-              },
-              child: Container(
-                width: wrongImageWidth,
-                height: wrongImageWidth, // للحفاظ على النسبة
-                child: Image.network(
-                  firstElement.imageUrl ?? '',
-                  fit: BoxFit.contain,
-                ),
-              ),
+        // ❌ الصورة الغلط (التانية)
+        GestureDetector(
+          onTap: () {
+            // عند النقر على الإجابة الخاطئة
+            _handleWrongAnswer();
+          },
+          child: Container(
+            width: correctImageWidth,
+            height: correctImageWidth, // للحفاظ على النسبة
+            child: Image.network(
+              lastElement.imageUrl ?? '',
+              fit: BoxFit.contain,
             ),
+          ),
+        ),
+
 
             SizedBox(height: spacingHeight),
 
-            // ✅ الصورة الصح (التانية - الصغيرة) مع الحركة
+            // ✅ الصورة الصح (الأولى) مع الحركة
             AnimatedBuilder(
               animation: _animationController!,
               builder: (context, child) {
@@ -204,7 +209,7 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
                 double shakeValue = 0;
                 if (_isAnimatingAnswer) {
                   // استخدام نسبة من الشاشة للاهتزاز
-                  shakeValue = screenWidth * 0.04 * sin(_animationController!.value * pi);
+                  shakeValue = screenWidth * 0.05 * sin(_animationController!.value * pi);
                 }
 
                 return Transform.translate(
@@ -230,10 +235,10 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
                   });
                 },
                 child: Container(
-                  width: correctImageWidth,
-                  height: correctImageWidth, // للحفاظ على النسبة
+                  width: wrongImageWidth,
+                  height: wrongImageWidth, // للحفاظ على النسبة
                   child: Image.network(
-                    lastElement.imageUrl ?? '',
+                    firstElement.imageUrl ?? '',
                     fit: BoxFit.contain,
                   ),
                 ),

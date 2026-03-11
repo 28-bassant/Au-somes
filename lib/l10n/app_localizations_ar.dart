@@ -396,4 +396,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get level => 'المستوى';
+
+  @override
+  String get complete_activity => 'أحسنت 👏\nخلصت كل الأنشطة';
 }

@@ -8,16 +8,16 @@ import 'dart:math';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class RightLeftLevel1Stage4 extends StatefulWidget {
+class RightLeftLevel3Stage4 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const RightLeftLevel1Stage4({Key? key, this.onNextStage}) : super(key: key);
+  const RightLeftLevel3Stage4({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  RightLeftLevel1Stage4State createState() => RightLeftLevel1Stage4State();
+  RightLeftLevel3Stage4State createState() => RightLeftLevel3Stage4State();
 }
 
-class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
+class RightLeftLevel3Stage4State extends State<RightLeftLevel3Stage4>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -95,9 +95,13 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
 
   void repeatSound() => playSound();
@@ -187,37 +191,29 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
             children: [
               // Anchor في الخلف
               Positioned(
-                left: anchorLeft,
+                right: anchorLeft,
                 top: anchorTop,
-                child: Image.network(
-                  anchorElement.imageUrl ?? '',
-                  width: anchorWidth,
-                  fit: BoxFit.contain,
+                child: Transform.scale(
+                  scaleX: -1, // هذا يعكس الصورة أفقياً (flip)
+                  child: Image.network(
+                    anchorElement.imageUrl ?? '',
+                    width: anchorWidth,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
+
+
 
               // الصور فوق الـ Anchor
               Positioned.fill(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: horizontalPadding * .0000008,
-                  vertical: 20),
+                      vertical: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // الصورة الغلط
-                      GestureDetector(
-                        onTap: () {
-                          _handleWrongAnswer();
-                        },
-                        child: Container(
-                          width: imageWidth,
-                          height: imageWidth ,
-                          child: Image.network(
-                            firstElement.imageUrl ?? '',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+
 
                       // الصورة الصحيحة مع الحركة
                       AnimatedBuilder(
@@ -269,6 +265,21 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
                               firstElement.imageUrl ?? '',
                               fit: BoxFit.cover,
                             ),
+                          ),
+                        ),
+                      ),
+
+                      // الصورة الغلط
+                      GestureDetector(
+                        onTap: () {
+                          _handleWrongAnswer();
+                        },
+                        child: Container(
+                          width: imageWidth,
+                          height: imageWidth ,
+                          child: Image.network(
+                            firstElement.imageUrl ?? '',
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),

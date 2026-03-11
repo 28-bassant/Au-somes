@@ -136,7 +136,8 @@
     "bed_time":"Bed Time",
     "am":"AM",
     "pm":"PM",
-    "level":"Level"
+    "level":"Level",
+    "complete_activity":"Well done 👏\nYou completed all the activities"
 
 
 

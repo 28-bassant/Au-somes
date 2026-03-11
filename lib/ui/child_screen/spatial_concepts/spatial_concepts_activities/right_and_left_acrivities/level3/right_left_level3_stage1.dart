@@ -7,16 +7,16 @@ import 'dart:math';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class NearFarLevel1Stage4 extends StatefulWidget {
+class RightLeftLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const NearFarLevel1Stage4({Key? key, this.onNextStage}) : super(key: key);
+  const RightLeftLevel3Stage1({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  NearFarLevel1Stage4State createState() => NearFarLevel1Stage4State();
+  RightLeftLevel3Stage1State createState() => RightLeftLevel3Stage1State();
 }
 
-class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
+class RightLeftLevel3Stage1State extends State<RightLeftLevel3Stage1>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -47,9 +47,9 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
   Future<void> _loadActivity() async {
     try {
       final activity = await ApiManager.getActivity(
-        ApiConstants.near_far_activityId,
+        ApiConstants.right_left_activityId,
         1,
-        4,
+        1,
       );
 
       if (mounted) {
@@ -94,10 +94,15 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
+
 
   void repeatSound() => playSound();
 
@@ -158,90 +163,103 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
       return const Center(child: Text('Error loading activity'));
     }
 
-    final firstElement = _activity!.elements!.first; // الصورة الغلط (الكبيرة)
-    final lastElement = _activity!.elements!.last;   // الصورة الصح (الصغيرة)
+    final rightElement = _activity!.elements![2]; // الصورة الصحيحة
+    final leftElement = _activity!.elements![1];  // الصورة الغلط
+    final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    // استخدام LayoutBuilder للحصول على حجم الشاشة
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double screenWidth = constraints.maxWidth;
-        final double screenHeight = constraints.maxHeight;
+    // استخدام MediaQuery مع SingleChildScrollView
+    final Size screenSize = MediaQuery.of(context).size;
+    final double scale = min(screenSize.width / 400, screenSize.height / 800);
 
-        // حساب عامل التحجيم بناءً على الشاشة (افتراض أن التصميم كان لشاشة 400px)
-        final double scale = screenWidth / 400;
-
-        // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double wrongImageWidth = 300 * scale;  // الصورة الكبيرة
-        final double correctImageWidth = 200 * scale; // الصورة الصغيرة
-        final double spacingHeight = 30 * scale;
-
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // ❌ الصورة الغلط (الأولى - الكبيرة)
-            GestureDetector(
-              onTap: () {
-                // عند النقر على الإجابة الخاطئة
-                _handleWrongAnswer();
-              },
-              child: Container(
-                width: wrongImageWidth,
-                height: wrongImageWidth, // للحفاظ على النسبة
-                child: Image.network(
-                  firstElement.imageUrl ?? '',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-
-            SizedBox(height: spacingHeight),
-
-            // ✅ الصورة الصح (التانية - الصغيرة) مع الحركة
-            AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                // حساب قيمة الحركة للاهتزاز بشكل متجاوب
-                double shakeValue = 0;
-                if (_isAnimatingAnswer) {
-                  // استخدام نسبة من الشاشة للاهتزاز
-                  shakeValue = screenWidth * 0.04 * sin(_animationController!.value * pi);
-                }
-
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
-                onTap: () {
-                  // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
-                  setState(() {
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  _animationController?.stop();
-                  _animationController?.value = 0;
-
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
-                },
-                child: Container(
-                  width: correctImageWidth,
-                  height: correctImageWidth, // للحفاظ على النسبة
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          width: screenSize.width,
+          height: screenSize.height * 0.8,
+          child: Stack(
+            children: [
+              // Anchor في النص
+              Center(
+                child: Transform.scale(
+                  scaleX: -1, // هذا يعكس الصورة أفقياً (flip)
                   child: Image.network(
-                    lastElement.imageUrl ?? '',
+                    anchorElement.imageUrl ?? '',
+                    width: 100 * scale,
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+
+              // rightelement في أقصى اليسار
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 30,
+                child: Center(
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = screenSize.width * 0.03 *
+                            sin(_animationController!.value * pi);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTapDown: (details) {
+                        // إجابة صحيحة
+                        setState(() {
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+                        _animationController?.stop();
+                        _animationController?.value = 0;
+
+                        WellDoneOverlay.show(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) {
+                            widget.onNextStage?.call();
+                          }
+                        });
+                      },
+                      child: Image.network(
+                        width: 180 * scale,
+                        height: 260 * scale,
+                        leftElement.imageUrl ?? '',
+                      ),
+                    ),
+                  ),
+                ),
+
+              ),
+
+              // wrongelement في أقصى اليمين مع الحركة
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 30,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      _handleWrongAnswer();
+                    },
+                    child: Image.network(
+                      width: 180 * scale,
+                      height: 260 * scale,
+                      rightElement.imageUrl ?? '',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

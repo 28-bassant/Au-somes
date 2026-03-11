@@ -1,23 +1,22 @@
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
-import 'package:au_somes/utils/dialog_utils.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class RightLeftLevel1Stage4 extends StatefulWidget {
+class RightLeftLevel3Stage3 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const RightLeftLevel1Stage4({Key? key, this.onNextStage}) : super(key: key);
+  const RightLeftLevel3Stage3({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  RightLeftLevel1Stage4State createState() => RightLeftLevel1Stage4State();
+  RightLeftLevel3Stage3State createState() => RightLeftLevel3Stage3State();
 }
 
-class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
+class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -25,7 +24,6 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -35,10 +33,8 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -50,7 +46,7 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
       final activity = await ApiManager.getActivity(
         ApiConstants.right_left_activityId,
         1,
-        4,
+        3,
       );
 
       if (mounted) {
@@ -58,10 +54,8 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -95,39 +89,37 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
 
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
 
-  // دالة لبدء حركة الإجابة الصحيحة
   void _startAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -149,86 +141,55 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
 
   @override
   Widget build(BuildContext context) {
-    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
 
-    final firstElement = _activity!.elements![1]; // الصورة الصحيحة
-    final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    final rightElement = _activity!.elements![0];
+    final leftElement = _activity!.elements![1];
+    final anchorElement =
+    _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    // استخدام LayoutBuilder للحصول على حجم الشاشة
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double screenWidth = constraints.maxWidth;
-        final double screenHeight = constraints.maxHeight;
+    final Size screenSize = MediaQuery.of(context).size;
+    final double scale = min(screenSize.width / 400, screenSize.height / 800);
 
-        // افتراض أن التصميم الأصلي على شاشة 400px
-        final double designWidth = 400.0;
-        final double scale = screenWidth / designWidth;
-
-        // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double anchorLeft = 80 * scale;
-        final double anchorTop = 80 * scale;
-        final double anchorWidth = 400 * scale;
-        final double imageWidth = 180 * scale;
-        final double horizontalPadding = 20 * scale;
-
-        return Container(
-          width: screenWidth,
-          height: screenHeight,
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          width: screenSize.width,
+          height: screenSize.height * .8,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Anchor في الخلف
-              Positioned(
-                left: anchorLeft,
-                top: anchorTop,
-                child: Image.network(
-                  anchorElement.imageUrl ?? '',
-                  width: anchorWidth,
-                  fit: BoxFit.contain,
+              Center(
+                child: Transform.scale(
+                  scaleX: -1,
+                  child: Image.network(
+                    anchorElement.imageUrl ?? '',
+                    width: 320 * scale,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
 
-              // الصور فوق الـ Anchor
               Positioned.fill(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding * .0000008,
-                  vertical: 20),
+                  padding: EdgeInsets.all(20 * scale),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // الصورة الغلط
-                      GestureDetector(
-                        onTap: () {
-                          _handleWrongAnswer();
-                        },
-                        child: Container(
-                          width: imageWidth,
-                          height: imageWidth ,
-                          child: Image.network(
-                            firstElement.imageUrl ?? '',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                      // الصورة الصحيحة مع الحركة
                       AnimatedBuilder(
                         animation: _animationController!,
                         builder: (context, child) {
-                          // حساب قيمة الحركة للاهتزاز بشكل متجاوب
                           double shakeValue = 0;
                           if (_isAnimatingAnswer) {
-                            // استخدام نسبة من الشاشة للاهتزاز
-                            shakeValue = screenWidth * 0.03 *
-                                sin(_animationController!.value * pi );
+                            shakeValue = screenSize.width *
+                                0.03 *
+                                sin(_animationController!.value * pi);
                           }
 
                           return Transform.translate(
@@ -238,37 +199,75 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
                         },
                         child: GestureDetector(
                           onTapDown: (details) {
-                            final tapX = details.localPosition.dx;
-                            final imageWidthValue = imageWidth;
+                            final local = details.localPosition;
+                            final double imageWidth = 180 * scale;
+                            final double imageHeight = 180 * scale;
 
-                            // المنطقة الصحيحة: منتصف الصورة (من 25% إلى 75%)
-                            if (tapX > imageWidthValue * 0.25 && tapX < imageWidthValue * 0.75) {
-                              // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
+                            // المنطقة الصحيحة أصبحت في الشمال
+                            final correctArea = Rect.fromLTWH(
+                              0,
+                              0,
+                              imageWidth * 0.6,
+                              imageHeight,
+                            );
+
+                            if (correctArea.contains(local)) {
                               setState(() {
                                 _wrongAttempts = 0;
                                 _isAnimatingAnswer = false;
                               });
+
                               _animationController?.stop();
                               _animationController?.value = 0;
 
                               WellDoneOverlay.show(context);
+
                               Future.delayed(const Duration(seconds: 3), () {
                                 if (mounted) {
                                   widget.onNextStage?.call();
                                 }
                               });
-                            } else {
-                              // نقر خارج المنطقة الصحيحة يعتبر إجابة خاطئة
-                              _handleWrongAnswer();
                             }
                           },
-                          child: Container(
-                            width: imageWidth,
-                            height: imageWidth,
-                            child: Image.network(
-                              firstElement.imageUrl ?? '',
-                              fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: 180 * scale,
+                            height: 180 * scale,
+                            child: Stack(
+                              children: [
+                                Image.network(
+                                  leftElement.imageUrl ?? '',
+                                  fit: BoxFit.cover,
+                                ),
+
+                                // منطقة المساعدة أصبحت في الشمال
+                                Positioned(
+                                  left: 0,
+                                  child: Container(
+                                    width: 180 * scale * 0.6,
+                                    height: 180 * scale,
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                        ),
+                      ),
+
+                      GestureDetector(
+                        onTap: () {
+                          _handleWrongAnswer();
+                        },
+                        child: Container(
+                          width: 180 * scale,
+                          height: 180 * scale,
+                          decoration: const BoxDecoration(
+                            border: Border.fromBorderSide(
+                              BorderSide(color: Colors.transparent),
+                            ),
+                          ),
+                          child: Image.network(
+                            rightElement.imageUrl ?? '',
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
@@ -278,8 +277,8 @@ class RightLeftLevel1Stage4State extends State<RightLeftLevel1Stage4>
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

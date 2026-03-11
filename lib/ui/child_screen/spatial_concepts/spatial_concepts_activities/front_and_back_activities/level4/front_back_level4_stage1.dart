@@ -8,17 +8,17 @@ import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class FrontBackLevel2Stage1Activity extends StatefulWidget {
+class FrontBackLevel4Stage1Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const FrontBackLevel2Stage1Activity({Key? key, this.onNextStage}) : super(key: key);
+  const FrontBackLevel4Stage1Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  State<FrontBackLevel2Stage1Activity> createState() =>
-      FrontBackLevel2Stage1ActivityState();
+  State<FrontBackLevel4Stage1Activity> createState() =>
+      FrontBackLevel4Stage1ActivityState();
 }
 
-class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Activity>
+class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Activity>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -26,9 +26,10 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
   bool _hasPlayedSound = false;
   bool _isPlacedCorrectly = false;
   bool _imagesLoaded = false;
+  bool _dataLoaded = false;
 
-  final GlobalKey _shadowLeftKey = GlobalKey(); // الشمال (الغلط)
-  final GlobalKey _shadowRightKey = GlobalKey(); // اليمين (الصح)
+  final GlobalKey _shadowLeftKey = GlobalKey(); // الشمال (المفروض غلط)
+  final GlobalKey _shadowRightKey = GlobalKey(); // اليمين (المفروض صح)
 
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
@@ -57,12 +58,17 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       if (mounted) {
         setState(() {
           _activity = activity;
+          _dataLoaded = true;
         });
 
         // تحميل جميع الصور أولاً
         await _preloadImages(activity);
 
-        // بعد تحميل الصور، نشغل الصوت
+        setState(() {
+          _imagesLoaded = true;
+        });
+
+        // بعد تحميل البيانات والصور، نشغل الصوت
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -76,38 +82,58 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _dataLoaded = true;
+          _imagesLoaded = true;
         });
       }
       print('Error loading activity: $e');
     }
   }
 
-  Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
-  }
-
-  void repeatSound() => playSound();
-
+  // دالة لتحميل جميع الصور مسبقاً
   Future<void> _preloadImages(ActivityResponse activity) async {
     final images = activity.elements!
         .map((e) => e.imageUrl)
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
+    // تحميل كل الصور في الخلفية
     final List<Future> precacheFutures = [];
     for (final url in images) {
       precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
+    // انتظار تحميل جميع الصور
     await Future.wait(precacheFutures);
-
-    setState(() {
-      _imagesLoaded = true;
-    });
-
     print('All images preloaded successfully');
+  }
+
+  Future<void> playSound() async {
+    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
+    if (!_dataLoaded || !_imagesLoaded) {
+      print('Waiting for data and images to load before playing sound');
+      return;
+    }
+
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
+    try {
+      await _player.stop();
+      await _player.play(
+        UrlSource(_activity!.deceptionInstructions![0]!),
+      );
+      print('Sound played successfully after data and images loaded');
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
+  }
+
+  void repeatSound() {
+    // تأكد من تحميل كل شيء قبل إعادة تشغيل الصوت
+    if (_dataLoaded && _imagesLoaded) {
+      playSound();
+    }
   }
 
   void _handleWrongAnswer() {
@@ -152,7 +178,7 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
     );
 
     // =========================
-    // تحقق من الظل الشمال (الغلط)
+    // تحقق من الظل الشمال (المفروض يكون غلط)
     // =========================
     final shadowLeftBox =
     _shadowLeftKey.currentContext?.findRenderObject() as RenderBox?;
@@ -168,13 +194,13 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       );
 
       if (rect.contains(actorCenter)) {
-        _handleWrongAnswer(); // غلط → نزيد المحاولات
+        _handleWrongAnswer(); // هذا غلط → نزيد المحاولات
         return;
       }
     }
 
     // =========================
-    // تحقق من الظل اليمين (الصح)
+    // تحقق من الظل اليمين (المفروض يكون صح)
     // =========================
     final shadowRightBox =
     _shadowRightKey.currentContext?.findRenderObject() as RenderBox?;
@@ -228,6 +254,7 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
     }
 
     final actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
+    final actor2 = _activity!.elements!.lastWhere((e) => e.role == 'Actor');
 
     // الظلال
     final shadowLeft = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');  // الشمال (غلط)
@@ -244,36 +271,10 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
     return Scaffold(
       body: Stack(
         children: [
-          // shadow الشمال (الغلط)
+          // الظل الأيمن (الصح) - متحرك
           Positioned(
             left: screenWidth * 0.22,
             top: screenHeight * 0.42,
-            child: Container(
-              key: _shadowLeftKey,
-              width: 120,
-              height: 120,
-              child: Image.network(
-                shadowLeft.imageUrl ?? '',
-                fit: BoxFit.fill,
-              ),
-            ),
-          ),
-
-          // anchor
-          Positioned.fill(
-            child: Center(
-              child: Image.network(
-                anchor.imageUrl ?? '',
-                width: anchorWidth,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-
-          // shadow اليمين (الصح) - وهو الذي يهتز عند الخطأ
-          Positioned(
-            left: screenWidth * 0.5,
-            top: screenHeight * 0.45,
             child: AnimatedBuilder(
               animation: _animationController!,
               builder: (context, child) {
@@ -294,9 +295,35 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
                 width: 120,
                 height: 120,
                 child: _isPlacedCorrectly
-                    ? Image.network(actor.imageUrl ?? '', fit: BoxFit.fill)
-                    : Image.network(shadowRight.imageUrl ?? '',
+                    ? Image.network(actor2.imageUrl ?? '', fit: BoxFit.fill)
+                    : Image.network(shadowLeft.imageUrl ?? '',
                     fit: BoxFit.fill),
+              ),
+            ),
+          ),
+
+          // anchor
+          Positioned.fill(
+            child: Center(
+              child: Image.network(
+                anchor.imageUrl ?? '',
+                width: anchorWidth,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+
+          // الظل الأيسر (الغلط)
+          Positioned(
+            left: screenWidth * 0.5,
+            top: screenHeight * 0.45,
+            child: Container(
+              key: _shadowLeftKey,
+              width: 120,
+              height: 120,
+              child: Image.network(
+                shadowRight.imageUrl ?? '',
+                fit: BoxFit.fill,
               ),
             ),
           ),
@@ -307,18 +334,18 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
               right: 150,
               bottom: 20,
               child: Draggable<String>(
-                data: actor.id,
+                data: actor2.id,
                 feedback: Material(
                   color: Colors.transparent,
                   child: Image.network(
-                    actor.imageUrl ?? '',
+                    actor2.imageUrl ?? '',
                     width: actorSize * 0.8,
                     height: actorSize * 0.5,
                   ),
                 ),
                 childWhenDragging: const SizedBox(),
                 child: Image.network(
-                  actor.imageUrl ?? '',
+                  actor2.imageUrl ?? '',
                   width: actorSize * 0.5,
                   height: actorSize * 0.5,
                 ),

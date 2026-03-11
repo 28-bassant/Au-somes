@@ -9,9 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
+import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/front_back_level1_stage3_activity.dart';
 import 'level1/front_back_level1_stage4_activity.dart';
 import 'level2/front_back_level2_stage2_activity.dart';
+import 'level3/front_back_level3_stage1.dart';
+import 'level3/front_back_level3_stage2.dart';
+import 'level3/front_back_level3_stage3.dart';
+import 'level4/front_back_level4_stage1.dart';
+import 'level4/front_back_level4_stage2.dart';
+import 'level4/front_back_level4_stage3.dart';
 
 class FrontBackBaseActivityScreen extends StatefulWidget {
   @override
@@ -27,6 +34,12 @@ class _FrontBackBaseActivityScreenState extends State<FrontBackBaseActivityScree
   final stage21Key = GlobalKey<FrontBackLevel2Stage1ActivityState>();
   final stage22Key = GlobalKey<FrontBackLevel2Stage2ActivityState>();
   final stage23Key = GlobalKey<FrontBackLevel2Stage3ActivityState>();
+  final stage31Key = GlobalKey<FrontBackLevel3Stage1ActivityState>();
+  final stage32Key = GlobalKey<FrontBackLevel3Stage2ActivityState>();
+  final stage33Key = GlobalKey<FrontBackLevel3Stage3ActivityState>();
+  final stage41Key = GlobalKey<FrontBackLevel4Stage1ActivityState>();
+  final stage42Key = GlobalKey<FrontBackLevel4Stage2ActivityState>();
+  final stage43Key = GlobalKey<FrontBackLevel4Stage3ActivityState>();
 
   late final List<Widget> activities;
   int currentActivityIndex = 0;
@@ -57,6 +70,24 @@ class _FrontBackBaseActivityScreenState extends State<FrontBackBaseActivityScree
  FrontBackLevel2Stage3Activity(key: stage23Key,
         onNextStage: goToNextActivity,
       ),
+      FrontBackLevel3Stage1Activity(key: stage31Key,
+        onNextStage: goToNextActivity,
+      ),
+ FrontBackLevel3Stage2Activity(key: stage32Key,
+        onNextStage: goToNextActivity,
+      ),
+ FrontBackLevel3Stage3Activity(key: stage33Key,
+        onNextStage: goToNextActivity,
+      ),
+ FrontBackLevel4Stage1Activity(key: stage41Key,
+        onNextStage: goToNextActivity,
+      ),
+ FrontBackLevel4Stage2Activity(key: stage42Key,
+        onNextStage: goToNextActivity,
+      ),
+FrontBackLevel4Stage3Activity(key: stage43Key,
+        onNextStage: goToNextActivity,
+      ),
 
     ];
   }
@@ -70,15 +101,27 @@ class _FrontBackBaseActivityScreenState extends State<FrontBackBaseActivityScree
     }
     // else if (currentActivityIndex == 2) {
     //   stage13Key.currentState?.repeatSound();}
-    else if (currentActivityIndex == 3) {
+    else if (currentActivityIndex == 2) {
         stage14Key.currentState?.repeatSound();
 
-    }else if (currentActivityIndex == 4) {
+    }else if (currentActivityIndex == 3) {
       stage21Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 5) {
+    }else if (currentActivityIndex == 4) {
       stage22Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 6) {
+    }else if (currentActivityIndex == 5) {
       stage23Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 6) {
+      stage31Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 7) {
+      stage32Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 8) {
+      stage33Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 9) {
+      stage41Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 10) {
+      stage42Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 11) {
+      stage43Key.currentState?.repeatSound();
     }
   }
 
@@ -87,13 +130,19 @@ class _FrontBackBaseActivityScreenState extends State<FrontBackBaseActivityScree
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت كل الأنشطة!")),
-        );
+        ConfettiOverlay.show(context);
+
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.spatialConceptsScreenRouteName,
+            );
+          }
+        });
       }
     });
   }
-
   void goToPreviousActivity() {
     setState(() {
       if (currentActivityIndex > 0) {

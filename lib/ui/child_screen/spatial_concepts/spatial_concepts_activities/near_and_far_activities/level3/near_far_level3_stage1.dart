@@ -8,16 +8,16 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class NearFarLevel1Stage1 extends StatefulWidget {
+class NearFarLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const NearFarLevel1Stage1({Key? key, this.onNextStage}) : super(key: key);
+  const NearFarLevel3Stage1({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  State<NearFarLevel1Stage1> createState() => NearFarLevel1Stage1State();
+  State<NearFarLevel3Stage1> createState() => NearFarLevel3Stage1State();
 }
 
-class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
+class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -89,10 +89,15 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
+
 
   void repeatSound() => playSound();
 
@@ -159,15 +164,29 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
               alignment: Alignment.centerLeft,
               child: Image.network(
                 anchor.imageUrl ?? '',
-                width: 100 * scale,
+                width: 120 * scale,
               ),
             ),
           ),
 
-          // الصورة الصحيحة (Actor Correct)
+          // الصورة الغلط
           Positioned(
             right: 80 * scale + 120,
             top: 250 * scale - 40,
+            child: GestureDetector(
+              onTap: _handleWrongAnswer,
+              child: Image.network(
+                actorCorrect.imageUrl ?? '',
+                width: 80 * scale,
+              ),
+            ),
+          ),
+
+          // الصورة الصح
+          Positioned(
+            top: 130 * scale + 80,
+            right: 40 * scale - 40,
+
             child: AnimatedBuilder(
               animation: _animationController!,
               builder: (context, child) {
@@ -192,23 +211,11 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
                   });
                 },
                 child: Image.network(
-                  actorCorrect.imageUrl ?? '',
-                  width: 80 * scale,
-                ),
-              ),
-            ),
-          ),
+                  actorWrong.imageUrl ?? '',
 
-          // الصورة الغلط (Actor Wrong)
-          Positioned(
-            top: 130 * scale + 80,
-            right: 40 * scale - 40,
-            child: GestureDetector(
-              onTap: _handleWrongAnswer,
-              child: Image.network(
-                actorWrong.imageUrl ?? '',
-                width: 200 * scale * 0.5,
-                height: 400 * scale * 0.5,
+                  width: 200 * scale * 0.5,
+                  height: 400 * scale * 0.5,
+                ),
               ),
             ),
           ),

@@ -7,12 +7,21 @@ import 'package:provider/provider.dart';
 
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
+import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/near_far_level1_stage2.dart';
 import 'level1/near_far_level1_stage3.dart';
 import 'level1/near_far_level1_stage4.dart';
 import 'level2/near_far_level2_stage1.dart';
 import 'level2/near_far_level2_stage3.dart';
 import 'level2/near_far_level2_stage4.dart';
+import 'level3/near_far_level3_stage1.dart';
+import 'level3/near_far_level3_stage2.dart';
+import 'level3/near_far_level3_stage3.dart';
+import 'level3/near_far_level3_stage4.dart';
+import 'level4/near_far_level4_stage1.dart';
+import 'level4/near_far_level4_stage2.dart';
+import 'level4/near_far_level4_stage3.dart';
+import 'level4/near_far_level4_stage4.dart';
 
 
 class NearFarBaseActivityScreen extends StatefulWidget {
@@ -30,6 +39,14 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
   final stage22Key = GlobalKey<NearFarLevel2Stage2State>();
   final stage23Key = GlobalKey<NearFarLevel2Stage3State>();
   final stage24Key = GlobalKey<NearFarLevel2Stage4State>();
+  final stage31Key = GlobalKey<NearFarLevel3Stage1State>();
+  final stage32Key = GlobalKey<NearFarLevel3Stage2State>();
+  final stage33Key = GlobalKey<NearFarLevel3Stage3State>();
+  final stage34Key = GlobalKey<NearFarLevel3Stage4State>();
+  final stage41Key = GlobalKey<NearFarLevel4Stage1State>();
+  final stage42Key = GlobalKey<NearFarLevel4Stage2State>();
+  final stage43Key = GlobalKey<NearFarLevel4Stage3State>();
+  final stage44Key = GlobalKey<NearFarLevel4Stage4State>();
 
 
 
@@ -73,6 +90,38 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
         key: stage24Key,
         onNextStage: goToNextActivity,
       ),
+      NearFarLevel3Stage1(
+        key: stage31Key,
+        onNextStage: goToNextActivity,
+      ),
+     NearFarLevel3Stage2(
+        key: stage32Key,
+        onNextStage: goToNextActivity,
+      ),
+     NearFarLevel3Stage3(
+        key: stage33Key,
+        onNextStage: goToNextActivity,
+      ),
+      NearFarLevel3Stage4(
+        key: stage34Key,
+        onNextStage: goToNextActivity,
+      ),
+      NearFarLevel4Stage1(
+        key: stage41Key,
+        onNextStage: goToNextActivity,
+      ),
+      NearFarLevel4Stage2(
+        key: stage42Key,
+        onNextStage: goToNextActivity,
+      ),
+      NearFarLevel4Stage3(
+        key: stage43Key,
+        onNextStage: goToNextActivity,
+      ),
+      NearFarLevel4Stage4(
+        key: stage44Key,
+        onNextStage: goToNextActivity,
+      ),
 
 
     ];
@@ -96,6 +145,22 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
       stage23Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 6) {
       stage24Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 7) {
+      stage31Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 8) {
+      stage32Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 9) {
+      stage33Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 10) {
+      stage34Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 11) {
+      stage41Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 12) {
+      stage42Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 13) {
+      stage43Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 14) {
+      stage44Key.currentState?.repeatSound();
     }
   }
 
@@ -104,9 +169,16 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت كل الأنشطة!")),
-        );
+        ConfettiOverlay.show(context);
+
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.spatialConceptsScreenRouteName,
+            );
+          }
+        });
       }
     });
   }
