@@ -7,16 +7,16 @@ import 'dart:math';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class NearFarLevel1Stage4 extends StatefulWidget {
+class NearFarLevel3Stage4 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const NearFarLevel1Stage4({Key? key, this.onNextStage}) : super(key: key);
+  const NearFarLevel3Stage4({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  NearFarLevel1Stage4State createState() => NearFarLevel1Stage4State();
+  NearFarLevel3Stage4State createState() => NearFarLevel3Stage4State();
 }
 
-class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
+class NearFarLevel3Stage4State extends State<NearFarLevel3Stage4>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -94,9 +94,13 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
 
   void repeatSound() => playSound();
@@ -178,24 +182,6 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ❌ الصورة الغلط (الأولى - الكبيرة)
-            GestureDetector(
-              onTap: () {
-                // عند النقر على الإجابة الخاطئة
-                _handleWrongAnswer();
-              },
-              child: Container(
-                width: wrongImageWidth,
-                height: wrongImageWidth, // للحفاظ على النسبة
-                child: Image.network(
-                  firstElement.imageUrl ?? '',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-
-            SizedBox(height: spacingHeight),
-
             // ✅ الصورة الصح (التانية - الصغيرة) مع الحركة
             AnimatedBuilder(
               animation: _animationController!,
@@ -230,12 +216,31 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
                   });
                 },
                 child: Container(
-                  width: correctImageWidth,
-                  height: correctImageWidth, // للحفاظ على النسبة
+                  width: wrongImageWidth,
+                  height: wrongImageWidth, // للحفاظ على النسبة
                   child: Image.network(
-                    lastElement.imageUrl ?? '',
+                    firstElement.imageUrl ?? '',
                     fit: BoxFit.contain,
                   ),
+                ),
+              ),
+            ),
+
+
+            SizedBox(height: spacingHeight),
+
+            // ❌ الصورة الغلط (الأولى - الكبيرة)
+            GestureDetector(
+              onTap: () {
+                // عند النقر على الإجابة الخاطئة
+                _handleWrongAnswer();
+              },
+              child: Container(
+                width: correctImageWidth,
+                height: correctImageWidth, // للحفاظ على النسبة
+                child: Image.network(
+                  lastElement.imageUrl ?? '',
+                  fit: BoxFit.contain,
                 ),
               ),
             ),

@@ -102,12 +102,12 @@ class Activity5Level1Stage2State extends State<Activity5Level1Stage2> {
                     // حساب النسب المئوية بناءً على أبعاد الشاشة
                     final double shadowSizePercent = 500 / 400;     // 125% من العرض المرجعي
                     final double targetWidthPercent = 120 / 400;     // 15% من العرض المرجعي
-                    final double targetHeightPercent = 40 / 800;    // 5% من الارتفاع المرجعي
+                    final double targetHeightPercent = 80 / 800;    // 5% من الارتفاع المرجعي
                     final double actorSizePercent = 60 / 400;       // 15% من العرض المرجعي
 
                     // نسب المواقع من الكود الأصلي
                     final double targetRightPercent = 20 / 400;     // 5% من العرض
-                    final double targetTopPercent = 355 / 680;      // 44.375% من الارتفاع
+                    final double targetTopPercent = 330 / 680;      // 44.375% من الارتفاع
 
                     final double actorRightPercent = 40 / 400;      // 10% من العرض
                     final double actorBottomPercent = 50 / 800;     // 6.25% من الارتفاع

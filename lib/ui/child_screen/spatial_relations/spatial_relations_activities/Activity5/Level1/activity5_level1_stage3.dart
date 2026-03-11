@@ -106,15 +106,15 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
                         400; // 125% من العرض المرجعي
                     final double targetWidthPercent = 120 /
                         400; // 15% من العرض المرجعي
-                    final double targetHeightPercent = 40 /
+                    final double targetHeightPercent = 80 /
                         800; // 5% من الارتفاع المرجعي
                     final double actorSizePercent = 60 /
                         400; // 15% من العرض المرجعي
 
                     // نسب المواقع من الكود الأصلي
-                    final double targetLeftPercent = 270 /
+                    final double targetLeftPercent = 230 /
                         400; // 67.5% من العرض
-                    final double targetTopPercent = 330 /
+                    final double targetTopPercent = 320 /
                         680; // 41.25% من الارتفاع
 
                     final double actorRightPercent = 40 / 400; // 10% من العرض

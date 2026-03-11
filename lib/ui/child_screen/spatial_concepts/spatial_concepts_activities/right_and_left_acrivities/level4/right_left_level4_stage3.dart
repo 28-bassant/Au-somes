@@ -9,16 +9,16 @@ import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class RightLeftLevel2Stage3 extends StatefulWidget {
+class RightLeftLevel4Stage3 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const RightLeftLevel2Stage3({Key? key, this.onNextStage}) : super(key: key);
+  const RightLeftLevel4Stage3({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  State<RightLeftLevel2Stage3> createState() => RightLeftLevel2Stage3State();
+  State<RightLeftLevel4Stage3> createState() => RightLeftLevel4Stage3State();
 }
 
-class RightLeftLevel2Stage3State extends State<RightLeftLevel2Stage3>
+class RightLeftLevel4Stage3State extends State<RightLeftLevel4Stage3>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   ActivityResponse? _activity;
@@ -112,10 +112,15 @@ class RightLeftLevel2Stage3State extends State<RightLeftLevel2Stage3>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
+
 
   void repeatSound() => playSound();
 
@@ -251,43 +256,120 @@ class RightLeftLevel2Stage3State extends State<RightLeftLevel2Stage3>
         final double scale = screenWidth / designWidth;
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double anchorWidth = 300 * scale;
-        final double anchorLeft = 100 * scale;
+        final double anchorWidth = 320 * scale;
+        final double anchorLeft = 80 * scale;
         final double shadow2Right = 190 * scale;
         final double shadowTop = 300 * scale;
         final double shadowWidth = 220 * scale;
-        final double shadow1Left = 210 * scale;
+        final double shadow1Left = 240 * scale;
         final double actorRight = 120 * scale;
         final double actorBottom =  scale;
-        final double actorWidth = 180 * scale;
-        final double actorFeedbackWidth = 200 * scale;
-        final double shadowBigWidth = 300 * scale;
+        final double actorWidth = 150 * scale;
+        final double actorFeedbackWidth = 300 * scale;
+        final double shadowBigWidth = 150 * scale;
         final double shakeIntensity = 20 * scale;
 
         return Stack(
           alignment: Alignment.center,
           children: [
-            /// ===== Shadow الغلط =====
+            /// ===== Shadow correct =====
             Positioned(
               right: shadow2Right-20,
               top: shadowTop,
-              child: Container(
-                key: _shadow2Key,
-                width: shadowWidth,
-                height: shadowWidth,
-                child: Image.network(
-                  shadow2.imageUrl ?? '',
-                  fit: BoxFit.cover,
-                ),
+          child: AnimatedBuilder(
+            animation: _animationController!,
+            builder: (context, child) {
+              // حساب قيمة الحركة للاهتزاز
+              double shakeValue = 0;
+              if (_isAnimatingShadow) {
+                // إنشاء حركة اهتزازية متجاوبة
+                shakeValue = shakeIntensity * sin(_animationController!.value * pi* .2);
+              }
+
+              return Transform.translate(
+                offset: Offset(shakeValue, 0),
+                child: child,
+              );
+            },
+            child: Container(
+              key: _shadow1Key,
+              width: shadowWidth,
+              height: shadowWidth,
+              child: DragTarget<String>(
+                onWillAccept: (data) => data == actor.id,
+                onAccept: (_) {
+                  // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
+                  setState(() {
+                    isPlacedCorrectly = true;
+                    _wrongAttempts = 0;
+                    _isAnimatingShadow = false;
+                  });
+
+                  _animationController?.stop();
+                  _animationController?.value = 0;
+
+                  WellDoneOverlay.show(context);
+                  Future.delayed(const Duration(seconds: 3), () {
+                    if (mounted) {
+                      widget.onNextStage?.call();
+                    }
+                  });
+                },
+                builder: (context, _, __) {
+                  return isPlacedCorrectly
+                      ? Image.network(
+                    actor.imageUrl ?? '',
+                    width: shadowBigWidth*.6,
+                    height: shadowBigWidth*.6,
+                    fit: BoxFit.cover,
+                  )
+                      : Image.network(
+                    shadow2.imageUrl ?? '',
+                    width: shadowBigWidth,
+                    height: shadowBigWidth,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             ),
+          ),
+        ),
+
+        /// ===== Actor =====
+        if (!isPlacedCorrectly)
+        Positioned(
+        right: actorRight,
+        bottom: actorBottom,
+        child: Draggable<String>(
+        data: actor.id,
+        feedback: Material(
+        color: Colors.transparent,
+        child: Image.network(
+        actor.imageUrl ?? '',
+        width: actorFeedbackWidth * .6,
+        ),
+        ),
+        childWhenDragging: const SizedBox(),
+        child: Image.network(
+        actor.imageUrl ?? '',
+        width: actorWidth,
+        ),
+        onDragEnd: (details) {
+        _handleDragEnd(details, context);
+        },
+        ),
+        ),
+
 
             /// ===== الخلفية =====
             Positioned(
-              left: anchorLeft,
-              child: Image.network(
-                anchor.imageUrl ?? '',
-                width: anchorWidth,
+              right: anchorLeft,
+              child: Transform.scale(
+                scaleX: -1,
+                child: Image.network(
+                  anchor.imageUrl ?? '',
+                  width: anchorWidth,
+                ),
               ),
             ),
 
@@ -295,89 +377,16 @@ class RightLeftLevel2Stage3State extends State<RightLeftLevel2Stage3>
             Positioned(
               left: shadow1Left-20,
               top: shadowTop,
-              child: AnimatedBuilder(
-                animation: _animationController!,
-                builder: (context, child) {
-                  // حساب قيمة الحركة للاهتزاز
-                  double shakeValue = 0;
-                  if (_isAnimatingShadow) {
-                    // إنشاء حركة اهتزازية متجاوبة
-                    shakeValue = shakeIntensity * sin(_animationController!.value * pi* .2);
-                  }
-
-                  return Transform.translate(
-                    offset: Offset(shakeValue, 0),
-                    child: child,
-                  );
-                },
-                child: Container(
-                  key: _shadow1Key,
-                  width: shadowWidth,
-                  height: shadowWidth,
-                  child: DragTarget<String>(
-                    onWillAccept: (data) => data == actor.id,
-                    onAccept: (_) {
-                      // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
-                      setState(() {
-                        isPlacedCorrectly = true;
-                        _wrongAttempts = 0;
-                        _isAnimatingShadow = false;
-                      });
-
-                      _animationController?.stop();
-                      _animationController?.value = 0;
-
-                      WellDoneOverlay.show(context);
-                      Future.delayed(const Duration(seconds: 3), () {
-                        if (mounted) {
-                          widget.onNextStage?.call();
-                        }
-                      });
-                    },
-                    builder: (context, _, __) {
-                      return isPlacedCorrectly
-                          ? Image.network(
-                        actor.imageUrl ?? '',
-                        width: shadowBigWidth*.6,
-                        height: shadowBigWidth*.6,
-                        fit: BoxFit.cover,
-                      )
-                          : Image.network(
-                        shadow1.imageUrl ?? '',
-                        width: shadowBigWidth,
-                        height: shadowBigWidth,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  ),
+              child: Container(
+                key: _shadow2Key,
+                width: shadowWidth,
+                height: shadowWidth,
+                child: Image.network(
+                  shadow1.imageUrl ?? '',
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-
-            /// ===== Actor =====
-            if (!isPlacedCorrectly)
-              Positioned(
-                right: actorRight,
-                bottom: actorBottom,
-                child: Draggable<String>(
-                  data: actor.id,
-                  feedback: Material(
-                    color: Colors.transparent,
-                    child: Image.network(
-                      actor.imageUrl ?? '',
-                      width: actorFeedbackWidth,
-                    ),
-                  ),
-                  childWhenDragging: const SizedBox(),
-                  child: Image.network(
-                    actor.imageUrl ?? '',
-                    width: actorWidth,
-                  ),
-                  onDragEnd: (details) {
-                    _handleDragEnd(details, context);
-                  },
-                ),
-              ),
           ],
         );
       },

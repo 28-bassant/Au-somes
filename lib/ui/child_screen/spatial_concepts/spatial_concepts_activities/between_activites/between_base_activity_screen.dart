@@ -5,6 +5,7 @@ import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
+import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/between_level1_stage1_activity.dart';
 import 'level1/between_level1_stage2_activity.dart';
 import 'level1/between_level1_stage3_activity.dart';
@@ -97,9 +98,16 @@ class _BetweenBaseActivityScreenState extends State<BetweenBaseActivityScreen> {
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت كل الأنشطة!")),
-        );
+        ConfettiOverlay.show(context);
+
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.spatialConceptsScreenRouteName,
+            );
+          }
+        });
       }
     });
   }

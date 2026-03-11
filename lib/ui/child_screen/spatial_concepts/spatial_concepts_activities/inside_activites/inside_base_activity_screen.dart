@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
+import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/inside_level1_stage1_activity.dart';
 import 'level1/inside_level1_stage2_activity.dart';
 import 'level1/inside_level1_stage3_activity.dart';
@@ -103,9 +104,16 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت كل الأنشطة!")),
-        );
+        ConfettiOverlay.show(context);
+
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.spatialConceptsScreenRouteName,
+            );
+          }
+        });
       }
     });
   }
