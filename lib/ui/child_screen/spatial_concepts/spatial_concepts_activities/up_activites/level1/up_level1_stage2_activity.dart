@@ -37,6 +37,14 @@ class UpLevel1Stage2ActivityState extends State<UpLevel1Stage2Activity>
       duration: const Duration(milliseconds: 800),
     );
     fetchActivity();
+  }bool isPlacedCorrectly = false;
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
   }
 
   void fetchActivity() async {
@@ -162,7 +170,7 @@ class UpLevel1Stage2ActivityState extends State<UpLevel1Stage2Activity>
         final actorLeft = (screenWidth - actorSize) / 2 ;
 
         final bottomCatSize = actorSize * 0.9;
-        final bottomCatTop = anchorTop + anchorHeight - bottomCatSize * 1.25;
+        final bottomCatTop = anchorTop + anchorHeight - bottomCatSize * 1.19;
         final bottomCatLeft = (screenWidth - bottomCatSize) / 2.9;
 
         final containerLeft = width * 0.35;

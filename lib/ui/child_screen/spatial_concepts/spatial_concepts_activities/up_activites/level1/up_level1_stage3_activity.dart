@@ -37,6 +37,14 @@ class UpLevel1Stage3ActivityState extends State<UpLevel1Stage3Activity>
       duration: const Duration(milliseconds: 800),
     );
     fetchActivity();
+  }bool isPlacedCorrectly = false;
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
   }
 
   void fetchActivity() async {

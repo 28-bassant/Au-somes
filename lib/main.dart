@@ -32,7 +32,8 @@ import 'package:au_somes/l10n/app_localizations.dart';
 
 import 'core/cache/shared_prefs_utils.dart';
 
-
+final RouteObserver<ModalRoute<void>> routeObserver =
+RouteObserver<ModalRoute<void>>();
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPrefsUtils.init();
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget{
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      navigatorObservers: [routeObserver],
       initialRoute: AppRoutes.selectScreenRouteName,
       routes:  {
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),

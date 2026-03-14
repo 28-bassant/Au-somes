@@ -129,9 +129,7 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
-        );
+        Navigator.pop(context);
       }
     });
   }
@@ -203,6 +201,7 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
             ),
           ),
           SizedBox(height: height * .04)
+
 
           // InkWell(
           //   onTap: goToNextActivity,

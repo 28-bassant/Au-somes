@@ -41,6 +41,15 @@ class InsideLevel1Stage1ActivityState extends State<InsideLevel1Stage1Activity>
     );
     _loadActivity();
   }
+  bool isPlacedCorrectly = false;
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
+  }
 
   Future<void> _loadActivity() async {
     try {

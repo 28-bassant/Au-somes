@@ -7,6 +7,7 @@ import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../main.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../reinforcement_widgets/confetti_overlay.dart';
@@ -25,7 +26,7 @@ class InsideBaseActivityScreen extends StatefulWidget {
       _InsideBaseActivityScreenState();
 }
 
-class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
+class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> with RouteAware {
   final stage11Key = GlobalKey<InsideLevel1Stage1ActivityState>();
   final stage12Key = GlobalKey<InsideLevel1Stage2ActivityState>();
   final stage13Key = GlobalKey<InsideLevel1Stage3ActivityState>();
@@ -105,7 +106,7 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
         currentActivityIndex++;
       } else {
 
-        Navigator.pushReplacementNamed(context, AppRoutes.outsideBaseActivityScreenRouteName);
+        Navigator.pushNamed(context, AppRoutes.outsideBaseActivityScreenRouteName);
 
 
       }
@@ -122,6 +123,33 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
         );
       }
     });
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+  @override
+  void didPopNext() {
+    final currentKey = activities[currentActivityIndex].key;
+
+    // dynamic cast لكل State عنده resetActivity
+    if (currentKey is GlobalKey) {
+      final state = currentKey.currentState;
+      if (state != null) {
+        try {
+          (state as dynamic).resetActivity(); // ✨ cast dynamic عشان Dart يسمح بالنداء
+        } catch (e) {
+          // لو State مش عنده resetActivity، نتجاهل
+        }
+      }
+    }
   }
 
   @override
@@ -191,6 +219,7 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
             ),
           ),
           SizedBox(height: height * .04)
+
 
 
           // InkWell(

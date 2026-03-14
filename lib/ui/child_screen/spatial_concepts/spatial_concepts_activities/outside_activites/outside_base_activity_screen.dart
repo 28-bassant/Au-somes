@@ -123,9 +123,7 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
-        );
+       Navigator.pop(context);
       }
     });
   }
@@ -196,7 +194,8 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04),
+          SizedBox(height: height * .04)
+
 
           // InkWell(
           //   onTap: goToNextActivity,

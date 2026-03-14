@@ -55,6 +55,14 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
 
     fetchActivity();
   }
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
+  }
 
   // جلب بيانات النشاط
   void fetchActivity() async {

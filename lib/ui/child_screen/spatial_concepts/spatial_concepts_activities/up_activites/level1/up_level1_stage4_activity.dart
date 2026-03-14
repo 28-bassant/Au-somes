@@ -47,6 +47,14 @@ class UpLevel1Stage4ActivityState extends State<UpLevel1Stage4Activity>
     );
 
     fetchActivity();
+  }bool isPlacedCorrectly = false;
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
   }
 
   void fetchActivity() async {

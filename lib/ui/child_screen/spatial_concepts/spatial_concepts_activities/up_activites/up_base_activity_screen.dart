@@ -1,6 +1,7 @@
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/up_activites/level1/up_level1_stage1_activity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../main.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
@@ -19,7 +20,7 @@ class UpBaseActivityScreen extends StatefulWidget {
       _UpBaseActivityScreenState();
 }
 
-class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
+class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteAware {
   final stage11Key = GlobalKey<UpLevel1Stage1ActivityState>();
   final stage12Key = GlobalKey<UpLevel1Stage2ActivityState>();
   final stage13Key = GlobalKey<UpLevel1Stage3ActivityState>();
@@ -112,7 +113,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
         currentActivityIndex++;
       } else {
 
-        Navigator.pushReplacementNamed(context, AppRoutes.downBaseActivityScreenRouteName);
+        Navigator.pushNamed(context, AppRoutes.downBaseActivityScreenRouteName);
 
       }
     });
@@ -128,6 +129,33 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
         );
       }
     });
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+  @override
+  void didPopNext() {
+    final currentKey = activities[currentActivityIndex].key;
+
+    // dynamic cast لكل State عنده resetActivity
+    if (currentKey is GlobalKey) {
+      final state = currentKey.currentState;
+      if (state != null) {
+        try {
+          (state as dynamic).resetActivity(); // ✨ cast dynamic عشان Dart يسمح بالنداء
+        } catch (e) {
+          // لو State مش عنده resetActivity، نتجاهل
+        }
+      }
+    }
   }
 
   @override
@@ -196,7 +224,8 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04),
+          SizedBox(height: height * .04)
+
 
           // InkWell(
           //   onTap: goToNextActivity,

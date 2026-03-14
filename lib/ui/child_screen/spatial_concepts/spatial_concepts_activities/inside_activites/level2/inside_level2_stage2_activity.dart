@@ -56,6 +56,14 @@ class InsideLevel2Stage2ActivityState
     );
     _loadActivity();
   }
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
+  }
 
   Future<void> _loadActivity() async {
     try {

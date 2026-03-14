@@ -40,6 +40,14 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
       vsync: this,
     );
     _loadActivity();
+  }bool isPlacedCorrectly = false;
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
   }
 
   Future<void> _loadActivity() async {
