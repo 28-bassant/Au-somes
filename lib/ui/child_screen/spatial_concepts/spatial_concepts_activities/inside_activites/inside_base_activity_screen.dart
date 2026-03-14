@@ -104,22 +104,10 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت انشطة في الداخل ")),
-        );
 
         Navigator.pushReplacementNamed(context, AppRoutes.outsideBaseActivityScreenRouteName);
 
-        ConfettiOverlay.show(context);
 
-        Future.delayed(const Duration(seconds: 5), () {
-          if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
-          }
-        });
       }
     });
   }
@@ -202,7 +190,8 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04),
+          SizedBox(height: height * .04)
+
 
           // InkWell(
           //   onTap: goToNextActivity,

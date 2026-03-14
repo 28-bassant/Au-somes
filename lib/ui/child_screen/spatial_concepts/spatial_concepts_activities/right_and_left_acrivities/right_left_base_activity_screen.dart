@@ -255,7 +255,7 @@ RightLeftLevel4Stage4(
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04),
+          SizedBox(height: height * .04),IconButton(onPressed: (){goToNextActivity();}, icon: Icon(Icons.add))
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

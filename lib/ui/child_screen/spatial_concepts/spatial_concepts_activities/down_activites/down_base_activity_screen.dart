@@ -202,7 +202,8 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04),
+          SizedBox(height: height * .04)
+
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(
