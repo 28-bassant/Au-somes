@@ -47,6 +47,7 @@ dependencies:
   percent_indicator: ^4.2.5
   audioplayers: ^6.5.1
   expandable_text: ^2.3.0
+  confetti: ^0.7.0
 
 dev_dependencies:
   flutter_test:

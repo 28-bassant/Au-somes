@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
+import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/right_left_level1_stage2.dart';
 import 'level1/right_left_level1_stage3.dart';
 import 'level1/right_left_level1_stage4.dart';
@@ -13,6 +14,14 @@ import 'level2/right_left_level2_stage1.dart';
 import 'level2/right_left_level2_stage2.dart';
 import 'level2/right_left_level2_stage3.dart';
 import 'level2/right_left_level2_stage4.dart';
+import 'level3/right_left_level3_stage1.dart';
+import 'level3/right_left_level3_stage2.dart';
+import 'level3/right_left_level3_stage3.dart';
+import 'level3/right_left_level3_stage4.dart';
+import 'level4/right_left_level4_stage1.dart';
+import 'level4/right_left_level4_stage2.dart';
+import 'level4/right_left_level4_stage3.dart';
+import 'level4/right_left_level4_stage4.dart';
 
 class RightLeftBaseActivityScreen extends StatefulWidget {
   @override
@@ -29,6 +38,14 @@ class _RightLeftBaseActivityScreenState extends State<RightLeftBaseActivityScree
   final stage22Key = GlobalKey<RightLeftLevel2Stage2State>();
   final stage23Key = GlobalKey<RightLeftLevel2Stage3State>();
   final stage24Key = GlobalKey<RightLeftLevel2Stage4State>();
+  final stage31Key = GlobalKey<RightLeftLevel3Stage1State>();
+  final stage32Key = GlobalKey<RightLeftLevel3Stage2State>();
+  final stage33Key = GlobalKey<RightLeftLevel3Stage3State>();
+  final stage34Key = GlobalKey<RightLeftLevel3Stage4State>();
+  final stage41Key = GlobalKey<RightLeftLevel4Stage1State>();
+  final stage42Key = GlobalKey<RightLeftLevel4Stage2State>();
+  final stage43Key = GlobalKey<RightLeftLevel4Stage3State>();
+  final stage44Key = GlobalKey<RightLeftLevel4Stage4State>();
 
 
   late final List<Widget> activities;
@@ -70,6 +87,38 @@ RightLeftLevel2Stage4(
         key: stage24Key,
         onNextStage: goToNextActivity,
       ),
+RightLeftLevel3Stage1(
+        key: stage31Key,
+        onNextStage: goToNextActivity,
+      ),
+RightLeftLevel3Stage2(
+        key: stage32Key,
+        onNextStage: goToNextActivity,
+      ),
+RightLeftLevel3Stage3(
+        key: stage33Key,
+        onNextStage: goToNextActivity,
+      ),
+RightLeftLevel3Stage4(
+        key: stage34Key,
+        onNextStage: goToNextActivity,
+      ),
+RightLeftLevel4Stage1(
+        key: stage41Key,
+        onNextStage: goToNextActivity,
+      ),
+RightLeftLevel4Stage2(
+        key: stage42Key,
+        onNextStage: goToNextActivity,
+      ),
+RightLeftLevel4Stage3(
+        key: stage43Key,
+        onNextStage: goToNextActivity,
+      ),
+RightLeftLevel4Stage4(
+        key: stage44Key,
+        onNextStage: goToNextActivity,
+      ),
 
 
     ];
@@ -93,6 +142,22 @@ RightLeftLevel2Stage4(
       stage23Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 7) {
       stage24Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 8) {
+      stage31Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 9) {
+      stage32Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 10) {
+      stage33Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 11) {
+      stage34Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 12) {
+      stage41Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 13) {
+      stage42Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 14) {
+      stage43Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 15) {
+      stage44Key.currentState?.repeatSound();
     }
   }
 
@@ -101,12 +166,20 @@ RightLeftLevel2Stage4(
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت كل الأنشطة!")),
-        );
+        ConfettiOverlay.show(context);
+
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.spatialConceptsScreenRouteName,
+            );
+          }
+        });
       }
     });
   }
+
 
   void goToPreviousActivity() {
     setState(() {

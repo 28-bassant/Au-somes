@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
+import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
@@ -17,25 +20,77 @@ class FrontBackLevel1Stage1Activity extends StatefulWidget {
 }
 
 class FrontBackLevel1Stage1ActivityState
-    extends State<FrontBackLevel1Stage1Activity> {
+    extends State<FrontBackLevel1Stage1Activity>
+    with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
+  ActivityResponse? _activity;
+  bool _isLoading = true;
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
-  late ActivityResponse _activity;
+
+  // متغيرات جديدة للإدارة
+  int _wrongAttempts = 0;
+  bool _isAnimatingAnswer = false;
+  AnimationController? _animationController;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-  }
 
-  Future<ActivityResponse> fetchActivity() async {
-    return await ApiManager.getActivity(
-      ApiConstants.front_back_activityId,
-      1,
-      1,
+    // تحميل النشاط مرة واحدة في البداية
+    _loadActivity();
+
+    // تهيئة المتحكم في الحركة بسرعة أقل
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
     );
   }
+
+  Future<void> _loadActivity() async {
+    try {
+      final activity = await ApiManager.getActivity(
+        ApiConstants.front_back_activityId,
+        1,
+        1,
+      );
+
+      if (mounted) {
+        setState(() {
+          _activity = activity;
+        });
+
+        // تحميل الصور
+        await _preloadImages(activity);
+
+        // تشغيل الصوت بعد تحميل الصور
+        if (!_hasPlayedSound) {
+          await playSound();
+          _hasPlayedSound = true;
+        }
+
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      print('Error loading activity: $e');
+    }
+  }
+
+  Future<void> playSound() async {
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    await _player.stop();
+    await _player.play(UrlSource(_activity!.audioUrl!));
+  }
+
+  void repeatSound() => playSound();
 
   Future<void> _preloadImages(ActivityResponse activity) async {
     final images = activity.elements!
@@ -50,118 +105,144 @@ class FrontBackLevel1Stage1ActivityState
     _imagesLoaded = true;
   }
 
-  Future<void> playSound() async {
-    if (_activity.audioUrl == null || _activity.audioUrl!.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(_activity.audioUrl!));
+  void _handleWrongAnswer() {
+    setState(() {
+      _wrongAttempts++;
+    });
+
+    if (_wrongAttempts == 1) {
+      TryAgainSound.play();
+    } else if (_wrongAttempts == 2) {
+      _startAnswerAnimation();
+    }
   }
 
-  void repeatSound() => playSound();
+  void _startAnswerAnimation() {
+    if (!_isAnimatingAnswer && _animationController != null) {
+      setState(() {
+        _isAnimatingAnswer = true;
+      });
+
+      _animationController!.repeat(reverse: true);
+
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted && _isAnimatingAnswer) {
+          setState(() {
+            _isAnimatingAnswer = false;
+          });
+          _animationController!.stop();
+          _animationController!.value = 0;
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
     _player.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ActivityResponse>(
-      future: fetchActivity(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-        if (!snapshot.hasData || snapshot.hasError) {
-          return const Center(child: Text('Error loading activity'));
-        }
+    if (_activity == null) {
+      return const Center(child: Text('Error loading activity'));
+    }
 
-        _activity = snapshot.data!;
+    final firstElement = _activity!.elements!.first;
+    final lastElement = _activity!.elements!.last;
+    final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        final firstElement = _activity.elements!.first;
-        final anchorElement =
-        _activity.elements!.firstWhere((e) => e.role == 'Anchor');
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-        if (!_imagesLoaded) {
-          _preloadImages(_activity).then((_) {
-            if (!_hasPlayedSound) {
-              playSound();
-              _hasPlayedSound = true;
-            }
-            setState(() {});
-          });
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        return Scaffold(
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            child: Stack(
-              children: [
-                // صورة الخلفية (Anchor) - متجاوبة مع الشاشة
-                Positioned.fill(
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.network(anchorElement.imageUrl!),
-                  ),
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: Stack(
+          children: [
+            // عنصر Try Again (الخطأ)
+            Positioned(
+              right: screenWidth * 0.45,  // 100 ÷ 400 = 0.25
+              bottom: screenHeight * 0.2, // 320 ÷ 800 = 0.4
+              child: GestureDetector(
+                onTap: () {
+                  _handleWrongAnswer();
+                },
+                child: Image.network(
+                  lastElement.imageUrl ?? '',
+                  width: screenWidth * 0.3, // 350 ÷ 400 = 0.875
+                  fit: BoxFit.contain,
                 ),
-
-                // العنصر المتحرك - باستخدام نسب مئوية مع تعديل الموقع للأعلى
-                Positioned.fill(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      // حساب النسب المئوية مع رفع العنصر للأعلى
-                      final double leftPercent = 160 / 400;    // 40% من العرض
-                      final double topPercent = 280 / 800;     // 35% من الارتفاع (بدلاً من 37.5%)
-                      final double widthPercent = 140 / 400;   // 35% من العرض
-                      final double heightPercent = 250 / 800;  // 31.25% من الارتفاع
-
-                      final double actualLeft = constraints.maxWidth * leftPercent;
-                      final double actualTop = constraints.maxHeight * topPercent;
-                      final double actualWidth = constraints.maxWidth * widthPercent;
-                      final double actualHeight = constraints.maxHeight * heightPercent;
-
-                      return Stack(
-                        children: [
-                          Positioned(
-                            left: actualLeft,
-                            top: actualTop+80, // تم رفعه للأعلى
-                            child: GestureDetector(
-                              onTapDown: (details) {
-                                final tap = details.localPosition;
-                                final double containerHeight = actualHeight;
-                                final correctTop = containerHeight * 2 / 4;
-                                final correctBottom = containerHeight;
-
-                                if (tap.dy >= correctTop && tap.dy <= correctBottom) {
-                                  WellDoneOverlay.show(context);
-                                  Future.delayed(const Duration(seconds: 3), () {
-                                    widget.onNextStage?.call();
-                                  });
-                                }
-                              },
-                              child: Container(
-                                width: actualWidth,
-                                height: actualHeight,
-                                child: Image.network(
-                                  firstElement.imageUrl!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            // صورة الخلفية
+            Positioned.fill(
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: IgnorePointer(
+                  child: Image.network(anchorElement.imageUrl ?? ''),
+                ),
+              ),
+            ),
+
+
+
+            // العنصر الصحيح
+            Positioned(
+              left: screenWidth * 0.5,  // 100 ÷ 400 = 0.25
+              top: screenHeight * 0.45,   // 320 ÷ 800 = 0.4
+              child: AnimatedBuilder(
+                animation: _animationController!,
+                builder: (context, child) {
+                  double shakeValue = 0;
+                  if (_isAnimatingAnswer) {
+                    shakeValue = 12 *
+                        sin(_animationController!.value *  pi );
+                  }
+
+                  return Transform.translate(
+                    offset: Offset(shakeValue, 0),
+                    child: child,
+                  );
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _wrongAttempts = 0;
+                      _isAnimatingAnswer = false;
+                    });
+
+                    _animationController?.stop();
+                    _animationController?.value = 0;
+
+                    WellDoneOverlay.show(context);
+
+                    Future.delayed(const Duration(seconds: 3), () {
+                      if (mounted) {
+                        widget.onNextStage?.call();
+                      }
+                    });
+                  },
+                  child: Image.network(
+                    width: screenWidth * 0.3,
+                    height: screenWidth * 0.3,
+                    firstElement.imageUrl ?? '',
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

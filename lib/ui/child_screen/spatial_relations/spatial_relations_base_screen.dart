@@ -33,6 +33,7 @@ import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
+import '../reinforcement_widgets/confetti_overlay.dart';
 
 
 class SpatialRelationsBaseScreen extends StatefulWidget {
@@ -274,9 +275,16 @@ else if (currentActivityIndex == 19) {
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("خلصت كل الأنشطة!")),
-        );
+        ConfettiOverlay.show(context);
+
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.spatialConceptsScreenRouteName,
+            );
+          }
+        });
       }
     });
   }

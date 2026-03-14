@@ -23,6 +23,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
   bool _isLoading = true;
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
+  bool _dataLoaded = false; // متغير جديد للتأكد من تحميل البيانات
 
   // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
@@ -55,12 +56,17 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
       if (mounted) {
         setState(() {
           _activity = activity;
+          _dataLoaded = true; // تم تحميل البيانات
         });
 
         // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
+        setState(() {
+          _imagesLoaded = true;
+        });
+
+        // تشغيل الصوت بعد تحميل الصور والبيانات
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -74,6 +80,8 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _dataLoaded = true;
+          _imagesLoaded = true;
         });
       }
       print('Error loading activity: $e');
@@ -86,20 +94,41 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
+    // تحميل كل الصور في الخلفية
+    final List<Future> precacheFutures = [];
     for (final url in images) {
-      await precacheImage(NetworkImage(url!), context);
+      precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
-    _imagesLoaded = true;
+    // انتظار تحميل جميع الصور
+    await Future.wait(precacheFutures);
+    print('All images preloaded successfully');
   }
 
   Future<void> playSound() async {
+    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
+    if (!_dataLoaded || !_imagesLoaded) {
+      print('Waiting for data and images to load before playing sound');
+      return;
+    }
+
     if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+
+    try {
+      await _player.stop();
+      await _player.play(UrlSource(_activity!.audioUrl!));
+      print('Sound played successfully after data and images loaded');
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
 
-  void repeatSound() => playSound();
+  void repeatSound() {
+    // التأكد من تحميل كل شيء قبل إعادة تشغيل الصوت
+    if (_dataLoaded && _imagesLoaded) {
+      playSound();
+    }
+  }
 
   // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
@@ -137,6 +166,24 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
         }
       });
     }
+  }
+
+  // دالة للتعامل مع الإجابة الصحيحة
+  void _handleCorrectAnswer() {
+    setState(() {
+      _wrongAttempts = 0;
+      _isAnimatingAnswer = false;
+    });
+
+    _animationController?.stop();
+    _animationController?.value = 0;
+
+    WellDoneOverlay.show(context);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        widget.onNextStage?.call();
+      }
+    });
   }
 
   @override
@@ -181,7 +228,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
             final double leftPositionPercent = 40 / 400;        // 10% من العرض
             final double rightPositionPercent = 160 / 400;      // 40% من العرض
             final double topFirstPositionPercent = 420 / 800;   // 52.5% من الارتفاع
-            final double topSecondPositionPercent = 260 / 800;  // 32.5% من الارتفاع
+            final double topSecondPositionPercent = 320 / 800;  // 32.5% من الارتفاع
 
             // حساب الأحجام والمواقع الفعلية
             final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
@@ -218,7 +265,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
                     onTap: _handleWrongAnswer,
                     child: Image.network(
                       wrongElement.imageUrl ?? '',
-                      width: optionWidth*1.3,
+                      width: optionWidth * 1.3,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           width: optionWidth,
@@ -231,10 +278,10 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
                   ),
                 ),
 
-                // ✅ الإجابة الصح (يمين + نازلة + animation)
+                // ✅ الإجابة الصح (يمين + animation)
                 Positioned(
                   right: rightPosition,
-                  top: topSecondPosition+55,
+                  top: topSecondPosition,
                   child: AnimatedBuilder(
                     animation: _animationController!,
                     builder: (context, child) {
@@ -249,21 +296,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
                       );
                     },
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _wrongAttempts = 0;
-                          _isAnimatingAnswer = false;
-                        });
-                        _animationController?.stop();
-                        _animationController?.value = 0;
-
-                        WellDoneOverlay.show(context);
-                        Future.delayed(const Duration(seconds: 3), () {
-                          if (mounted) {
-                            widget.onNextStage?.call();
-                          }
-                        });
-                      },
+                      onTap: _handleCorrectAnswer,
                       child: Image.network(
                         correctElement.imageUrl ?? '',
                         width: optionWidth,

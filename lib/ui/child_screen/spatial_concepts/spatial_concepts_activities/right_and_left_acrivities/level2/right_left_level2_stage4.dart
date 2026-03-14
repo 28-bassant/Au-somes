@@ -25,6 +25,7 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
   bool _isLoading = true;
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
+  bool _dataLoaded = false;
   bool isPlacedCorrectly = false;
 
   late ActivityElement actor;
@@ -66,6 +67,7 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
       if (mounted) {
         setState(() {
           _activity = activity;
+          _dataLoaded = true;
         });
 
         // البحث عن العناصر
@@ -77,6 +79,10 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
 
         // تحميل الصور
         await _preloadImages(activity);
+
+        setState(() {
+          _imagesLoaded = true;
+        });
 
         // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
@@ -92,6 +98,8 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _dataLoaded = true;
+          _imagesLoaded = true;
         });
       }
       print('Error loading activity: $e');
@@ -104,20 +112,37 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
+    final List<Future> precacheFutures = [];
     for (final url in images) {
-      await precacheImage(NetworkImage(url!), context);
+      precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
-    _imagesLoaded = true;
+    await Future.wait(precacheFutures);
+    print('All images preloaded successfully');
   }
 
   Future<void> playSound() async {
+    if (!_dataLoaded || !_imagesLoaded) {
+      print('Waiting for data and images to load before playing sound');
+      return;
+    }
+
     if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+
+    try {
+      await _player.stop();
+      await _player.play(UrlSource(_activity!.audioUrl!));
+      print('Sound played successfully after data and images loaded');
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
 
-  void repeatSound() => playSound();
+  void repeatSound() {
+    if (_dataLoaded && _imagesLoaded) {
+      playSound();
+    }
+  }
 
   // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
@@ -251,15 +276,15 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
         final double scale = screenWidth / designWidth;
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double anchorWidth = 300 * scale;
+        final double anchorWidth = 350 * scale;
         final double anchorLeft = 80 * scale;
         final double anchorBottom = 100 * scale;
         final double shadow2Right = 200 * scale;
-        final double shadowTop = 300 * scale;
+        final double shadowTop = 250 * scale;
         final double shadowWidth = 250 * scale;
         final double shadow1Left = 210 * scale;
-        final double actorRight = 20 * scale;
-        final double actorBottom = -20 * scale;
+        final double actorRight = 170 * scale;
+        final double actorBottom =  scale;
         final double actorChildWidth = 150 * scale;
         final double actorFeedbackWidth = 250 * scale;
         final double shadowBigWidth = 300 * scale;
@@ -271,39 +296,37 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
             /// ===== Shadow الغلط =====
             Positioned(
               right: shadow2Right,
-              top: shadowTop,
+              top: shadowTop-100,
               child: Container(
                 key: _shadow2Key,
                 width: shadowWidth,
                 height: shadowWidth,
                 child: Image.network(
-                  shadow2.imageUrl ?? '',
+                  shadow1.imageUrl ?? '',
                   fit: BoxFit.cover,
                 ),
               ),
             ),
 
             /// ===== الخلفية =====
-            Positioned(
-              left: anchorLeft,
-              bottom: anchorBottom,
+            Center(
               child: Image.network(
                 anchor.imageUrl ?? '',
-                width: anchorWidth,
+                width: anchorWidth*.4,
               ),
             ),
 
             /// ===== Shadow الصح مع الحركة =====
             Positioned(
               left: shadow1Left,
-              top: shadowTop,
+              top: shadowTop-100,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
                   // حساب قيمة الحركة للاهتزاز
                   double shakeValue = 0;
                   if (_isAnimatingShadow) {
-                    // إنشاء حركة اهتزازية متجاوبة بنفس طريقة الكود الآخر
+                    // إنشاء حركة اهتزازية متجاوبة
                     shakeValue = shakeIntensity * sin(_animationController!.value * pi * .2);
                   }
 
@@ -345,7 +368,7 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
                         fit: BoxFit.cover,
                       )
                           : Image.network(
-                        shadow1.imageUrl ?? '',
+                        shadow2.imageUrl ?? '',
                         width: shadowBigWidth,
                         height: shadowBigWidth,
                         fit: BoxFit.cover,
@@ -373,7 +396,7 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
                   childWhenDragging: const SizedBox(),
                   child: Image.network(
                     actor.imageUrl ?? '',
-                    width: actorChildWidth,
+                    width: actorChildWidth*.8,
                   ),
                   onDragEnd: (details) {
                     _handleDragEnd(details, context);

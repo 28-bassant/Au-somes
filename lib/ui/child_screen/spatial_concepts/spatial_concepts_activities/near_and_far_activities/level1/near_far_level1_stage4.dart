@@ -204,7 +204,7 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
                 double shakeValue = 0;
                 if (_isAnimatingAnswer) {
                   // استخدام نسبة من الشاشة للاهتزاز
-                  shakeValue = screenWidth * 0.08 * sin(_animationController!.value * pi);
+                  shakeValue = screenWidth * 0.04 * sin(_animationController!.value * pi);
                 }
 
                 return Transform.translate(

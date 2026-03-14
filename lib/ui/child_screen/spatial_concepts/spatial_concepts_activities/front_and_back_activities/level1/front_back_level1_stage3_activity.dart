@@ -53,7 +53,7 @@ class FrontBackLevel1Stage3ActivityState
       final activity = await ApiManager.getActivity(
         ApiConstants.front_back_activityId,
         1,
-        3,
+        4,
       );
 
       if (mounted) {
@@ -170,8 +170,8 @@ class FrontBackLevel1Stage3ActivityState
           children: [
             // عنصر Try Again (الخطأ)
             Positioned(
-              right: screenWidth * 0.25,  // 100 ÷ 400 = 0.25
-              bottom: screenHeight * 0.4, // 320 ÷ 800 = 0.4
+              right: screenWidth * 0.35,  // 100 ÷ 400 = 0.25
+              bottom: screenHeight * 0.3, // 320 ÷ 800 = 0.4
               child: GestureDetector(
                 onTap: () {
                   _handleWrongAnswer();
@@ -198,7 +198,7 @@ class FrontBackLevel1Stage3ActivityState
             // العنصر الصحيح
             Positioned(
               left: screenWidth * 0.25,  // 100 ÷ 400 = 0.25
-              top: screenHeight * 0.4,   // 320 ÷ 800 = 0.4
+              top: screenHeight * 0.3,   // 320 ÷ 800 = 0.4
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {

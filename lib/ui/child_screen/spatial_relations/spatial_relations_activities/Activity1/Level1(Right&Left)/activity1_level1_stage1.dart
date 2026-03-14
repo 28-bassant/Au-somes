@@ -23,6 +23,7 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
   bool _isLoading = true;
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
+  bool _dataLoaded = false; // متغير جديد للتأكد من تحميل البيانات
 
   // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
@@ -55,12 +56,17 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
       if (mounted) {
         setState(() {
           _activity = activity;
+          _dataLoaded = true; // تم تحميل البيانات
         });
 
         // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
+        setState(() {
+          _imagesLoaded = true;
+        });
+
+        // تشغيل الصوت بعد تحميل الصور والبيانات
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -74,6 +80,8 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _dataLoaded = true;
+          _imagesLoaded = true;
         });
       }
       print('Error loading activity: $e');
@@ -86,20 +94,41 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
+    // تحميل كل الصور في الخلفية
+    final List<Future> precacheFutures = [];
     for (final url in images) {
-      await precacheImage(NetworkImage(url!), context);
+      precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
-    _imagesLoaded = true;
+    // انتظار تحميل جميع الصور
+    await Future.wait(precacheFutures);
+    print('All images preloaded successfully');
   }
 
   Future<void> playSound() async {
+    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
+    if (!_dataLoaded || !_imagesLoaded) {
+      print('Waiting for data and images to load before playing sound');
+      return;
+    }
+
     if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+
+    try {
+      await _player.stop();
+      await _player.play(UrlSource(_activity!.audioUrl!));
+      print('Sound played successfully after data and images loaded');
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
 
-  void repeatSound() => playSound();
+  void repeatSound() {
+    // التأكد من تحميل كل شيء قبل إعادة تشغيل الصوت
+    if (_dataLoaded && _imagesLoaded) {
+      playSound();
+    }
+  }
 
   // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
@@ -137,6 +166,24 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
         }
       });
     }
+  }
+
+  // دالة للتعامل مع الإجابة الصحيحة
+  void _handleCorrectAnswer() {
+    setState(() {
+      _wrongAttempts = 0;
+      _isAnimatingAnswer = false;
+    });
+
+    _animationController?.stop();
+    _animationController?.value = 0;
+
+    WellDoneOverlay.show(context);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        widget.onNextStage?.call();
+      }
+    });
   }
 
   @override
@@ -205,28 +252,14 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
                       );
                     },
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _wrongAttempts = 0;
-                          _isAnimatingAnswer = false;
-                        });
-                        _animationController?.stop();
-                        _animationController?.value = 0;
-
-                        WellDoneOverlay.show(context);
-                        Future.delayed(const Duration(seconds: 3), () {
-                          if (mounted) {
-                            widget.onNextStage?.call();
-                          }
-                        });
-                      },
+                      onTap: _handleCorrectAnswer,
                       child: Image.network(
                         correctElement.imageUrl ?? '',
                         width: optionWidth,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: optionWidth,
-                            height: optionWidth, // لجعلها مربعة
+                            height: optionWidth,
                             color: Colors.grey[300],
                             child: const Icon(Icons.error),
                           );
@@ -243,7 +276,7 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: anchorWidth,
-                      height: anchorWidth, // لجعلها مربعة
+                      height: anchorWidth,
                       color: Colors.grey[300],
                       child: const Icon(Icons.error),
                     );
@@ -261,7 +294,7 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           width: optionWidth,
-                          height: optionWidth, // لجعلها مربعة
+                          height: optionWidth,
                           color: Colors.grey[300],
                           child: const Icon(Icons.error),
                         );

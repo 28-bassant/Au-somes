@@ -52,7 +52,7 @@ class FrontBackLevel1Stage4ActivityState
       final activity = await ApiManager.getActivity(
         ApiConstants.front_back_activityId,
         1,
-        1, // تم التصحيح: Stage 4
+        4, // تم التصحيح: Stage 4
       );
 
       if (mounted) {
@@ -161,10 +161,21 @@ class FrontBackLevel1Stage4ActivityState
       return const Center(child: Text('Error loading activity'));
     }
 
-    final firstElement = _activity!.elements!.first;
-    final lastElement = _activity!.elements!.last;
-    final anchorElement =
-    _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    // استخراج العناصر حسب الـ Response الجديد
+    final anchorElement = _activity!.elements!
+        .firstWhere((e) => e.role == 'Anchor'); // العنصر الأساسي
+
+// كل الـ Actors
+    final allActors = _activity!.elements!
+        .where((e) => e.role == 'Actor')
+        .toList(); // هيرجع 2 Actors
+
+// العنصر الصحيح (isCorrect = true)
+    final correctElement = allActors.firstWhere((e) => e.isCorrect == true);
+
+// العنصر الغلط (isCorrect = false)
+    final wrongElement = allActors.firstWhere((e) => e.isCorrect == false);
+
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -175,22 +186,22 @@ class FrontBackLevel1Stage4ActivityState
         height: double.infinity,
         child: Stack(
           children: [
-            // صورة Try Again (الصورة الثانية) - باستخدام نسب مئوية
+            // عنصر Try Again (الخطأ)
             Positioned(
-              right: screenWidth * 0.45,  // 180 ÷ 400 = 0.45
-              bottom: screenHeight * 0.225, // 180 ÷ 800 = 0.225
+              right: screenWidth * 0.65,  // 100 ÷ 400 = 0.25
+              bottom: screenHeight * 0.3, // 320 ÷ 800 = 0.4
               child: GestureDetector(
                 onTap: () {
                   _handleWrongAnswer();
                 },
                 child: Image.network(
-                  lastElement.imageUrl ?? '',
-                  width: screenWidth * 0.375, // 150 ÷ 400 = 0.375
+                  wrongElement.imageUrl ?? '',
+                  width: screenWidth * 0.35, // 350 ÷ 400 = 0.875
                   fit: BoxFit.contain,
                 ),
               ),
             ),
-            // صورة الخلفية (Anchor) - متجاوبة مع الشاشة
+            // صورة الخلفية
             Positioned.fill(
               child: FittedBox(
                 fit: BoxFit.contain,
@@ -202,17 +213,15 @@ class FrontBackLevel1Stage4ActivityState
 
 
 
-            // العنصر الصحيح (الصورة الأولى) مع الحركة - باستخدام نسب مئوية
+            // العنصر الصحيح
             Positioned(
-              left: screenWidth * 0.375,   // 150 ÷ 400 = 0.375
-              top: screenHeight * 0.375,   // 300 ÷ 800 = 0.375
+              left: screenWidth * 0.4,  // 100 ÷ 400 = 0.25
+              top: screenHeight * 0.4,   // 320 ÷ 800 = 0.4
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
-                  // حساب قيمة الحركة للاهتزاز بشكل نسبي
                   double shakeValue = 0;
                   if (_isAnimatingAnswer) {
-                    // استخدام نسبة من عرض الشاشة للاهتزاز
                     shakeValue = 12 *
                         sin(_animationController!.value *  pi );
                   }
@@ -223,26 +232,19 @@ class FrontBackLevel1Stage4ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTapDown: (TapDownDetails details) {
-                    final localPos = details.localPosition;
-
-                    final imageWidth = screenWidth * 0.625;  // 250 ÷ 400 = 0.625
-                    final imageHeight = screenWidth * 0.625;
-
-                    // مربع المنطقة الصحيحة للنقر - باستخدام نسب مئوية
-                    final squareSize = screenWidth * 0.25;  // 100 ÷ 400 = 0.25
-                    final squareLeft = (imageWidth - squareSize) / 2 - (screenWidth * 0.05);  // -20 ÷ 400 = 0.05
-                    final squareTop = (imageHeight - squareSize) / 2 + (screenWidth * 0.15);  // 60 ÷ 400 = 0.15
+                  onTapDown: (details) {
+                    final local = details.localPosition;
+                    final w = screenWidth * 0.625; // 250 ÷ 400 = 0.625
+                    final h = screenWidth * 0.625;
 
                     final correctArea = Rect.fromLTWH(
-                      squareLeft,
-                      squareTop,
-                      squareSize,
-                      squareSize,
+                      w * 0.3,
+                      0,
+                      w * 0.4,
+                      h,
                     );
 
-                    if (correctArea.contains(localPos)) {
-                      // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
+                    if (correctArea.contains(local)) {
                       setState(() {
                         _wrongAttempts = 0;
                         _isAnimatingAnswer = false;
@@ -257,17 +259,13 @@ class FrontBackLevel1Stage4ActivityState
                         }
                       });
                     } else {
-                      // نقر خارج المنطقة الصحيحة يعتبر إجابة خاطئة
                       _handleWrongAnswer();
                     }
                   },
-                  child: Container(
-                    width: screenWidth * 0.625,
-                    height: screenWidth * 0.625,
-                    child: Image.network(
-                      firstElement.imageUrl ?? '',
-                      fit: BoxFit.cover,
-                    ),
+                  child: Image.network(
+                    width: screenWidth * 0.45,
+                    height: screenWidth * 0.45,
+                    correctElement.imageUrl ?? '',
                   ),
                 ),
               ),

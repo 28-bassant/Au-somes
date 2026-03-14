@@ -399,4 +399,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get level => 'Level';
+
+  @override
+  String get complete_activity =>
+      'Well done 👏\nYou completed all the activities';
 }
