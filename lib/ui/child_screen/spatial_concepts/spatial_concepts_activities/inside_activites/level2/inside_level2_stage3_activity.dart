@@ -188,8 +188,8 @@ class InsideLevel2Stage3ActivityState
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
         final double shadow2Left = 10 * scale;
-        final double shadow2Top = 180 * scale;
-        final double shadow2Width = 100 * scale;
+        final double shadow2Top = 220 * scale;
+        final double shadow2Width = 90 * scale;
         final double anchorRight = 5 * scale;
         final double anchorTop = 130 * scale;
         final double anchorWidth = 280 * scale;
@@ -198,12 +198,12 @@ class InsideLevel2Stage3ActivityState
         final double shadow1Width = 50 * scale;
         final double actorPlacedWidth = 100 * scale;
         final double actorLeft = 10 * scale;
-        final double actorBottom = 240 * scale;
-        final double actorWidth = 100 * scale;
-        final double actorFeedbackWidth = 100 * scale;
+        final double actorBottom = 260 * scale;
+        final double actorWidth = 90 * scale;
+        final double actorFeedbackWidth = 90 * scale;
         final double actorPlacedOffset = -5 * scale;
         final double wrongPointSize = 50 * scale;
-        final double shakeIntensity = 20 * scale * 0.03;
+        final double shakeIntensity = 20 * scale * 0.06;
 
         return Stack(
           children: [

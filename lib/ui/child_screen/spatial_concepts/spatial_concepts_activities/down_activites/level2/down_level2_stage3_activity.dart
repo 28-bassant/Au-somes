@@ -87,7 +87,7 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
         // 🔹 تشغيل الصوت بعد تحميل الصور
         if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
           await _player.stop();
-          await _player.play(UrlSource(activity!.audioUrl!));
+          await _player.play(UrlSource(activity!.deceptionInstructions!.first));
           setState(() {
             hasPlayedSound = true;
           });
@@ -122,9 +122,13 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
 
   // 🔹 تشغيل الصوت
   Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
+    if (activity?.deceptionInstructions == null ||
+        activity!.deceptionInstructions!.isEmpty) return;
+
+    final deceptionUrl = activity!.deceptionInstructions!.first;
+
     await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
+    await _player.play(UrlSource(deceptionUrl));
   }
 
   void repeatSound() => playSound();
@@ -162,25 +166,21 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
   void _handleDragEnd(DraggableDetails details) {
     if (isPlacedCorrectly) return;
 
-    // حساب عامل القياس
     final screenWidth = MediaQuery.of(context).size.width;
     final scale = screenWidth / 360.0;
 
-    // 🔹 حساب مركز القطّة بعد السحب - أصبح متناسباً
     final actorCenter = Offset(
       details.offset.dx + (200 * scale) / 2,
       details.offset.dy + (200 * scale) / 2,
     );
 
-    // 🔹 التحقق من Shadow الصحيح
-    final correctBox = _shadowCorrectKey.currentContext?.findRenderObject() as RenderBox?;
-    if (correctBox != null) {
-      final pos = correctBox.localToGlobal(Offset.zero);
-      final rect = Rect.fromLTWH(pos.dx, pos.dy, correctBox.size.width,
-          correctBox.size.height);
-
+    // 🔹 التحقق من Shadow الغلط أولاً (يعكس المنطق)
+    final wrongBox = _shadowWrongKey.currentContext?.findRenderObject() as RenderBox?;
+    if (wrongBox != null) {
+      final pos = wrongBox.localToGlobal(Offset.zero);
+      final rect = Rect.fromLTWH(pos.dx, pos.dy, wrongBox.size.width, wrongBox.size.height);
       if (rect.contains(actorCenter)) {
-        // ✅ وضع القطّة في المكان الصحيح
+        // ✅ الآن السحب على المكان "الغلط" يعتبر صح
         _animationController.stop();
         _animationController.value = 0;
         setState(() {
@@ -188,10 +188,7 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
           _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
-        // عرض رسالة "Well Done"
         WellDoneOverlay.show(context);
-
-        // الانتقال للمرحلة التالية بعد 3 ثواني
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) {
             widget.onNextStage?.call();
@@ -201,15 +198,14 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
       }
     }
 
-    // 🔹 التحقق من Shadow الغلط
-    final wrongBox = _shadowWrongKey.currentContext?.findRenderObject() as RenderBox?;
-    if (wrongBox != null) {
-      final pos = wrongBox.localToGlobal(Offset.zero);
-      final rect = Rect.fromLTWH(pos.dx, pos.dy, wrongBox.size.width, wrongBox.size.height);
-
+    // 🔹 التحقق من Shadow الصحيح (أصبح try again)
+    final correctBox = _shadowCorrectKey.currentContext?.findRenderObject() as RenderBox?;
+    if (correctBox != null) {
+      final pos = correctBox.localToGlobal(Offset.zero);
+      final rect = Rect.fromLTWH(pos.dx, pos.dy, correctBox.size.width, correctBox.size.height);
       if (rect.contains(actorCenter)) {
-        // ❌ إذا وُضعت القطّة على المكان الغلط
-        _handleWrongAnswer();
+        // ❌ السحب على المكان "الصح" → خطأ
+        _handleWrongAnswer(); // يحرك Shadow الغلط ويصدر صوت try again
       }
     }
   }
@@ -257,7 +253,7 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
         /// ❌ Shadow الغلط
         Positioned(
           left: 40 * scale, // أصبح متناسباً
-          top: 320 * scale, // أصبح متناسباً
+          top: 320 * scale,
           child: AnimatedBuilder(
             animation: _animationController,
             builder: (context, child) {
@@ -271,7 +267,7 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
               );
             },
             child: Container(
-              key: _shadowCorrectKey,
+              key: _shadowWrongKey,
               width: 230 * scale, // أصبح متناسباً
               height: 250 * scale, // أصبح متناسباً
               // 🔹 إظهار القطّة مكان الشادو عند الإجابة الصحيحة
@@ -279,42 +275,44 @@ class DownLevel2Stage3ActivityState extends State<DownLevel2Stage3Activity>
                   ? Transform.translate(
                 offset: Offset(0, -40 * scale), // أصبح متناسباً
                 child: Transform.scale(
-                  scale: .77,
+                  scale: .78,
                   child: Image.network(
                     actor!.imageUrl ?? '',
-                    width: 230 * scale, // أصبح متناسباً
-                    height: 250 * scale, // أصبح متناسباً
+                    width: 300 * scale, // أصبح متناسباً
+                    height: 300 * scale, // أصبح متناسباً
                     fit: BoxFit.cover,
                   ),
                 ),
               )
                   : Image.network(
-                shadowCorrect!.imageUrl ?? '',
+                shadowWrong!.imageUrl ?? '',
                 width: 230 * scale, // أصبح متناسباً
                 height: 250 * scale, // أصبح متناسباً
                 fit: BoxFit.cover,
               ),
             ),
-          ),
+          ),// أصبح متناسباً
+
         ),
 
         /// ✅ Shadow الصح مع الاهتزاز
         Positioned(
           left: 60 * scale, // أصبح متناسباً
-          top: 140 * scale, // أصبح متناسباً
+          top: 140 * scale,
           child: Container(
-            key: _shadowWrongKey,
+            key: _shadowCorrectKey,
             width: 230 * scale, // أصبح متناسباً
             height: 250 * scale, // أصبح متناسباً
-            child: Image.network(shadowWrong!.imageUrl ?? '', fit: BoxFit.cover),
-          ),
+            child: Image.network(shadowCorrect!.imageUrl ?? '', fit: BoxFit.cover),
+          ),// أصبح متناسباً
+
         ),
 
         /// 🐱 Actor draggable
         if (!isPlacedCorrectly)
           Positioned(
-            right: 0,
-            bottom: -15 * scale, // أصبح متناسباً
+            right: -30*scale,
+            bottom: -10 * scale, // أصبح متناسباً
             child: Draggable<String>(
               data: actor!.id,
               feedback: Material(

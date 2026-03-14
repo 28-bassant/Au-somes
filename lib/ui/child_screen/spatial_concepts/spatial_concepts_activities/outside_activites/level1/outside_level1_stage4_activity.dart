@@ -8,17 +8,17 @@ import '../../../../../../utils/dialog_utils.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 import 'dart:math';
 
-class InsideLevel1Stage2Activity extends StatefulWidget {
+class OutsideLevel1Stage4Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const InsideLevel1Stage2Activity({Key? key, this.onNextStage}) : super(key: key);
+  const OutsideLevel1Stage4Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  InsideLevel1Stage2ActivityState createState() =>
-      InsideLevel1Stage2ActivityState();
+  OutsideLevel1Stage4ActivityState createState() =>
+      OutsideLevel1Stage4ActivityState();
 }
 
-class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
+class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity>
     with SingleTickerProviderStateMixin {
   ActivityResponse? _activity;
   bool _isLoading = true;
@@ -47,7 +47,7 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
       final response = await ApiManager.getActivity(
         ApiConstants.inside_outside_activityId,
         1,
-        2,
+        4,
       );
 
       if (mounted) {
@@ -93,10 +93,13 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
+    final deceptionUrl = _activity!.deceptionInstructions!.first;
 
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(UrlSource(deceptionUrl));
   }
 
   void repeatSound() => playSound();
@@ -169,17 +172,17 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
         final double wrong1Right = 0 * scale;
-        final double wrong1Top = 200* scale;
+        final double wrong1Top = 190 * scale;
         final double wrong1Width = 300 * scale;
         final double wrong1Height = 300 * scale;
-        final double wrong2Left = 1 * scale;
-        final double wrong2Top = 480 * scale;
-        final double wrong2Width = 150 * scale;
-        final double wrong2Height = 150 * scale;
-        final double correctRight = 112* scale;
-        final double correctTop = 330 * scale;
-        final double correctWidth = 90 * scale;
-        final double correctHeight = 80 * scale;
+        final double wrong2Left = 5 * scale;
+        final double wrong2Top = 450* scale;
+        final double wrong2Width = 180 * scale;
+        final double wrong2Height = 170 * scale;
+        final double correctRight = 110 * scale;
+        final double correctTop = 316 * scale;
+        final double correctWidth = 95 * scale;
+        final double correctHeight = 100 * scale;
         final double shakeIntensity = 12 * scale;
 
         return Stack(
@@ -196,7 +199,7 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
                 child: Container(
                   child: Image.network(
                     anchorElement.imageUrl ?? '',
-                    fit: BoxFit.fill,
+                    fit: BoxFit.contain,
                     width: wrong1Width,
                     height: wrong1Height,
                   ),
@@ -208,29 +211,6 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
             Positioned(
               left: wrong2Left,
               top: wrong2Top,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Transform.rotate(
-                    angle: -pi/44,
-                    child: Image.network(
-                      lastElement.imageUrl ?? '',
-                      fit: BoxFit.contain,
-                      width: wrong2Width,
-                      height: wrong2Height,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            /// العنصر الصحيح مع الحركة
-            Positioned(
-              right: correctRight,
-              top: correctTop,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
@@ -263,199 +243,33 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
                       }
                     });
                   },
-                  child: Container(
-                    color: Colors.transparent,
-                      child: Transform.rotate(
-                        angle:0,
-                        child: Image.network(
-                          lastElement.imageUrl ?? '',
-                          width: correctWidth,
-                          height: correctHeight,
-                          fit: BoxFit.fill,
-
-                                            ),
-                      ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-/*import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import '../../../../../../api/api_constants.dart';
-import '../../../../../../api/api_manager.dart';
-import '../../../../../../models/activities/activity_response.dart';
-import '../../../../../../utils/dialog_utils.dart';
-import '../../../../reinforcement_widgets/well_done_overlay.dart';
-
-class InsideLevel1Stage2Activity extends StatefulWidget {
-  final VoidCallback? onNextStage;
-
-  const InsideLevel1Stage2Activity({Key? key, this.onNextStage}) : super(key: key);
-
-  @override
-  InsideLevel1Stage2ActivityState createState() =>
-      InsideLevel1Stage2ActivityState();
-}
-
-class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity> {
-  ActivityResponse? activity;
-  bool isLoading = true;
-  bool _hasPlayedSound = false;
-  bool _imagesLoaded = false;
-  late AudioPlayer _player;
-
-  @override
-  void initState() {
-    super.initState();
-    _player = AudioPlayer();
-    _loadActivity();
-  }
-
-  Future<void> _loadActivity() async {
-    try {
-      final response = await ApiManager.getActivity(
-        ApiConstants.inside_outside_activityId,
-        1,
-        2,
-      );
-
-      if (mounted) {
-        setState(() {
-          activity = response;
-        });
-
-        // تحميل الصور أولاً
-        await _preloadImages(response!);
-
-        // تشغيل الصوت بعد تحميل الصور
-        if (!_hasPlayedSound) {
-          await playSound();
-          setState(() {
-            _hasPlayedSound = true;
-          });
-        }
-
-        setState(() {
-          _imagesLoaded = true;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-      print('Error loading activity: $e');
-    }
-  }
-
-  Future<void> _preloadImages(ActivityResponse activity) async {
-    final images = activity.elements!
-        .map((e) => e.imageUrl)
-        .where((url) => url != null && url!.isNotEmpty)
-        .toList();
-
-    for (final url in images) {
-      await precacheImage(NetworkImage(url!), context);
-    }
-  }
-
-  Future<void> playSound() async {
-    if (activity?.audioUrl == null || activity!.audioUrl!.isEmpty) return;
-
-    await _player.stop();
-    await _player.play(UrlSource(activity!.audioUrl!));
-  }
-
-  void repeatSound() => playSound();
-
-  @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (activity == null) {
-      return const Center(child: Text('Error loading activity'));
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double screenWidth = constraints.maxWidth;
-        final double screenHeight = constraints.maxHeight;
-
-        // افتراض أن التصميم الأصلي على شاشة 400px
-        final double designWidth = 400.0;
-        final double scale = screenWidth / designWidth;
-
-        // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double anchorLeft = 25 * scale;
-        final double anchorRight = 25 * scale;
-        final double anchorTop = 120 * scale;
-        final double actorLeft = 125 * scale;
-        final double actorTop = 280 * scale;
-        final double actorWidth = screenWidth * 0.32; // 32% من عرض الشاشة
-        final double actorHeight = screenHeight * 0.2; // 20% من ارتفاع الشاشة
-
-        final actorElement =
-        activity!.elements!.firstWhere((e) => e.role == 'Actor');
-        final anchorElement =
-        activity!.elements!.firstWhere((e) => e.role == 'Anchor');
-
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            /// الأنكور (لو اتداس عليه = Try Again)
-            Positioned(
-              left: anchorLeft,
-              right: anchorRight,
-              top: anchorTop,
-              child: GestureDetector(
-                onTap: () {
-                  DialogUtils.showMsg(context: context, msg: 'Try Again');
-                },
                 child: Container(
+                  color: Colors.transparent,
                   child: Image.network(
-                    anchorElement.imageUrl ?? '',
+                    lastElement.imageUrl ?? '',
                     fit: BoxFit.contain,
+                    width: wrong2Width,
+                    height: wrong2Height,
                   ),
                 ),
               ),
-            ),
-
-            /// الأكتور (الإجابة الصح)
+            )),
+            /// العنصر الصحيح مع الحركة
             Positioned(
-              left: actorLeft,
-              top: actorTop,
+              right: correctRight,
+              top: correctTop,
               child: GestureDetector(
                 onTap: () {
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    widget.onNextStage?.call();
-                  });
+                  _handleWrongAnswer();
                 },
                 child: Container(
                   color: Colors.transparent,
                   child: Transform.rotate(
                     angle: .3,
                     child: Image.network(
-                      actorElement.imageUrl ?? '',
-                      width: actorWidth,
-                      height: actorHeight,
+                      firstElement.imageUrl ?? '',
+                      width: correctWidth,
+                      height: correctHeight,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -468,5 +282,3 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity> 
     );
   }
 }
-
- */

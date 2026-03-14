@@ -172,23 +172,23 @@ class UpLevel1Stage4ActivityState extends State<UpLevel1Stage4Activity>
       final actorLeft = (screenWidth - actorSize) / 2 + 16;
 
       // 🐱 حجم ومكان القطة الخطأ
-      final bottomCatSize = actorSize * 0.8;
+      final bottomCatSize = actorSize * 0.87;
       final bottomCatTop = anchorTop + anchorHeight - bottomCatSize * 1.2;
       final bottomCatLeft = (screenWidth - bottomCatSize) / 2.9;
 
       // 🌟 الكونتينر على القطة الصحيحة
       final containerLeft = width * 0.40;
-      final containerTop = height * 0.23;
-      final containerWidth = width * 0.32;
-      final containerHeight = height * 0.2;
+      final containerTop = height * 0.254;
+      final containerWidth = width * 0.29;
+      final containerHeight = height * 0.175;
       final containerRect =
       Rect.fromLTWH(containerLeft, containerTop, containerWidth, containerHeight);
 
       // 🌟 الكونتينر على القطة الخطأ
       final wrongContainerLeft = bottomCatLeft + 40;
-      final wrongContainerTop = bottomCatTop + 35;
+      final wrongContainerTop = bottomCatTop + 41;
       final wrongContainerWidth = containerWidth * 0.9;
-      final wrongContainerHeight = containerHeight * 0.75;
+      final wrongContainerHeight = containerHeight * 0.82;
       final wrongRect = Rect.fromLTWH(
           wrongContainerLeft, wrongContainerTop, wrongContainerWidth, wrongContainerHeight);
       return Stack(

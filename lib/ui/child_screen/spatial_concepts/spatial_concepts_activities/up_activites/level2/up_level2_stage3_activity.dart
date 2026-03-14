@@ -313,8 +313,8 @@ class UpLevel2Stage3ActivityState extends State<UpLevel2Stage3Activity>
         /// 🐱 Actor draggable
         if (!isPlacedCorrectly)
           Positioned(
-            right: 0,
-            bottom: -15 * scale, // أصبح متناسباً
+            right: -30*scale,
+            bottom: -10 * scale, // أصبح متناسباً
             child: Draggable<String>(
               data: actor!.id,
               feedback: Material(

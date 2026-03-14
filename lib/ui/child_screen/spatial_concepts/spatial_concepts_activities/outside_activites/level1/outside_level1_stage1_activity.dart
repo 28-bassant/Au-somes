@@ -8,17 +8,17 @@ import '../../../../../../utils/dialog_utils.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 import 'dart:math';
 
-class InsideLevel1Stage3Activity extends StatefulWidget {
+class OutsideLevel1Stage1Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const InsideLevel1Stage3Activity({Key? key, this.onNextStage}) : super(key: key);
+  const OutsideLevel1Stage1Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  InsideLevel1Stage3ActivityState createState() =>
-      InsideLevel1Stage3ActivityState();
+  OutsideLevel1Stage1ActivityState createState() =>
+      OutsideLevel1Stage1ActivityState();
 }
 
-class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
+class OutsideLevel1Stage1ActivityState extends State<OutsideLevel1Stage1Activity>
     with SingleTickerProviderStateMixin {
   ActivityResponse? _activity;
   bool _isLoading = true;
@@ -47,7 +47,7 @@ class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
       final response = await ApiManager.getActivity(
         ApiConstants.inside_outside_activityId,
         1,
-        3,
+        1,
       );
 
       if (mounted) {
@@ -93,10 +93,13 @@ class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
+    final deceptionUrl = _activity!.deceptionInstructions!.first;
 
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(UrlSource(deceptionUrl));
   }
 
   void repeatSound() => playSound();
@@ -179,12 +182,12 @@ class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
         final double correctTop = 230 * scale;
         final double correctWidth = 120 * scale;
         final double correctHeight = 120 * scale;
-        final double shakeIntensity = 22* scale*.09;
+        final double shakeIntensity = 12 * scale;
 
         return Stack(
           alignment: Alignment.center,
           children: [
-            /// الأنكور (لو اتداس عليه = Try Again)
+            /// الأنكور
             Positioned(
               left: anchorLeft,
               right: anchorRight,
@@ -206,26 +209,6 @@ class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
             Positioned(
               left: wrongLeft,
               top: wrongTop,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Image.network(
-                    lastElement.imageUrl ?? '',
-                    fit: BoxFit.contain,
-                    width: wrongWidth,
-                    height: wrongHeight,
-                  ),
-                ),
-              ),
-            ),
-
-            /// العنصر الصحيح مع الحركة
-            Positioned(
-              left: correctLeft-7,
-              top: correctTop,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
@@ -258,19 +241,39 @@ class InsideLevel1Stage3ActivityState extends State<InsideLevel1Stage3Activity>
                       }
                     });
                   },
+
+                child: Container(
+                  color: Colors.transparent,
+                  child: Image.network(
+                    firstElement.imageUrl ?? '',
+                    fit: BoxFit.contain,
+                    width: wrongWidth,
+                    height: wrongHeight,
+                  ),
+                ),
+              ),
+            )),
+
+            /// العنصر الصحيح مع الحركة
+            Positioned(
+              left: correctLeft-7,
+              top: correctTop,
+              child: GestureDetector(
+                onTap: () {
+                  _handleWrongAnswer();
+                },
                   child: Container(
                     color: Colors.transparent,
                     child: Image.network(
-                      firstElement.imageUrl ?? '',
+                      lastElement.imageUrl ?? '',
                       width: correctWidth,
                       height: correctHeight,
                       fit: BoxFit.contain,
                     ),
                   ),
-                ),
-              ),
-            ),
-          ],
+                ))
+
+            ],
         );
       },
     );
