@@ -206,12 +206,16 @@ class BetweenLevel2Stage1ActivityState
               builder: (context, child) {
                 double shake = 0;
                 if (_isAnimatingShadow) {
-                  shake = shakeIntensity *
-                      sin(_animationController.value * 2 * pi);
+                  shake = shakeIntensity * sin(_animationController.value * 2 * pi);
                 }
+                double lift = isPlacedCorrectly ? -20.0 : 0.0;
+                double scale = isPlacedCorrectly ? 1.3 : 1.0;
                 return Transform.translate(
-                  offset: Offset(shake, 0),
-                  child: child,
+                  offset: Offset(shake, lift),
+                  child: Transform.scale(
+                    scale: scale,
+                    child: child,
+                  ),
                 );
               },
               child: Container(
@@ -230,7 +234,6 @@ class BetweenLevel2Stage1ActivityState
               ),
             ),
           ),
-
           /// ===== Actor =====
           if (!isPlacedCorrectly)
             Positioned(

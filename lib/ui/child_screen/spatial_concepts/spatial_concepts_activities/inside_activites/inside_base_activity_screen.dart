@@ -107,7 +107,7 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
           const SnackBar(content: Text("خلصت انشطة في الداخل ")),
         );
 
-        Navigator.pushNamed(context, AppRoutes.outsideBaseActivityScreenRouteName);
+        Navigator.pushReplacementNamed(context, AppRoutes.outsideBaseActivityScreenRouteName);
 
       }
     });

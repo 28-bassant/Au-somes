@@ -114,7 +114,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
           const SnackBar(content: Text("خلصت انشطة فوق ")),
         );
 
-        Navigator.pushNamed(context, AppRoutes.downBaseActivityScreenRouteName);
+        Navigator.pushReplacementNamed(context, AppRoutes.downBaseActivityScreenRouteName);
 
       }
     });
@@ -199,6 +199,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> {
             ),
           ),
           SizedBox(height: height * .04),
+          IconButton(onPressed: (){goToNextActivity();}, icon: Icon(Icons.add))
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

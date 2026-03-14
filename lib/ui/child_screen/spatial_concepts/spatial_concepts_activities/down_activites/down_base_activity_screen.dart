@@ -121,7 +121,9 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+        );
       }
     });
   }

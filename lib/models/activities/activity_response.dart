@@ -1,11 +1,14 @@
+// activity_response.dart
+
 import 'activity_element.dart';
+
 class ActivityResponse {
   ActivityResponse({
     this.phaseId,
     this.name,
     this.audioUrl,
-    this.deceptionInstructions,
     this.elements,
+    this.deceptionInstructions, // 👈 إضافة المتغير الجديد
   });
 
   ActivityResponse.fromJson(dynamic json) {
@@ -13,10 +16,9 @@ class ActivityResponse {
     name = json['name'] ?? '';
     audioUrl = json['audioUrl'] ?? '';
 
-    if (json['deceptionInstructions'] != null &&
-        json['deceptionInstructions'] is List) {
-      deceptionInstructions =
-      List<String>.from(json['deceptionInstructions']);
+    // 👈 إضافة deceptionInstructions
+    if (json['deceptionInstructions'] != null && json['deceptionInstructions'] is List) {
+      deceptionInstructions = List<String>.from(json['deceptionInstructions']);
     } else {
       deceptionInstructions = [];
     }
@@ -33,7 +35,7 @@ class ActivityResponse {
   String? phaseId;
   String? name;
   String? audioUrl;
-  List<String>? deceptionInstructions;
+  List<String>? deceptionInstructions; // 👈 المتغير الجديد
   List<ActivityElement>? elements;
 
   Map<String, dynamic> toJson() {
@@ -41,15 +43,10 @@ class ActivityResponse {
     map['phaseId'] = phaseId;
     map['name'] = name;
     map['audioUrl'] = audioUrl;
-
-    if (deceptionInstructions != null) {
-      map['deceptionInstructions'] = deceptionInstructions;
-    }
-
+    map['deceptionInstructions'] = deceptionInstructions; // 👈 إضافته للـ toJson
     if (elements != null) {
       map['elements'] = elements?.map((v) => v.toJson()).toList();
     }
-
     return map;
   }
 }

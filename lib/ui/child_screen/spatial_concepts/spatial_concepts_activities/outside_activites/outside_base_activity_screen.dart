@@ -115,7 +115,9 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+        );
       }
     });
   }
