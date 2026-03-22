@@ -159,56 +159,56 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> wit
     var width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-        appBar: AppBar(
-            actionsPadding: EdgeInsets.symmetric(horizontal: width * .02),
-            centerTitle: true,
-            actions: [
-            GestureDetector(
+      appBar: AppBar(
+        actionsPadding: EdgeInsets.symmetric(horizontal: width * .02),
+        centerTitle: true,
+        actions: [
+          GestureDetector(
             onTap: () => Navigator.pushReplacementNamed(
-        context, AppRoutes.spatialConceptsScreenRouteName),
-    child: Container(
-    width: 40,
-    height: 40,
-    decoration: BoxDecoration(
-    color: AppColors.whiteColor,
-    borderRadius: BorderRadius.circular(20),
-    border: Border.all(
-    color: AppColors.blackColorWithOpacity60, width: 1),
-    ),
-    child: Icon(
-    Icons.home_outlined,
-      color: AppColors.blackColorWithOpacity60,
-      size: 25,
-    ),
-    ),
-            ),
-            ],
-          leading: GestureDetector(
-            onTap: goToPreviousActivity,
-            child: Row(
-              children: [
-                SizedBox(width: width * .02),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: AppColors.blackColorWithOpacity60, width: 1),
-                  ),
-                  child: Icon(
-                    languageProvider.isArabic()
-                        ? Icons.arrow_forward
-                        : Icons.arrow_back,
-                    color: AppColors.blackColorWithOpacity60,
-                    size: 25,
-                  ),
-                ),
-              ],
+                context, AppRoutes.spatialConceptsScreenRouteName),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                    color: AppColors.blackColorWithOpacity60, width: 1),
+              ),
+              child: Icon(
+                Icons.home_outlined,
+                color: AppColors.blackColorWithOpacity60,
+                size: 25,
+              ),
             ),
           ),
+        ],
+        leading: GestureDetector(
+          onTap: goToPreviousActivity,
+          child: Row(
+            children: [
+              SizedBox(width: width * .02),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                      color: AppColors.blackColorWithOpacity60, width: 1),
+                ),
+                child: Icon(
+                  languageProvider.isArabic()
+                      ? Icons.arrow_forward
+                      : Icons.arrow_back,
+                  color: AppColors.blackColorWithOpacity60,
+                  size: 25,
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
       body: Column(
         children: [
           Expanded(child: activities[currentActivityIndex]),

@@ -63,6 +63,7 @@ class ChildScreen extends StatelessWidget{
               onPressed: () {
                 //todo : Navigate to Visual Spatial Perception
                 Navigator.pushNamed(context, AppRoutes.visualSpatialPerceptionScreenRouteName);
+
               },),
 
           ],
