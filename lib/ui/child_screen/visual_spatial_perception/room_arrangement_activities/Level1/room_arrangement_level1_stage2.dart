@@ -7,21 +7,21 @@ import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 
-class RoomArrangementLevel1Stage1 extends StatefulWidget {
+class RoomArrangementLevel1Stage2 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const RoomArrangementLevel1Stage1({
+  const RoomArrangementLevel1Stage2({
     Key? key,
     this.onNextStage,
   }) : super(key: key);
 
   @override
-  State<RoomArrangementLevel1Stage1> createState() =>
-      RoomArrangementLevel1Stage1State();
+  State<RoomArrangementLevel1Stage2> createState() =>
+      RoomArrangementLevel1Stage2State();
 }
 
-class RoomArrangementLevel1Stage1State
-    extends State<RoomArrangementLevel1Stage1> {
+class RoomArrangementLevel1Stage2State
+    extends State<RoomArrangementLevel1Stage2> {
 
   late AudioPlayer _player;
   late ActivityResponse _activity;
@@ -31,8 +31,6 @@ class RoomArrangementLevel1Stage1State
 
   late Future<ActivityResponse> _activityFuture;
   Map<int, bool> placed = {};
-
-  // لتتبع عدد الإجابات الصحيحة لمنع تشغيل الصوت أكثر من مرة لنفس العنصر
   Map<int, bool> _soundPlayed = {};
 
   @override
@@ -46,7 +44,7 @@ class RoomArrangementLevel1Stage1State
     _activity = await ApiManager.getActivity(
       ApiConstants.room_arrangement_activityId,
       1,
-      1,
+      2,
     );
 
     final urls = _activity.elements!
@@ -96,6 +94,7 @@ class RoomArrangementLevel1Stage1State
             .where((e) => e.role == 'Actor')
             .toList();
 
+        // تهيئة حالة الـ placed و _soundPlayed
         for (int i = 0; i < actors.length; i++) {
           placed.putIfAbsent(i, () => false);
           _soundPlayed.putIfAbsent(i, () => false);
@@ -114,19 +113,31 @@ class RoomArrangementLevel1Stage1State
 
               // ================= أحجام مختلفة لكل Actor =================
               final List<double> actorSizes = [
-                constraints.maxWidth * 0.12, // Actor 0 قبل السحب
-                constraints.maxWidth * 0.14, // Actor 1 قبل السحب
+                constraints.maxWidth * 0.12,
+                constraints.maxWidth * 0.13,
+                constraints.maxWidth * 0.13,
+                constraints.maxWidth * 0.15,
               ];
 
               final List<double> placedActorSizes = [
-                constraints.maxWidth * 0.20, // Actor 0 بعد السحب
-                constraints.maxWidth * 0.22, // Actor 1 بعد السحب
+                constraints.maxWidth * 0.13,
+                constraints.maxWidth * 0.12,
+                constraints.maxWidth * 0.12,
+                constraints.maxWidth * 0.13,
+              ];
+              final List<double> placedActorHeight = [
+                constraints.maxWidth * 0.14,
+                constraints.maxWidth * 0.15,
+                constraints.maxWidth * 0.15,
+                constraints.maxWidth * 0.14,
               ];
 
-              // ================= أماكن Drop Zones =================
-              List<Offset> dropPositions = [
-                Offset(constraints.maxWidth * 0.30, constraints.maxHeight * 0.40),
-                Offset(constraints.maxWidth * 0.7, constraints.maxHeight * 0.48),
+              // ================= Drop Zones =================
+              final List<Offset> dropPositions = [
+                Offset(constraints.maxWidth * 0.02, constraints.maxHeight * 0.44),
+                Offset(constraints.maxWidth * 0.75, constraints.maxHeight * 0.45),
+                Offset(constraints.maxWidth * 0.88, constraints.maxHeight * 0.45),
+                Offset(constraints.maxWidth * 0.02, constraints.maxHeight * 0.366),
               ];
 
               return Stack(
@@ -134,7 +145,7 @@ class RoomArrangementLevel1Stage1State
 
                   // ================= Anchor =================
                   Positioned(
-                    top: 190,
+                    top: 230,
                     left: 0,
                     right: 0,
                     bottom: 250,
@@ -151,7 +162,7 @@ class RoomArrangementLevel1Stage1State
                       top: dropPositions[i].dy,
                       child: DragTarget<int>(
                         onWillAccept: (data) {
-                          return data == i && placed[i] == false;
+                          return data == i && placed[i] != true;
                         },
                         onAccept: (data) {
                           setState(() {
@@ -164,7 +175,8 @@ class RoomArrangementLevel1Stage1State
                             TrueAnswerSound.play();
                           }
 
-                          if (placed.values.every((e) => e)) {
+                          // لو كل العناصر اتوضعت صح
+                          if (placed.values.every((e) => e == true)) {
                             WellDoneOverlay.show(context);
                             Future.delayed(const Duration(seconds: 2), () {
                               widget.onNextStage?.call();
@@ -174,7 +186,7 @@ class RoomArrangementLevel1Stage1State
                         builder: (context, candidateData, rejectedData) {
                           return Container(
                             width: placedActorSizes[i],
-                            height: placedActorSizes[i],
+                            height: placedActorHeight[i],
                             decoration: BoxDecoration(
                               // border: Border.all(color: Colors.black, width: 2),
                             ),
@@ -185,7 +197,7 @@ class RoomArrangementLevel1Stage1State
                               height: placedActorSizes[i],
                               fit: BoxFit.contain,
                             )
-                                : Container(), // 👈 آمن بدل null
+                                : Container(),
                           );
                         },
                       ),
@@ -195,8 +207,8 @@ class RoomArrangementLevel1Stage1State
                   for (int i = 0; i < actors.length; i++)
                     if (placed[i] != true)
                       Positioned(
-                        bottom: 260.0 + (i * 80),
-                        left: 40.0 + (i * 20),
+                        bottom: 260,
+                        left: 40.0 + (i * 90),
                         child: Draggable<int>(
                           data: i,
                           feedback: Material(
