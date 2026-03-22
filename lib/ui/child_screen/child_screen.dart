@@ -62,7 +62,7 @@ class ChildScreen extends StatelessWidget{
               text: AppLocalizations.of(context)!.visual_spatial_perception,
               onPressed: () {
                 //todo : Navigate to Visual Spatial Perception
-                Navigator.pushNamed(context, AppRoutes.visualSpatialPerceptionBaseScreenRouteName);
+                Navigator.pushNamed(context, AppRoutes.visualSpatialPerceptionScreenRouteName);
 
               },),
 

@@ -7,6 +7,7 @@ import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../main.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../reinforcement_widgets/confetti_overlay.dart';
@@ -25,7 +26,7 @@ class InsideBaseActivityScreen extends StatefulWidget {
       _InsideBaseActivityScreenState();
 }
 
-class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
+class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> with RouteAware {
   final stage11Key = GlobalKey<InsideLevel1Stage1ActivityState>();
   final stage12Key = GlobalKey<InsideLevel1Stage2ActivityState>();
   final stage13Key = GlobalKey<InsideLevel1Stage3ActivityState>();
@@ -104,16 +105,10 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
-        ConfettiOverlay.show(context);
 
-        Future.delayed(const Duration(seconds: 5), () {
-          if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
-          }
-        });
+        Navigator.pushNamed(context, AppRoutes.outsideBaseActivityScreenRouteName);
+
+
       }
     });
   }
@@ -129,6 +124,33 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
       }
     });
   }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+  @override
+  void didPopNext() {
+    final currentKey = activities[currentActivityIndex].key;
+
+    // dynamic cast لكل State عنده resetActivity
+    if (currentKey is GlobalKey) {
+      final state = currentKey.currentState;
+      if (state != null) {
+        try {
+          (state as dynamic).resetActivity(); // ✨ cast dynamic عشان Dart يسمح بالنداء
+        } catch (e) {
+          // لو State مش عنده resetActivity، نتجاهل
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,56 +159,56 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
     var width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-        appBar: AppBar(
-            actionsPadding: EdgeInsets.symmetric(horizontal: width * .02),
-            centerTitle: true,
-            actions: [
-            GestureDetector(
+      appBar: AppBar(
+        actionsPadding: EdgeInsets.symmetric(horizontal: width * .02),
+        centerTitle: true,
+        actions: [
+          GestureDetector(
             onTap: () => Navigator.pushReplacementNamed(
-        context, AppRoutes.spatialConceptsScreenRouteName),
-    child: Container(
-    width: 40,
-    height: 40,
-    decoration: BoxDecoration(
-    color: AppColors.whiteColor,
-    borderRadius: BorderRadius.circular(20),
-    border: Border.all(
-    color: AppColors.blackColorWithOpacity60, width: 1),
-    ),
-    child: Icon(
-    Icons.home_outlined,
-      color: AppColors.blackColorWithOpacity60,
-      size: 25,
-    ),
-    ),
-            ),
-            ],
-          leading: GestureDetector(
-            onTap: goToPreviousActivity,
-            child: Row(
-              children: [
-                SizedBox(width: width * .02),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.whiteColor,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: AppColors.blackColorWithOpacity60, width: 1),
-                  ),
-                  child: Icon(
-                    languageProvider.isArabic()
-                        ? Icons.arrow_forward
-                        : Icons.arrow_back,
-                    color: AppColors.blackColorWithOpacity60,
-                    size: 25,
-                  ),
-                ),
-              ],
+                context, AppRoutes.spatialConceptsScreenRouteName),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                    color: AppColors.blackColorWithOpacity60, width: 1),
+              ),
+              child: Icon(
+                Icons.home_outlined,
+                color: AppColors.blackColorWithOpacity60,
+                size: 25,
+              ),
             ),
           ),
+        ],
+        leading: GestureDetector(
+          onTap: goToPreviousActivity,
+          child: Row(
+            children: [
+              SizedBox(width: width * .02),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                      color: AppColors.blackColorWithOpacity60, width: 1),
+                ),
+                child: Icon(
+                  languageProvider.isArabic()
+                      ? Icons.arrow_forward
+                      : Icons.arrow_back,
+                  color: AppColors.blackColorWithOpacity60,
+                  size: 25,
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
       body: Column(
         children: [
           Expanded(child: activities[currentActivityIndex]),
@@ -196,7 +218,10 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04),
+          SizedBox(height: height * .04)
+
+
+
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: const Center(

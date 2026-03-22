@@ -176,9 +176,9 @@ class BetweenLevel2Stage3ActivityState
         final double bag1Top = 400 * scale;
         final double bag1Left1 = 20 * scale;
         final double bag1Left2 = 135 * scale;
-        final double shadow1Left = 137 * scale;
+        final double shadow1Left = 150 * scale;
         final double shadow1Top = 180 * scale;
-        final double shadow1Width = 145 * scale;
+        final double shadow1Width = 90 * scale;
         final double shadow1Height = 140 * scale;
         final double actorPlacedWidth = 300 * scale;
         final double actorPlacedHeight = 300 * scale;

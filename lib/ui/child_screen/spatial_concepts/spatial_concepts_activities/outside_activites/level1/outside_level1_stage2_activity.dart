@@ -8,17 +8,17 @@ import '../../../../../../utils/dialog_utils.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 import 'dart:math';
 
-class InsideLevel1Stage2Activity extends StatefulWidget {
+class OutsideLevel1Stage2Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const InsideLevel1Stage2Activity({Key? key, this.onNextStage}) : super(key: key);
+  const OutsideLevel1Stage2Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  InsideLevel1Stage2ActivityState createState() =>
-      InsideLevel1Stage2ActivityState();
+  OutsideLevel1Stage2ActivityState createState() =>
+      OutsideLevel1Stage2ActivityState();
 }
 
-class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
+class OutsideLevel1Stage2ActivityState extends State<OutsideLevel1Stage2Activity>
     with SingleTickerProviderStateMixin {
   ActivityResponse? _activity;
   bool _isLoading = true;
@@ -40,14 +40,6 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
       vsync: this,
     );
     _loadActivity();
-  }bool isPlacedCorrectly = false;
-  void resetActivity() {
-    setState(() {
-      isPlacedCorrectly = false;
-      _wrongAttempts = 0;
-      playSound();
-      // أي حالة داخلية أخرى عايزة reset
-    });
   }
 
   Future<void> _loadActivity() async {
@@ -101,10 +93,13 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
+    final deceptionUrl = _activity!.deceptionInstructions!.first;
 
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(UrlSource(deceptionUrl));
   }
 
   void repeatSound() => playSound();
@@ -193,7 +188,7 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
         return Stack(
           alignment: Alignment.center,
           children: [
-            /// الأنكور الأول ( Try Again)
+            /// الأنكور الأول
             Positioned(
               right: wrong1Right,
               top: wrong1Top,
@@ -212,33 +207,10 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
               ),
             ),
 
-            /// الأنكور الثاني ( Try Again)
+            ///  ( Try Again)
             Positioned(
               left: wrong2Left,
               top: wrong2Top,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Transform.rotate(
-                    angle: -pi/44,
-                    child: Image.network(
-                      lastElement.imageUrl ?? '',
-                      fit: BoxFit.contain,
-                      width: wrong2Width,
-                      height: wrong2Height,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            /// العنصر الصحيح مع الحركة
-            Positioned(
-              right: correctRight,
-              top: correctTop,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
@@ -271,21 +243,44 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
                       }
                     });
                   },
-                  child: Container(
-                    color: Colors.transparent,
-                      child: Transform.rotate(
-                        angle:0,
-                        child: Image.network(
-                          lastElement.imageUrl ?? '',
-                          width: correctWidth,
-                          height: correctHeight,
-                          fit: BoxFit.fill,
-
-                                            ),
-                      ),
+                child: Container(
+                  color: Colors.transparent,
+                  child: Transform.rotate(
+                    angle: -pi/44,
+                    child: Image.network(
+                      lastElement.imageUrl ?? '',
+                      fit: BoxFit.contain,
+                      width: wrong2Width,
+                      height: wrong2Height,
+                    ),
                   ),
                 ),
               ),
+            ),),
+
+            /// العنصر الصحيح مع الحركة
+            Positioned(
+              right: correctRight,
+              top: correctTop,
+              child: GestureDetector(
+                onTap: () {
+                  _handleWrongAnswer();
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  child: Transform.rotate(
+                    angle:0,
+                    child: Image.network(
+                      lastElement.imageUrl ?? '',
+                      width: correctWidth,
+                      height: correctHeight,
+                      fit: BoxFit.fill,
+
+                    ),
+                  ),
+                ),
+              ),
+
             ),
           ],
         );

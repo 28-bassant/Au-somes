@@ -56,6 +56,14 @@ class InsideLevel2Stage4ActivityState
     );
     _loadActivity();
   }
+  void resetActivity() {
+    setState(() {
+      isPlacedCorrectly = false;
+      _wrongAttempts = 0;
+      playSound();
+      // أي حالة داخلية أخرى عايزة reset
+    });
+  }
 
   Future<void> _loadActivity() async {
     try {
@@ -187,23 +195,23 @@ class InsideLevel2Stage4ActivityState
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
         final double shadow2Left = 10 * scale;
-        final double shadow2Top = 380 * scale;
+        final double shadow2Top = 400 * scale;
         final double shadow2Width = 140 * scale;
         final double anchorRight = 5 * scale;
         final double anchorTop = 80 * scale;
         final double anchorWidth = 280 * scale;
         final double shadow1Right = 110 * scale;
         final double shadow1Top = 235 * scale;
-        final double shadow1Width = 115 * scale;
+        final double shadow1Width = 120 * scale;
         final double shadow1ImageWidth = 130 * scale;
         final double actorPlacedWidth = 130 * scale;
         final double actorLeft = 20 * scale;
-        final double actorBottom = 140 * scale;
+        final double actorBottom = 170 * scale;
         final double actorWidth = 130 * scale;
         final double actorFeedbackWidth = 130 * scale;
         final double actorPlacedOffset = -5 * scale;
         final double wrongPointSize = 50 * scale;
-        final double shakeIntensity = 20 * scale * 0.03;
+        final double shakeIntensity = 3 * scale ;
 
         return Stack(
           children: [

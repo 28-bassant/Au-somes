@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import '../../../../../../api/api_constants.dart';
 import '../../../../../../api/api_manager.dart';
 import '../../../../../../models/activities/activity_element.dart';
 import '../../../../../../models/activities/activity_response.dart';
+import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
 class BetweenLevel2Stage1Activity extends StatefulWidget {
@@ -21,7 +23,9 @@ class BetweenLevel2Stage1Activity extends StatefulWidget {
 }
 
 class BetweenLevel2Stage1ActivityState
-    extends State<BetweenLevel2Stage1Activity> {
+    extends State<BetweenLevel2Stage1Activity>
+    with SingleTickerProviderStateMixin {
+
   ActivityResponse? _activity;
   bool _isLoading = true;
   bool _hasPlayedSound = false;
@@ -29,15 +33,24 @@ class BetweenLevel2Stage1ActivityState
   bool isPlacedCorrectly = false;
 
   late AudioPlayer _player;
-
   late ActivityElement actor;
-  late ActivityElement shadow;
+  late ActivityElement shadow; // الصح
   late ActivityElement anchor;
+
+  // ===== إدارة الخطأ =====
+  int _wrongAttempts = 0;
+  bool _isAnimatingShadow = false;
+  late AnimationController _animationController;
+
+  final GlobalKey _correctShadowKey = GlobalKey();
+  final GlobalKey _wrongShadowKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
+    _animationController =
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
     _loadActivity();
   }
 
@@ -54,20 +67,15 @@ class BetweenLevel2Stage1ActivityState
           _activity = response;
         });
 
-        // البحث عن العناصر
         actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
         shadow = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
         anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        // تحميل الصور أولاً
         await _preloadImages(_activity!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
-          setState(() {
-            _hasPlayedSound = true;
-          });
+          _hasPlayedSound = true;
         }
 
         setState(() {
@@ -81,7 +89,6 @@ class BetweenLevel2Stage1ActivityState
           _isLoading = false;
         });
       }
-      print('Error loading activity: $e');
     }
   }
 
@@ -100,13 +107,37 @@ class BetweenLevel2Stage1ActivityState
     if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
+  }void repeatSound() => playSound();
+
+  // ===== منطق الخطأ =====
+  void _handleWrongAnswer() {
+    setState(() => _wrongAttempts++);
+
+    if (_wrongAttempts == 1) {
+      TryAgainSound.play();
+    } else if (_wrongAttempts == 2) {
+      _startShadowAnimation();
+    }
   }
 
-  void repeatSound() => playSound();
+  void _startShadowAnimation() {
+    setState(() => _isAnimatingShadow = true);
+
+    _animationController.repeat(reverse: true);
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        _animationController.stop();
+        _animationController.value = 0;
+        setState(() => _isAnimatingShadow = false);
+      }
+    });
+  }
 
   @override
   void dispose() {
     _player.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -121,103 +152,176 @@ class BetweenLevel2Stage1ActivityState
     }
 
     return LayoutBuilder(
-      builder: (context, constraints) {
-        final double screenWidth = constraints.maxWidth;
-        final double screenHeight = constraints.maxHeight;
+        builder: (context, constraints) {
+      final double screenWidth = constraints.maxWidth;
+      final double scale = screenWidth / 400.0;
 
-        // افتراض أن التصميم الأصلي على شاشة 400px
-        final double designWidth = 400.0;
-        final double scale = screenWidth / designWidth;
+      final double anchorWidth = 330 * scale;
+      final double anchorTop = 230 * scale;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double anchorWidth = 500 * scale;
-        final double shadowLeft = 120 * scale;
-        final double shadowTop = 280 * scale;
-        final double shadowWidth = 175 * scale;
-        final double actorPlacedWidth = 200 * scale;
-        final double actorPlacedOffsetX = -20 * scale;
-        final double actorPlacedOffsetY = -30 * scale;
-        final double actorRight = 40 * scale;
-        final double actorBottom = -15 * scale;
-        final double actorWidth = 220 * scale;
-        final double actorFeedbackWidth = 220 * scale;
+      final double shadowLeft = 75 * scale;
+      final double shadowTop = 310 * scale;
+      final double shadowWidth = 175 * scale;
 
-        return Stack(
-          children: [
-            /// ===== Anchor (خلفية ثابتة) =====
-            Center(
-              child: Image.network(
-                anchor.imageUrl ?? '',
-                width: anchorWidth,
-              ),
+      final double wrongShadowLeft = shadowLeft * 3.55;
+
+      final double actorRight = 0;
+      final double actorBottom = -15 * scale;
+      final double actorWidth = 220 * scale;
+      final double actorFeedbackWidth = 220 * scale;
+
+      final double shakeIntensity = 12 * scale;
+
+      return Stack(
+        children: [
+          /// ===== Anchor =====
+          Positioned(
+            top: anchorTop,
+            left: 0,
+            child: Image.network(
+              anchor.imageUrl ?? '',
+              width: anchorWidth,
+              fit: BoxFit.contain,
             ),
+          ),
 
-            /// ===== Shadow (مكان الإسقاط) =====
-            Positioned(
-              left: shadowLeft,
-              top: shadowTop,
-              child: DragTarget<String>(
-                onWillAccept: (data) => data == shadow.id,
-                onAccept: (data) {
-                  setState(() {
-                    isPlacedCorrectly = true;
-                  });
-
-                  WellDoneOverlay.show(context);
-
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
-                },
-                builder: (context, candidateData, rejectedData) {
-                  return isPlacedCorrectly
-                      ? Transform.translate(
-                    offset: Offset(actorPlacedOffsetX, actorPlacedOffsetY),
-                    child: Image.network(
-                      actor.imageUrl ?? '',
-                      width: actorPlacedWidth,
-                    ),
-                  )
-                      : Image.network(
-                    shadow.imageUrl ?? '',
-                    width: shadowWidth,
-                    color: Colors.black,
-                  );
-                },
-              ),
+          /// ===== Shadow الغلط =====
+          Positioned(
+            key: _wrongShadowKey,
+            top: shadowTop,
+            left: wrongShadowLeft,
+            child: Image.network(
+              shadow.imageUrl ?? '',
+              width: shadowWidth,
+              color: Colors.black,
             ),
+          ),
 
-            /// ===== Actor (اللي بيتسحب فعليًا) =====
-            if (!isPlacedCorrectly)
-              Positioned(
-                right: actorRight,
-                bottom: actorBottom,
-                child: Draggable<String>(
-                  data: actor.targetedZoneId,
-                  /// 👈 ده اللي الطفل شايفه وهو بيسحب
-                  feedback: Material(
-                    color: Colors.transparent,
-                    child: Image.network(
-                      actor.imageUrl ?? '',
-                      width: actorFeedbackWidth,
-                    ),
+          /// ===== Shadow الصح =====
+          Positioned(
+            left: shadowLeft,
+            top: shadowTop,
+            child: AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                double shake = 0;
+                if (_isAnimatingShadow) {
+                  shake = shakeIntensity * sin(_animationController.value * 2 * pi);
+                }
+                double lift = isPlacedCorrectly ? -20.0 : 0.0;
+                double scale = isPlacedCorrectly ? 1.3 : 1.0;
+                return Transform.translate(
+                  offset: Offset(shake, lift),
+                  child: Transform.scale(
+                    scale: scale,
+                    child: child,
                   ),
-
-                  /// 👈 نخفي الأصل
-                  childWhenDragging: const SizedBox(),
-
-                  /// 👈 الشكل قبل السحب
-                  child: Image.network(
-                    actor.imageUrl ?? '',
-                    width: actorWidth,
-                  ),
+                );
+              },
+              child: Container(
+                key: _correctShadowKey,
+                child: isPlacedCorrectly
+                    ? Image.network(
+                  actor.imageUrl ?? '',
+                  width: shadowWidth,
+                  fit: BoxFit.contain,
+                )
+                    : Image.network(
+                  shadow.imageUrl ?? '',
+                  width: shadowWidth,
+                  color: Colors.black,
                 ),
               ),
-          ],
-        );
-      },
+            ),
+          ),
+          /// ===== Actor =====
+          if (!isPlacedCorrectly)
+            Positioned(
+              right: actorRight,
+              bottom: actorBottom,
+              child: Draggable<String>(
+                data: actor.id,
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: Image.network(
+                    actor.imageUrl ?? '',
+                    width: actorFeedbackWidth,
+                  ),
+                ),
+                childWhenDragging: const SizedBox(),
+                child: Image.network(
+                  actor.imageUrl ?? '',
+                  width: actorWidth,
+                ),
+                onDragEnd: (details) {
+
+                  final actorCenter = Offset(
+                    details.offset.dx + actorWidth / 2,
+                    details.offset.dy + actorWidth / 2,
+                  );
+
+                  /// ===== Check Shadow الصح =====
+                  final correctBox =
+                  _correctShadowKey.currentContext?.findRenderObject()
+                  as RenderBox?;
+
+                  if (correctBox != null) {
+                    final correctPos =
+                    correctBox.localToGlobal(Offset.zero);
+
+                    final correctRect = Rect.fromLTWH(
+                      correctPos.dx,
+                      correctPos.dy,
+                      correctBox.size.width,
+                      correctBox.size.height,
+                    );
+
+                    if (correctRect.contains(actorCenter)) {
+                      setState(() {
+                        isPlacedCorrectly = true;
+                        _wrongAttempts = 0;
+                        _isAnimatingShadow = false;
+                      });
+
+                      _animationController.stop();
+
+                      WellDoneOverlay.show(context);
+
+                      Future.delayed(const Duration(seconds: 3), () {
+                        if (mounted) {
+                          widget.onNextStage?.call();
+                        }
+                      });
+                      return;
+                    }
+                  }
+
+                  /// ===== Check Shadow الغلط =====
+                  final wrongBox =
+                  _wrongShadowKey.currentContext?.findRenderObject()
+                  as RenderBox?;
+
+                  if (wrongBox != null) {
+                    final wrongPos =
+                    wrongBox.localToGlobal(Offset.zero);
+
+                    final wrongRect = Rect.fromLTWH(
+                      wrongPos.dx,
+                      wrongPos.dy,
+                      wrongBox.size.width,
+                      wrongBox.size.height,
+                    );
+
+                    if (wrongRect.contains(actorCenter)) {
+                      _handleWrongAnswer();
+                    }
+                  }
+                },
+              ),
+            ),
+        ],
+      );
+        },
     );
   }
 }

@@ -1,35 +1,39 @@
-import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/up_activites/level1/up_level1_stage1_activity.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_and_back_activities/level1/front_back_level1_stage1_activity.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_and_back_activities/level1/front_back_level1_stage2_activity.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_and_back_activities/level2/front_back_level2_stage1_activity.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_and_back_activities/level2/front_back_level2_stage3_activity.dart';
+import 'package:au_somes/utils/app_assets.dart';
+import 'package:au_somes/utils/app_routes.dart';
+import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../../main.dart';
 import '../../../../../providers/app_language_provider.dart';
-import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
-import '../../../../../utils/app_routes.dart';
 import '../../../reinforcement_widgets/confetti_overlay.dart';
-import 'level1/up_level1_stage2_activity.dart';
-import 'level1/up_level1_stage3_activity.dart';
-import 'level1/up_level1_stage4_activity.dart';
-import 'level2/up_level2_stage1_activity.dart';
-import 'level2/up_level2_stage2_activity.dart';
-import 'level2/up_level2_stage3_activity.dart';
-import 'level2/up_level2_stage4_activity.dart';
-class UpBaseActivityScreen extends StatefulWidget {
+import 'level1/outside_level1_stage1_activity.dart';
+import 'level1/outside_level1_stage2_activity.dart';
+import 'level1/outside_level1_stage3_activity.dart';
+import 'level1/outside_level1_stage4_activity.dart';
+import 'level2/outside_level2_stage1_activity.dart';
+import 'level2/outside_level2_stage2_activity.dart';
+import 'level2/outside_level2_stage3_activity.dart';
+import 'level2/outside_level2_stage4_activity.dart';
+
+class OutsideBaseActivityScreen extends StatefulWidget {
   @override
-  _UpBaseActivityScreenState createState() =>
-      _UpBaseActivityScreenState();
+  _OutsideBaseActivityScreenState createState() =>
+      _OutsideBaseActivityScreenState();
 }
 
-class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteAware {
-  final stage11Key = GlobalKey<UpLevel1Stage1ActivityState>();
-  final stage12Key = GlobalKey<UpLevel1Stage2ActivityState>();
-  final stage13Key = GlobalKey<UpLevel1Stage3ActivityState>();
-  final stage14Key = GlobalKey<UpLevel1Stage4ActivityState>();
-  final stage21Key = GlobalKey<UpLevel2Stage1ActivityState>();
-  final stage22Key = GlobalKey<UpLevel2Stage2ActivityState>();
-  final stage23Key = GlobalKey<UpLevel2Stage3ActivityState>();
-  final stage24Key = GlobalKey<UpLevel2Stage4ActivityState>();
-
+class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
+  final stage11Key = GlobalKey<OutsideLevel1Stage1ActivityState>();
+  final stage12Key = GlobalKey<OutsideLevel1Stage2ActivityState>();
+  final stage13Key = GlobalKey<OutsideLevel1Stage3ActivityState>();
+  final stage14Key = GlobalKey<OutsideLevel1Stage4ActivityState>();
+  final stage21Key = GlobalKey<OutsideLevel2Stage1ActivityState>();
+  final stage22Key = GlobalKey<OutsideLevel2Stage2ActivityState>();
+  final stage23Key = GlobalKey<OutsideLevel2Stage3ActivityState>();
+  final stage24Key = GlobalKey<OutsideLevel2Stage4ActivityState>();
 
   late final List<Widget> activities;
   int currentActivityIndex = 0;
@@ -38,43 +42,38 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
   void initState() {
     super.initState();
     activities = [
-      UpLevel1Stage1Activity(
+      OutsideLevel1Stage1Activity(
         key: stage11Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel1Stage2Activity(
+      OutsideLevel1Stage2Activity(
         key: stage12Key,
         onNextStage: goToNextActivity,
       ),
-
-      UpLevel1Stage3Activity(
+      OutsideLevel1Stage3Activity(
         key: stage13Key,
         onNextStage: goToNextActivity,
       ),
-
-      UpLevel1Stage4Activity(
+      OutsideLevel1Stage4Activity(
         key: stage14Key,
         onNextStage: goToNextActivity,
       ),
-
-      UpLevel2Stage1Activity(
+      OutsideLevel2Stage1Activity(
         key: stage21Key,
         onNextStage: goToNextActivity,
       ),
-
-      UpLevel2Stage2Activity(
+      OutsideLevel2Stage2Activity(
         key: stage22Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel2Stage3Activity(
+      OutsideLevel2Stage3Activity(
         key: stage23Key,
         onNextStage: goToNextActivity,
       ),
-      UpLevel2Stage4Activity(
+      OutsideLevel2Stage4Activity(
         key: stage24Key,
         onNextStage: goToNextActivity,
       ),
-
 
     ];
   }
@@ -84,27 +83,20 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
       stage11Key.currentState?.repeatSound();
     } else if (currentActivityIndex == 1) {
       stage12Key.currentState?.repeatSound();
-    }
-
-    else if (currentActivityIndex == 2) {
+    } else if (currentActivityIndex == 2) {
       stage13Key.currentState?.repeatSound();
-    }
-
-    else if (currentActivityIndex == 3) {
+    } else if (currentActivityIndex == 3) {
       stage14Key.currentState?.repeatSound();
-    }
-    else if (currentActivityIndex == 4) {
+    } else if (currentActivityIndex == 4) {
       stage21Key.currentState?.repeatSound();
-    }
-
-    else if (currentActivityIndex == 5) {
+    } else if (currentActivityIndex == 5) {
       stage22Key.currentState?.repeatSound();
     } else if (currentActivityIndex == 6) {
       stage23Key.currentState?.repeatSound();
-    }
-    else if (currentActivityIndex == 7) {
+    } else if (currentActivityIndex == 7) {
       stage24Key.currentState?.repeatSound();
     }
+
   }
 
   void goToNextActivity() {
@@ -112,9 +104,16 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
       if (currentActivityIndex < activities.length - 1) {
         currentActivityIndex++;
       } else {
+        ConfettiOverlay.show(context);
 
-        Navigator.pushNamed(context, AppRoutes.downBaseActivityScreenRouteName);
-
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(
+              context,
+              AppRoutes.spatialConceptsScreenRouteName,
+            );
+          }
+        });
       }
     });
   }
@@ -124,38 +123,9 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
-        );
+       Navigator.pop(context);
       }
     });
-  }
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
-  }
-
-  @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
-    super.dispose();
-  }
-  @override
-  void didPopNext() {
-    final currentKey = activities[currentActivityIndex].key;
-
-    // dynamic cast لكل State عنده resetActivity
-    if (currentKey is GlobalKey) {
-      final state = currentKey.currentState;
-      if (state != null) {
-        try {
-          (state as dynamic).resetActivity(); // ✨ cast dynamic عشان Dart يسمح بالنداء
-        } catch (e) {
-          // لو State مش عنده resetActivity، نتجاهل
-        }
-      }
-    }
   }
 
   @override
@@ -183,8 +153,8 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
     ),
     child: Icon(
     Icons.home_outlined,
-    color: AppColors.blackColorWithOpacity60,
-    size: 25,
+      color: AppColors.blackColorWithOpacity60,
+      size: 25,
     ),
     ),
             ),
@@ -229,7 +199,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
 
           // InkWell(
           //   onTap: goToNextActivity,
-          //   child: Center(
+          //   child: const Center(
           //     child: Icon(Icons.add),
           //   ),
           // ),

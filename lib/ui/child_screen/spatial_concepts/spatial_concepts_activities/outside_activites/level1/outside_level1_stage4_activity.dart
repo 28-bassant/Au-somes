@@ -8,17 +8,17 @@ import '../../../../../../utils/dialog_utils.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 import 'dart:math';
 
-class InsideLevel1Stage4Activity extends StatefulWidget {
+class OutsideLevel1Stage4Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const InsideLevel1Stage4Activity({Key? key, this.onNextStage}) : super(key: key);
+  const OutsideLevel1Stage4Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  InsideLevel1Stage4ActivityState createState() =>
-      InsideLevel1Stage4ActivityState();
+  OutsideLevel1Stage4ActivityState createState() =>
+      OutsideLevel1Stage4ActivityState();
 }
 
-class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
+class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity>
     with SingleTickerProviderStateMixin {
   ActivityResponse? _activity;
   bool _isLoading = true;
@@ -40,14 +40,6 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
       vsync: this,
     );
     _loadActivity();
-  }bool isPlacedCorrectly = false;
-  void resetActivity() {
-    setState(() {
-      isPlacedCorrectly = false;
-      _wrongAttempts = 0;
-      playSound();
-      // أي حالة داخلية أخرى عايزة reset
-    });
   }
 
   Future<void> _loadActivity() async {
@@ -101,10 +93,13 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
+    final deceptionUrl = _activity!.deceptionInstructions!.first;
 
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(UrlSource(deceptionUrl));
   }
 
   void repeatSound() => playSound();
@@ -216,26 +211,6 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
             Positioned(
               left: wrong2Left,
               top: wrong2Top,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Image.network(
-                    lastElement.imageUrl ?? '',
-                    fit: BoxFit.contain,
-                    width: wrong2Width,
-                    height: wrong2Height,
-                  ),
-                ),
-              ),
-            ),
-
-            /// العنصر الصحيح مع الحركة
-            Positioned(
-              right: correctRight,
-              top: correctTop,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
@@ -268,16 +243,34 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
                       }
                     });
                   },
-                  child: Container(
-                    color: Colors.transparent,
-                    child: Transform.rotate(
-                      angle: .3,
-                      child: Image.network(
-                        firstElement.imageUrl ?? '',
-                        width: correctWidth,
-                        height: correctHeight,
-                        fit: BoxFit.contain,
-                      ),
+                child: Container(
+                  color: Colors.transparent,
+                  child: Image.network(
+                    lastElement.imageUrl ?? '',
+                    fit: BoxFit.contain,
+                    width: wrong2Width,
+                    height: wrong2Height,
+                  ),
+                ),
+              ),
+            )),
+            /// العنصر الصحيح مع الحركة
+            Positioned(
+              right: correctRight,
+              top: correctTop,
+              child: GestureDetector(
+                onTap: () {
+                  _handleWrongAnswer();
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  child: Transform.rotate(
+                    angle: .3,
+                    child: Image.network(
+                      firstElement.imageUrl ?? '',
+                      width: correctWidth,
+                      height: correctHeight,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),

@@ -9,15 +9,15 @@ import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
-class Activity7Level1Stage1 extends StatefulWidget {
+class Activity7Level1Stage2 extends StatefulWidget {
   final VoidCallback? onNextStage;
-  const Activity7Level1Stage1({Key? key, this.onNextStage}) : super(key: key);
+  const Activity7Level1Stage2({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  State<Activity7Level1Stage1> createState() => Activity7Level1Stage1State();
+  State<Activity7Level1Stage2> createState() => Activity7Level1Stage2State();
 }
 
-class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
+class Activity7Level1Stage2State extends State<Activity7Level1Stage2>
     with SingleTickerProviderStateMixin {
   late AudioPlayer _player;
   late ActivityResponse _activity;
@@ -50,9 +50,9 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
 
   Future<void> _loadActivity() async {
     _activity = await ApiManager.getActivity(
-      ApiConstants.sr_inside_outside_activityId,
+      ApiConstants.sr_right_left_activityId,
       2,
-      2,
+      3,
     );
 
     final urls = _activity.elements!
@@ -134,8 +134,8 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
     final shadow = _loadedActivity!.elements!.firstWhere((e) => e.role == 'Shadow');
     final anchors =
     _loadedActivity!.elements!.where((e) => e.role == 'Anchor').toList();
-    final childAnchor = anchors[1]; // الطفل
-    final court = anchors[0]; // الملعب
+    final childAnchor = anchors[0]; // الطفل
+    final court = anchors[1]; // الملعب
 
     if (!_hasPlayedSound) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -165,8 +165,7 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
 
           return Stack(
             children: [
-
-              /// 🏟 ملعب الخلفية
+              /// ملعب الخلفية
               Positioned.fill(
                 child: Image.network(
                   court.imageUrl ?? '',
@@ -174,24 +173,41 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
                 ),
               ),
 
-              /// 🏀 سلة واحدة في المنتصف
+              ///  سلة الشمال (غلط)
               Positioned(
-                left: (screenWidth - basketSize) / 2,
+                left: screenWidth * 0.02,
                 top: basketTop,
-                child: Container(
-
-                  child: Image.network(
-                    shadow.imageUrl ?? '',
-                    width: basketSize,
-                  ),
+                child: Image.network(
+                  shadow.imageUrl ?? '',
+                  width: basketSize,
                 ),
               ),
 
+              /// سلة اليمين (الصح) مع تحريك عند الخطأ الثاني
+              Positioned(
+                right: screenWidth * 0.02,
+                top: basketTop,
+                child: AnimatedBuilder(
+                  animation: _basketAnimationController!,
+                  builder: (context, child) {
+                    Offset offset = Offset.zero;
+                    if (_isAnimatingBasket && _basketOffsetAnimation != null) {
+                      offset = _basketOffsetAnimation!.value;
+                    }
+                    return Transform.translate(
+                      offset: Offset(offset.dx * screenWidth, 0), // نحرك في المحور X
+                      child: child,
+                    );
+                  },
+                  child: Image.network(shadow.imageUrl ?? '', width: basketSize),
+                ),
+              ),
+              
               /// DragTarget صغير عند فتحة السلة فقط
               Positioned(
-                left: (screenWidth - basketSize) / 2 + basketSize * 0.15,
+                right:screenWidth*.07,
                 top: basketTop + basketSize * 0.15,
-                width: basketSize * 0.70,   // عرض صغير
+                width: basketSize * 0.71,   // عرض صغير
                 height: basketSize * 0.33, // ارتفاع صغير
                 child: !isPlacedCorrectly
                     ? DragTarget<String>(
@@ -201,10 +217,12 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
                       setState(() {
                         isPlacedCorrectly = true;
                       });
+
                       WellDoneOverlay.show(
                         context,
                         duration: const Duration(seconds: 2),
                       );
+
                       Future.delayed(const Duration(seconds: 2), () {
                         widget.onNextStage?.call();
                       });
@@ -212,14 +230,35 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
                   },
                   builder: (context, candidateData, rejectedData) {
                     return Container(
-                       color: Colors.transparent,
+
+
+                      color: Colors.transparent,
                     );
                   },
                 )
                     : const SizedBox(),
               ),
 
-              /// 👶 الطفل
+              // DragTarget على سلّة الشمال (الغلط)
+              Positioned(
+                left:screenWidth*.07,
+                top: basketTop + basketSize * 0.15,
+                width: basketSize * 0.71,   // عرض صغير
+                height: basketSize * 0.33,
+                child: !isPlacedCorrectly
+                    ? DragTarget<String>(
+                  onWillAccept: (data) => true,
+                  onAccept: (data) {
+                    _handleWrongAnswer(); // الصوت Try Again أو تحريك السلّة الصح
+                  },
+                  builder: (context, candidateData, rejectedData) {
+                    return Container(color: Colors.transparent);
+                  },
+                )
+                    : const SizedBox(),
+              ),
+
+              ///  الطفل في النص
               Positioned(
                 left: childLeft,
                 top: childTop,
@@ -229,38 +268,26 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
                 ),
               ),
 
-              /// 🏀 الكرة قبل السحب (مع تأثير التصغير)
+              ///  الكرة قبل السحب
               if (!isPlacedCorrectly)
                 Positioned(
                   left: ballStartLeft,
                   top: ballStartTop,
                   child: Draggable<String>(
                     data: actor.targetedZoneId,
-
                     onDragUpdate: (details) {
-                      final basketCenter = Offset(
-                        screenWidth / 2,
-                        basketTop + basketSize / 2,
-                      );
-
                       final dx = details.globalPosition.dx - basketCenter.dx;
                       final dy = details.globalPosition.dy - basketCenter.dy;
                       final distance = math.sqrt(dx * dx + dy * dy);
-
-                      double scale =
-                      (distance / (screenWidth * 1.1)).clamp(0.6, 1.0);
-
+                      double scale = (distance / (screenWidth * 1.1)).clamp(0.6, 1.0);
                       ballScale.value = scale;
                     },
-
                     onDraggableCanceled: (_, __) {
                       ballScale.value = 1.0;
                     },
-
                     onDragEnd: (_) {
                       ballScale.value = 1.0;
                     },
-
                     feedback: ValueListenableBuilder<double>(
                       valueListenable: ballScale,
                       builder: (context, scale, child) {
@@ -272,35 +299,24 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
                           ),
                         );
                       },
-                      child: Image.network(
-                        actor.imageUrl ?? '',
-                        width: ballSize,
-                      ),
+                      child: Image.network(actor.imageUrl ?? '', width: ballSize),
                     ),
-
                     childWhenDragging: Opacity(
                       opacity: 0.3,
-                      child: Image.network(
-                        actor.imageUrl ?? '',
-                        width: ballSize,
-                      ),
+                      child: Image.network(actor.imageUrl ?? '', width: ballSize),
                     ),
-
-                    child: Image.network(
-                      actor.imageUrl ?? '',
-                      width: ballSize,
-                    ),
+                    child: Image.network(actor.imageUrl ?? '', width: ballSize),
                   ),
                 ),
 
-              /// 🏀 الكرة داخل السلة بعد النجاح
+              ///  الكرة داخل السلّة بعد النجاح
               if (isPlacedCorrectly)
                 Positioned(
-                  left: (screenWidth - basketSize) / 2 + basketSize * 0.36,
+                  right: screenWidth * 0.08 + basketSize * 0.19,
                   top: basketTop + basketSize * 0.37,
                   child: Image.network(
                     actor.imageUrl ?? '',
-                    width: ballSize * 0.6,
+                    width: ballSize * 0.57,
                   ),
                 ),
             ],

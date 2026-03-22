@@ -8,17 +8,17 @@ import '../../../../../../utils/dialog_utils.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 import 'dart:math';
 
-class InsideLevel1Stage4Activity extends StatefulWidget {
+class OutsideLevel1Stage1Activity extends StatefulWidget {
   final VoidCallback? onNextStage;
 
-  const InsideLevel1Stage4Activity({Key? key, this.onNextStage}) : super(key: key);
+  const OutsideLevel1Stage1Activity({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  InsideLevel1Stage4ActivityState createState() =>
-      InsideLevel1Stage4ActivityState();
+  OutsideLevel1Stage1ActivityState createState() =>
+      OutsideLevel1Stage1ActivityState();
 }
 
-class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
+class OutsideLevel1Stage1ActivityState extends State<OutsideLevel1Stage1Activity>
     with SingleTickerProviderStateMixin {
   ActivityResponse? _activity;
   bool _isLoading = true;
@@ -40,14 +40,6 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
       vsync: this,
     );
     _loadActivity();
-  }bool isPlacedCorrectly = false;
-  void resetActivity() {
-    setState(() {
-      isPlacedCorrectly = false;
-      _wrongAttempts = 0;
-      playSound();
-      // أي حالة داخلية أخرى عايزة reset
-    });
   }
 
   Future<void> _loadActivity() async {
@@ -55,7 +47,7 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
       final response = await ApiManager.getActivity(
         ApiConstants.inside_outside_activityId,
         1,
-        4,
+        1,
       );
 
       if (mounted) {
@@ -101,10 +93,13 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
+    final deceptionUrl = _activity!.deceptionInstructions!.first;
 
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(UrlSource(deceptionUrl));
   }
 
   void repeatSound() => playSound();
@@ -176,27 +171,27 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
         final double scale = screenWidth / designWidth;
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double wrong1Right = 0 * scale;
-        final double wrong1Top = 190 * scale;
-        final double wrong1Width = 300 * scale;
-        final double wrong1Height = 300 * scale;
-        final double wrong2Left = 5 * scale;
-        final double wrong2Top = 450* scale;
-        final double wrong2Width = 180 * scale;
-        final double wrong2Height = 170 * scale;
-        final double correctRight = 110 * scale;
-        final double correctTop = 316 * scale;
-        final double correctWidth = 95 * scale;
-        final double correctHeight = 100 * scale;
+        final double anchorLeft = 120 * scale;
+        final double anchorRight = 10 * scale;
+        final double anchorTop = 130 * scale;
+        final double wrongLeft = 0 * scale;
+        final double wrongTop = 250 * scale;
+        final double wrongWidth = 140 * scale;
+        final double wrongHeight = 140 * scale;
+        final double correctLeft = 192 * scale;
+        final double correctTop = 230 * scale;
+        final double correctWidth = 120 * scale;
+        final double correctHeight = 120 * scale;
         final double shakeIntensity = 12 * scale;
 
         return Stack(
           alignment: Alignment.center,
           children: [
-            /// الأنكور الأول ( Try Again)
+            /// الأنكور
             Positioned(
-              right: wrong1Right,
-              top: wrong1Top,
+              left: anchorLeft,
+              right: anchorRight,
+              top: anchorTop,
               child: GestureDetector(
                 onTap: () {
                   _handleWrongAnswer();
@@ -205,44 +200,22 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
                   child: Image.network(
                     anchorElement.imageUrl ?? '',
                     fit: BoxFit.contain,
-                    width: wrong1Width,
-                    height: wrong1Height,
                   ),
                 ),
               ),
             ),
 
-            /// الأنكور الثاني ( Try Again)
+            /// العنصر الخطأ الأول
             Positioned(
-              left: wrong2Left,
-              top: wrong2Top,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Image.network(
-                    lastElement.imageUrl ?? '',
-                    fit: BoxFit.contain,
-                    width: wrong2Width,
-                    height: wrong2Height,
-                  ),
-                ),
-              ),
-            ),
-
-            /// العنصر الصحيح مع الحركة
-            Positioned(
-              right: correctRight,
-              top: correctTop,
+              left: wrongLeft,
+              top: wrongTop,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
                   double shakeValue = 0;
                   if (_isAnimatingAnswer) {
                     shakeValue = shakeIntensity *
-                        sin(_animationController!.value * 1 * pi);
+                        sin(_animationController!.value * pi);
                   }
 
                   return Transform.translate(
@@ -268,22 +241,39 @@ class InsideLevel1Stage4ActivityState extends State<InsideLevel1Stage4Activity>
                       }
                     });
                   },
-                  child: Container(
-                    color: Colors.transparent,
-                    child: Transform.rotate(
-                      angle: .3,
-                      child: Image.network(
-                        firstElement.imageUrl ?? '',
-                        width: correctWidth,
-                        height: correctHeight,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+
+                child: Container(
+                  color: Colors.transparent,
+                  child: Image.network(
+                    firstElement.imageUrl ?? '',
+                    fit: BoxFit.contain,
+                    width: wrongWidth,
+                    height: wrongHeight,
                   ),
                 ),
               ),
-            ),
-          ],
+            )),
+
+            /// العنصر الصحيح مع الحركة
+            Positioned(
+              left: correctLeft-7,
+              top: correctTop,
+              child: GestureDetector(
+                onTap: () {
+                  _handleWrongAnswer();
+                },
+                  child: Container(
+                    color: Colors.transparent,
+                    child: Image.network(
+                      lastElement.imageUrl ?? '',
+                      width: correctWidth,
+                      height: correctHeight,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ))
+
+            ],
         );
       },
     );
