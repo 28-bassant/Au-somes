@@ -3,6 +3,7 @@ import 'package:au_somes/utils/app_colors.dart';
 import 'package:au_somes/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 
+import '../core/cache/token_utils.dart';
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -33,9 +34,30 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(Duration(seconds: 4), () {
-      //todo: Navigate to login screen
-      Navigator.pushReplacementNamed(context, AppRoutes.registerScreenRouteName);
+    //todo: check token
+    Future.delayed(Duration(seconds: 3), () async {
+      final token = TokenUtils.getToken();
+      final expiry = TokenUtils.getTokenExpiry();
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      if (token != null && token.isNotEmpty) {
+        if (expiry != null && now < expiry) {
+          //todo:  valid token => navigate to select screen
+          Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
+        } else {
+          //todo: token expired => refresh token
+          bool success = await TokenUtils.refreshAccessToken();
+
+          if (success) {
+            Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
+          } else {
+            //todo:  refresh failed
+            Navigator.pushReplacementNamed(context, AppRoutes.loginScreenRouteName);
+          }
+        }
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.loginScreenRouteName);
+      }
     });
   }
 
@@ -56,7 +78,6 @@ class _SplashScreenState extends State<SplashScreen>
           children: [
             Image(image: AssetImage(AppAssets.logoImage)),
             SizedBox(height: height * .01),
-
             SlideTransition(
               position: _slideAnimation,
               child: Image(image: AssetImage(AppAssets.appNameImage)),

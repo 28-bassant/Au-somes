@@ -1,7 +1,30 @@
 import 'package:au_somes/providers/app_language_provider.dart';
 import 'package:au_somes/splash_screen/splash_screen.dart';
+import 'package:au_somes/ui/auth/forget_password/forged_password_screen1.dart';
+import 'package:au_somes/ui/auth/forget_password/forget_password_screen2.dart';
+import 'package:au_somes/ui/auth/forget_password/forget_password_screen3.dart';
 import 'package:au_somes/ui/auth/login_screen/login_screen.dart';
 import 'package:au_somes/ui/auth/register_screen/register_screen.dart';
+import 'package:au_somes/ui/child_screen/child_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/between_activites/between_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/down_activites/down_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/front_and_back_activities/front_back_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/inside_activites/inside_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/outside_activites/outside_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/up_activites/up_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/near_and_far_activities/near_far_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/right_and_left_acrivities/right_left_base_activity_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
+import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_base_screen.dart';
+
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_spatial_perception_base_screen.dart';
+import 'package:au_somes/ui/parent_screen/parent_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_routine/daily_routine_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/daily_tips_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/progress_level/progress_level_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/edit_profile/edit_profile_screen.dart';
+import 'package:au_somes/ui/select_screen/select_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +32,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:au_somes/l10n/app_localizations.dart';
 
+import 'core/cache/shared_prefs_utils.dart';
 
-void main(){
+final RouteObserver<ModalRoute<void>> routeObserver =
+RouteObserver<ModalRoute<void>>();
+void main()async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefsUtils.init();
   runApp( MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AppLanguageProvider(),),
@@ -31,11 +59,35 @@ class MyApp extends StatelessWidget{
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      initialRoute: AppRoutes.splashScreenRouteName,
+      navigatorObservers: [routeObserver],
+      initialRoute: AppRoutes.selectScreenRouteName,
       routes:  {
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),
-        AppRoutes.registerScreenRouteName : (context) => RegisterScreen(),
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),
+        AppRoutes.registerScreenRouteName : (context) => RegisterScreen(),
+        AppRoutes.forgetPasswordScreen1RouteName:(context)=>ForgetPasswordScreen1(),
+        AppRoutes.forgetPasswordScreen2RouteName:(context)=>ForgetPasswordScreen2(),
+        AppRoutes.forgetPasswordScreen3RouteName:(context)=>ForgetPasswordScreen3(),
+        AppRoutes.selectScreenRouteName:(context)=>SelectScreen(),
+        AppRoutes.parentScreenRouteName:(context)=>ParentScreen(),
+        AppRoutes.childScreenRouteName:(context)=>ChildScreen(),
+        AppRoutes.chatbotScreenRouteName:(context)=>ChatbotScreen(),
+        AppRoutes.progressLevelScreenRouteName:(context)=>ProgressLevelScreen(),
+        AppRoutes.editProfileScreenRouteName:(context)=>EditProfileScreen(),
+        AppRoutes.spatialConceptsScreenRouteName:(context)=>SpatialConceptsScreen(),
+        AppRoutes.dailyRoutineScreenRouteName:(context)=>DailyRoutineScreen(),
+        AppRoutes.dailyTipsScreenRouteName:(context)=>DailyTipsScreen(),
+        AppRoutes.frontBackBaseActivityScreenRouteName:(context)=>FrontBackBaseActivityScreen(),
+        AppRoutes.upBaseActivityScreenRouteName:(context)=>UpBaseActivityScreen(),
+        AppRoutes.downBaseActivityScreenRouteName:(context)=>DownBaseActivityScreen(),
+        AppRoutes.betweenBaseActivityScreenRouteName:(context)=>BetweenBaseActivityScreen(),
+        AppRoutes.insideBaseActivityScreenRouteName:(context)=>InsideBaseActivityScreen(),
+        AppRoutes.rightLeftBaseActivityScreenRouteName:(context)=>RightLeftBaseActivityScreen(),
+        AppRoutes.nearFarBaseActivityScreenRouteName:(context)=>NearFarBaseActivityScreen(),
+        AppRoutes.spatialRelationsActivitiesBaseScreenRouteName:(context)=>SpatialRelationsBaseScreen(),
+        AppRoutes.outsideBaseActivityScreenRouteName:(context)=>OutsideBaseActivityScreen(),
+        AppRoutes.visualSpatialPerceptionScreenRouteName:(context)=>VisualSpatialPerceptionBaseScreen(),
+
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),

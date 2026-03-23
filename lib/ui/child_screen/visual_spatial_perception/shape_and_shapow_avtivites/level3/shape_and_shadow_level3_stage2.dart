@@ -1,0 +1,300 @@
+import 'dart:async';
+import 'dart:math';
+import 'dart:math' as math;
+import 'package:au_somes/api/api_constants.dart';
+import 'package:au_somes/api/api_manager.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import '../../../../../../models/activities/activity_response.dart';
+import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/try_again_sound.dart';
+import '../../../reinforcement_widgets/well_done_overlay.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+class ShapeAndShadowLevel3Stage2 extends StatefulWidget {
+  final VoidCallback? onNextStage;
+
+  const ShapeAndShadowLevel3Stage2({Key? key, this.onNextStage})
+      : super(key: key);
+
+  @override
+  State createState() => ShapeAndShadowLevel3Stage2State();
+}
+
+class ShapeAndShadowLevel3Stage2State
+    extends State<ShapeAndShadowLevel3Stage2> {
+  ActivityResponse? _activity;
+  bool _isLoading = true;
+  late AudioPlayer _player;
+
+  // Shadows
+  ActivityElement? shadow1;
+  ActivityElement? shadow2;
+
+  // Actors
+  ActivityElement? actor1;
+  ActivityElement? actor2;
+  ActivityElement? actor3;
+
+  // shadowId -> actor
+  Map<String, ActivityElement> placed = {};
+
+  // rotation لكل actor
+  Map<String, double> actorRotation = {};
+
+  // 🔥 لكل actor محاولة واحدة فقط
+  Map<String, int> actorTryCount = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+    _loadActivity();
+  }
+
+  Future<void> _loadActivity() async {
+    try {
+      final response = await ApiManager.getActivity(
+        ApiConstants.shape_and_shadow_activityId,
+        3,
+        2,
+      );
+
+      if (!mounted) return;
+
+      _activity = response;
+
+      final shadowsList =
+      _activity!.elements!.where((e) => e.role == 'Shadow').toList();
+      shadow1 = shadowsList[0];
+      shadow2 = shadowsList[1];
+
+      final actorsList =
+      _activity!.elements!.where((e) => e.role == 'Actor').toList();
+      actor1 = actorsList[0];
+      actor2 = actorsList[1];
+      actor3 = actorsList[2];
+
+      // 🎯 rotations
+      actorRotation[actor1!.id!] = 0;
+      actorRotation[actor2!.id!] = -math.pi / 4;
+      actorRotation[actor3!.id!] = math.pi;
+
+      // 🔥 reset try لكل actor
+      actorTryCount[actor1!.id!] = 0;
+      actorTryCount[actor2!.id!] = 0;
+      actorTryCount[actor3!.id!] = 0;
+
+      await _preloadImages();
+      await _playSound();
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      print("Error: $e");
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _preloadImages() async {
+    final images = _activity!.elements!
+        .map((e) => e.imageUrl)
+        .where((url) => url != null && url!.isNotEmpty);
+
+    for (final url in images) {
+      await precacheImage(NetworkImage(url!), context);
+    }
+  }
+
+  Future<void> _playSound() async {
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    await _player.stop();
+    await _player.play(UrlSource(_activity!.audioUrl!));
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final h = MediaQuery.of(context).size.height;
+    final w = MediaQuery.of(context).size.width;
+
+    return Stack(
+      children: [
+        // 🔵 Shadows
+        Positioned(
+          top: h * 0.2,
+          left: w * 0.2,
+          child: _buildShadow(shadow1, w),
+        ),
+        Positioned(
+          top: h * 0.2,
+          left: w * 0.55,
+          child: _buildShadow(shadow2, w),
+        ),
+
+        // 🟠 Actors
+        Positioned(
+          bottom: h * 0.1,
+          left: w * 0.1,
+          child: _buildDraggableActor(actor1),
+        ),
+        Positioned(
+          bottom: h * 0.04,
+          left: w * 0.4,
+          width: w * .23,
+          height: h * .21,
+          child: _buildDraggableActor(actor2),
+        ),
+        Positioned(
+          bottom: h * 0.1,
+          left: w * 0.7,
+          child: _buildDraggableActor(actor3),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShadow(ActivityElement? shadow, double w) {
+    return DragTarget<ActivityElement>(
+        onWillAccept: (_) => true,
+    onAccept: (actor) {
+    if (actor.targetedZoneId == shadow?.id) {
+    // ✅ صح
+      setState(() {
+        placed[shadow!.id!] = actor;
+
+        // 🔥 reset المحاولات لكل actors (دور جديد)
+        actorTryCount.updateAll((key, value) => 0);
+      });
+    WellDoneOverlay.show(context);if (placed.length == 2) {
+      Future.delayed(const Duration(milliseconds: 700), () {
+        widget.onNextStage?.call();
+      });
+    }
+    } else {
+      // ❌ غلط → مرة واحدة بس لكل actor
+      final id = actor.id!;
+      if (actorTryCount[id]! < 1) {
+        TryAgainSound.play();
+        actorTryCount[id] = 1;
+      }
+    }
+    },
+      builder: (context, candidateData, rejectedData) {
+        return SizedBox(
+          width: w * 0.22,
+          height: w * 0.22,
+          child: placed.containsKey(shadow?.id)
+              ? Builder(
+            builder: (_) {
+              final placedActor = placed[shadow!.id]!;
+
+              final isActor2 = placedActor.id == actor2?.id;
+
+              return Transform.rotate(
+                angle: actorRotation[placedActor.id!] ?? 0,
+                child: Transform.scale(
+                  scale: isActor2 ? 1.22 : 1.0,
+                  child: Image.network(
+                    placedActor.imageUrl ?? '',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              );
+            },
+          )
+              : Image.network(
+            shadow?.imageUrl ?? '',
+            fit: BoxFit.contain,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDraggableActor(
+      ActivityElement? actor, {
+        double? width,
+        double? height,
+      }) {
+    final isPlaced = placed.containsValue(actor);
+
+    final w = MediaQuery.of(context).size.width;
+    final finalWidth = width ?? w * 0.21;
+    final finalHeight = height ?? w * 0.20;
+
+    final isActor2 = actor?.id == actor2?.id;
+
+    return Draggable<ActivityElement>(
+      data: actor,
+
+      // ✨ أثناء السحب
+      feedback: Transform.rotate(
+        angle: actorRotation[actor?.id ?? ''] ?? 0,
+        child: Material(
+          color: Colors.transparent,
+          child: SizedBox(
+            width: isActor2 ? finalWidth * 1.4 : finalWidth,
+            height: isActor2 ? finalHeight * 1.4 : finalHeight,
+            child: Image.network(
+              actor?.imageUrl ?? '',
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ),
+
+      childWhenDragging: const SizedBox(),
+
+      child: isPlaced
+          ? const SizedBox()
+          : SizedBox(
+        width: finalWidth,
+        height: finalHeight,
+        child: Image.network(
+          actor?.imageUrl ?? '',
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+}

@@ -8,20 +8,23 @@ import '../utils/app_colors.dart';
 
 typedef OnValidator = String? Function(String?)?;
 
-class CustomTextFormField extends StatelessWidget {
+class CustomTextFormField extends StatefulWidget {
   Color? filledColor;
   Color? borderColor;
   String? labelText;
   TextStyle? labelStyle;
   Widget? prefixIcon;
   Widget? suffixIcon;
-  OnValidator onValidator;
+  String? Function(String?)? validator;
   TextInputType? keyboardType;
   TextEditingController? controller;
   bool obscureText;
   int? maxLines;
   TextStyle? textStyle;
   double? borderRadius;
+  String? hintText;
+  String? initialValue;
+  TextStyle? hintStyle;
 
   CustomTextFormField({
     this.filledColor,
@@ -32,58 +35,66 @@ class CustomTextFormField extends StatelessWidget {
     this.labelStyle,
     this.prefixIcon,
     this.suffixIcon,
-    this.controller,
-    this.onValidator,
+    this.controller
+  ,this.hintText
+  ,this.hintStyle,
+    this.validator,
     this.keyboardType,
     this.obscureText = false,
     this.textStyle,
-    this.borderRadius
+    this.borderRadius,
+    this.initialValue
 
   });
 
   @override
+  State<CustomTextFormField> createState() => _CustomTextFormFieldState();
+}
+
+class _CustomTextFormFieldState extends State<CustomTextFormField> {
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
-
+      initialValue: widget.initialValue,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            width: 2,
+            width: 1,
             strokeAlign: 2
           )
         ),
         enabledBorder: builtTextFieldBorder(
             borderColor:
-            borderColor ?? AppColors.softBlue,
+            widget.borderColor ?? AppColors.greyColor,
         ),
-        focusedBorder: builtTextFieldBorder(borderColor: AppColors.softBlue),
+        focusedBorder: builtTextFieldBorder(borderColor: AppColors.blackColorWithOpacity60),
         errorBorder: builtTextFieldBorder(borderColor: AppColors.redColor),
         errorStyle: AppStyles.medium16Red.copyWith(color: AppColors.redColor),
-        fillColor: filledColor ?? AppColors.trasparentColor,
+        fillColor: widget.filledColor ?? AppColors.whiteColor,
         filled: true,
-        labelText: labelText,
-
-        labelStyle:
-        labelStyle ?? AppStyles.semiBold20SoftBlue,
-        prefixIcon: prefixIcon,
-        suffixIcon: suffixIcon,
+        labelText: widget.labelText,
+        hintText: widget.hintText,
+        hintStyle:widget.hintStyle ?? AppStyles.medium16grey ,
+        labelStyle: widget.labelStyle ?? AppStyles.medium20BlackWithOpacity60,
+        prefixIcon: widget.prefixIcon,
+        suffixIcon: widget.suffixIcon,
 
       ),
-      controller: controller,
-      maxLines: maxLines ?? 1,
-      style:textStyle ?? AppStyles.semiBold20SoftBlue,
-      validator: onValidator,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
+      controller: widget.controller,
+      maxLines: widget.maxLines ?? 1,
+      style:widget.textStyle ?? AppStyles.medium16BlackWithOpacity60,
+      validator: widget.validator,
+      keyboardType: widget.keyboardType,
+      obscureText: widget.obscureText,
     );
   }
 
   OutlineInputBorder builtTextFieldBorder({required Color? borderColor}) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(borderRadius ?? 16),
+      borderRadius: BorderRadius.circular(widget.borderRadius ?? 16),
       borderSide: BorderSide(
-        color: borderColor ?? AppColors.softBlue,
+        color: borderColor ?? AppColors.mintGreen,
         width: 2,
       ),
     );
