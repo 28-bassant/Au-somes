@@ -156,10 +156,34 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
     Positioned(top: bagTop + bagHeight * 0.6, left: w * 0.58, child: _buildShadow(shadow2, actor2, w)),
 
     // 🟠 Actors
-    Positioned(bottom: h * 0.12, left: w * 0.10, child: _buildDraggableActor(actor1, w * 0.17, w * 0.20)),
-    Positioned(bottom: h * 0.12, left: w * 0.30, child: _buildDraggableActor(actor2, w * 0.17, w * 0.20)),
-        Positioned(bottom: h * 0.12, left: w * 0.50, child: _buildDraggableActor(actor3, w * 0.17, w * 0.20)),
-        Positioned(bottom: h * 0.10, left: w * 0.70, child: _buildDraggableActor(actor4, w * 0.20, w * 0.21)),
+        // 🟠 Actors في Container واحد مع إطار رمادي
+        Positioned(
+          bottom: h * 0.12,
+          left: w * 0.1,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: w * 0.02, vertical: h * 0.01),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey.shade400,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // توزيعهم متساوي داخل الكونتينر
+              children: [
+                _buildDraggableActor(actor1, w * 0.17, w * 0.20),
+                SizedBox(width: w * 0.03), // مسافة بسيطة بينهم
+                _buildDraggableActor(actor2, w * 0.17, w * 0.20),
+                SizedBox(width: w * 0.03),
+                _buildDraggableActor(actor3, w * 0.17, w * 0.20),
+                SizedBox(width: w * 0.03),
+                _buildDraggableActor(actor4, w * 0.20, w * 0.21),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

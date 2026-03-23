@@ -167,22 +167,44 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
     ];
     return Stack(
         children: [
-    // 🔵 Shadows
-    for (int i = 0; i < shadows.length; i++)
-    Positioned(
-        top: safe(shadows[i].y) != 0 ? h * safe(shadows[i].y) : h * 0.15,
-    left: safe(shadows[i].x) != 0
-    ? w * safe(shadows[i].x)
-        : w * (0.2 + i * 0.35),
-      width: i == 1 ? w * 0.28 : w * 0.25,
-      height: i == 1 ? h * 0.22 : h * 0.2,
-      child: Image.network(
-        placed.containsKey(shadows[i].id)
-            ? placed[shadows[i].id]! // 👈 هنا بيظهر الأكتور الصح بس
-            : shadows[i].imageUrl ?? '',
-        fit: BoxFit.contain,
-      ),
-    ),
+          // 🔵 Shadows (Container واحد حوالينهم)
+          Positioned(
+            top: h * 0.12,
+            left: w * 0.09,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: w*.02),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey.shade400,
+                  width: 2.4,
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: SizedBox(
+                width: w * 0.78,
+                height: h * 0.2,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (int i = 0; i < shadows.length; i++)
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: w * 0.03),
+                          width: i == 1 ? w * 0.28 : w * 0.25,
+                          height: i == 1 ? h * 0.22 : h * 0.2,
+                          child: Image.network(
+                            placed.containsKey(shadows[i].id)
+                                ? placed[shadows[i].id]!
+                                : shadows[i].imageUrl ?? '',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
 
           // 🟠 Actors
           for (int i = 0; i < orderedActors.length; i++)

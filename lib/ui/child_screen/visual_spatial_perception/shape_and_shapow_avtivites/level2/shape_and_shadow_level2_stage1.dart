@@ -134,65 +134,81 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
     return Stack(
         children: [
     /// 🔵 Shadows
-    for (int i = 0; i < shadows.length; i++)
-    Positioned(
-        top: safe(shadows[i].y) != 0 ? h * safe(shadows[i].y) : h * 0.22,
-        left: safe(shadows[i].x) != 0
-            ? w * safe(shadows[i].x)
-            : w * (0.22 + (1-i) * 0.35),
-        child: DragTarget<ActivityElement>(
-        onWillAccept: (actor) => true, // كل Actor ممكن يسحب لأي Shadow
-          onAccept: (actor) {
-            if (actor.targetedZoneId == shadows[i].id) {
-              // ✅ صح
-              setState(() {
-                placed[shadows[i].id!] = actor.imageUrl ?? '';
-
-                // بعد أول إجابة صح → بداية دور جديد
-                _firstAnswerDone = true;
-                _grapeTryCount = 0; // يسمح للعنب Try مرة واحدة فقط بعد الإجابة الصح
-              });
-
-              WellDoneOverlay.show(context);
-
-              if (placed.length == shadows.length) {
-                Future.delayed(const Duration(milliseconds: 700), () {
-                  widget.onNextStage?.call();
-                });
-              }
-            } else {
-              // Actor غلط
-              final isGrape = actor == orderedActors[2];
-
-              if (isGrape) {
-                if (!_firstAnswerDone && _grapeTryCount < 2) {
-                  // قبل أي إجابة صح → Try مرتين
-                  TryAgainSound.play();
-                  _grapeTryCount++;
-                } else if (_firstAnswerDone && _grapeTryCount < 1) {
-                  // بعد أول إجابة صح → Try مرة واحدة فقط
-                  TryAgainSound.play();
-                  _grapeTryCount++;
-                }
-              }
-
-              // باقي Actors يرجع مكانه بدون أي صوت
-            }
-          },
-          builder: (context, candidateData, rejectedData) {
-            return SizedBox(
-              width: w * 0.25,
-              height: h * 0.2,
-              child: Image.network(
-                placed.containsKey(shadows[i].id)
-                    ? placed[shadows[i].id]!
-                    : shadows[i].imageUrl ?? '',
-                fit: BoxFit.contain,
+          Positioned(
+            top: h * 0.14,
+            left: w * 0.07,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey.shade400,
+                  width: 2.4,
+                ),
+                borderRadius: BorderRadius.circular(16),
               ),
-            );
-          },
-        ),
-    ),
+              child: SizedBox(
+                width: w * 0.8,
+                height: h * 0.2,
+                child: Stack(
+                  children: [
+                    for (int i = 0; i < shadows.length; i++)
+                      Positioned(
+                        top: safe(shadows[i].y) != 0
+                            ? h * safe(shadows[i].y)
+                            : h * 0.001,
+                        left: safe(shadows[i].x) != 0
+                            ? w * safe(shadows[i].x)
+                            : w * (0.1 + (1 - i) * 0.34),
+                        child: DragTarget<ActivityElement>(
+                          onWillAccept: (actor) => true,
+                          onAccept: (actor) {
+                            if (actor.targetedZoneId == shadows[i].id) {
+                              setState(() {
+                                placed[shadows[i].id!] = actor.imageUrl ?? '';
+                                _firstAnswerDone = true;
+                                _grapeTryCount = 0;
+                              });
+
+                              WellDoneOverlay.show(context);
+
+                              if (placed.length == shadows.length) {
+                                Future.delayed(const Duration(milliseconds: 700), () {
+                                  widget.onNextStage?.call();
+                                });
+                              }
+                            } else {
+                              final isGrape = actor == orderedActors[2];
+
+                              if (isGrape) {
+                                if (!_firstAnswerDone && _grapeTryCount < 2) {
+                                  TryAgainSound.play();
+                                  _grapeTryCount++;
+                                } else if (_firstAnswerDone && _grapeTryCount < 1) {
+                                  TryAgainSound.play();
+                                  _grapeTryCount++;
+                                }
+                              }
+                            }
+                          },
+                          builder: (context, candidateData, rejectedData) {
+                            return SizedBox(
+                              width: w * 0.25,
+                              height: h * 0.2,
+                              child: Image.network(
+                                placed.containsKey(shadows[i].id)
+                                    ? placed[shadows[i].id]!
+                                    : shadows[i].imageUrl ?? '',
+                                fit: BoxFit.contain,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
 
           /// 🟠 Actors
           // داخل الـ build() عند رسم Actors

@@ -1,3 +1,4 @@
+import 'package:au_somes/utils/app_assets.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
@@ -144,10 +145,10 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
           top: h * 0.15,
           left: w * 0.05,
           child: Container(
-            color: Colors.pinkAccent.shade700,
+            color: Colors.transparent,
             width: w * 0.9,
-            child: Image.network(
-              anchor?.imageUrl ?? '',
+            child: Image.asset(
+              AppAssets.star?? '',
               width: w * 0.3,
               height: h * 0.36,
             ),
@@ -156,8 +157,8 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
 
         /// 🔺 Shadow فوق
         Positioned(
-          top: h * 0.19,
-          left: w * 0.49,
+          top: h * 0.197,
+          left: w * 0.51,
           child: _buildShadow(shadows[1], w),
         ),
 

@@ -131,11 +131,22 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
 
   Widget _buildShadow(ActivityElement shadow, double w, double h) {
     return DragTarget<ActivityElement>(
-      onWillAccept: (actor) => actor?.targetedZoneId == shadow.id,
+      onWillAccept: (actor) => true,
       onAccept: (actor) {
-        setState(() {
-          placed[shadow.id!] = actor!.imageUrl!;
-        });
+        if (actor!.targetedZoneId == shadow.id) {
+          setState(() {
+            placed[shadow.id!] = actor.imageUrl!;
+          });
+
+          WellDoneOverlay.show(context); // ✅ يظهر عند كل إجابة صحيحة
+
+          // لو كل الشادو اتملأوا
+          if (placed.length == 4) {
+            Future.delayed(const Duration(milliseconds: 700), () {
+              widget.onNextStage?.call();
+            });
+          }
+        }
       },
       builder: (context, candidateData, rejectedData) {
         return SizedBox(
@@ -149,7 +160,8 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
         );
       },
     );
-  }Widget _buildDraggableActor(ActivityElement actor, {double? width, double? height}) {
+  }
+  Widget _buildDraggableActor(ActivityElement actor, {double? width, double? height}) {
     final isPlaced = placed[actor.targetedZoneId] == actor.imageUrl;
     return Draggable<ActivityElement>(
       data: actor,
@@ -160,44 +172,76 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
           : SizedBox(width: width, height: height, child: buildActorImage(actor.imageUrl!, width: width, height: height)),
     );
   }
-
-  @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;final customActor = ActivityElement(
+    final w = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final h = MediaQuery
+        .of(context)
+        .size
+        .height;
+
+    // Actor إضافي لو محتاج
+    final customActor = ActivityElement(
       id: 'triangle_custom',
-      imageUrl: AppAssets.dress_outside, // الصورة اللي حطيتيها
-      targetedZoneId: actorTriangleBlue.targetedZoneId, // نخلي الـ Shadow نفسه
+      imageUrl: AppAssets.dress_outside,
+      targetedZoneId: actorTriangleBlue.targetedZoneId,
       role: 'Actor',
     );
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+
+    return Stack(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildShadow(shadowSquareLarge, w * 0.25, w * 0.25),
-
-            _buildShadow(shadowTriangleLarge, w * 0.25, w * 0.25),
-            _buildShadow(shadowSquareSmall, w * 0.18, w * 0.18),
-            _buildShadow(shadowTriangleSmall, w * 0.18, w * 0.18),
-          ],
+        // 🔵 Shadows
+        Positioned(
+          top: h * 0.2,
+          left: w * 0.015,
+          child: _buildShadow(shadowSquareLarge, w * 0.26, w * 0.25),
         ),
-        const SizedBox(height: 50),
+        Positioned(
+          top: h * 0.196,
+          left: w * 0.7,
+          child: _buildShadow(shadowTriangleLarge, w * 0.25, w * 0.25),
+        ),
+        Positioned(
+          top: h * 0.228,
+          left: w * 0.5,
+          child: _buildShadow(shadowSquareSmall, w * 0.18, w * 0.18),
+        ),
+        Positioned(
+          top: h * 0.227,
+          left: w * 0.29,
+          child: _buildShadow(shadowTriangleSmall, w * 0.18, w * 0.18),
+        ),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildDraggableActor(actorSquareRed, width: w * 0.22, height: w * 0.22),
-
-            _buildDraggableActor(actorSquareBlue, width: w * 0.18, height: w * 0.18),
-            _buildDraggableActor(actorTriangleRed, width: w * 0.22, height: w * 0.22),
-            _buildDraggableActor(customActor, width: w * 0.18, height: w * 0.18),
-          ],
+        // 🟠 Actors draggable
+        Positioned(
+          bottom: h * 0.12,
+          left: w * 0.04,
+          child: _buildDraggableActor(
+              actorSquareRed, width: w * 0.238, height: w * 0.238),
+        ),
+        Positioned(
+          bottom: h * 0.12,
+          left: w * 0.3,
+          child: _buildDraggableActor(
+              actorSquareBlue, width: w * 0.18, height: w * 0.18),
+        ),
+        Positioned(
+          bottom: h * 0.12,
+          left: w * 0.51,
+          child: _buildDraggableActor(
+              actorTriangleRed, width: w * 0.234, height: w * 0.234),
+        ),
+        Positioned(
+          bottom: h * 0.12,
+          left: w * 0.78,
+          child: _buildDraggableActor(
+              customActor, width: w * 0.18, height: w * 0.18),
         ),
       ],
     );
-  }
-}
+  }}
 
 // Dummy classes
 class ActivityElement {
