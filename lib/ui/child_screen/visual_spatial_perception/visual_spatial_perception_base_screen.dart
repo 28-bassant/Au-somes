@@ -1,5 +1,14 @@
 
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/room_arrangement_activities/Level1/room_arrangement_level1_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level1/shape_and_shadow_level1_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level1/shape_and_shadow_level1_stage2.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level2/shape_and_shadow_level2_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level2/shape_and_shadow_level2_stage2.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level3/shape_and_shadow_level3_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level3/shape_and_shadow_level3_stage2.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_closure/level1/visual_closure_level1_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_closure/level2/visual_closure_level2_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_closure/level3/visual_closure_level3_stage1.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,10 +27,15 @@ class VisualSpatialPerceptionBaseScreen extends StatefulWidget {
 
 class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPerceptionBaseScreen> {
   final room_arrangement11Key = GlobalKey<RoomArrangementLevel1Stage1State>();
-
-
-
-
+  final shape_and_shadow_12Key = GlobalKey<ShapeAndShadowLevel1Stage1State>();
+  final shape_and_shadow_13Key = GlobalKey<ShapeAndShadowLevel1Stage2State>();
+  final shape_and_shadow_14Key = GlobalKey<ShapeAndShadowLevel2Stage1State>();
+  final shape_and_shadow_15Key = GlobalKey<ShapeAndShadowLevel2Stage2State>();
+  final shape_and_shadow_16Key = GlobalKey<ShapeAndShadowLevel3Stage1State>();
+  final shape_and_shadow_17Key = GlobalKey<ShapeAndShadowLevel3Stage2State>();
+  final visual_closure_18Key = GlobalKey<VisualClosureLevel1Stage1State>();
+  final visual_closure_19Key = GlobalKey<VisualClosureLevel2Stage1State>();
+  final visual_closure_20Key = GlobalKey<VisualClosureLevel3Stage1State>();
   late final List<Widget> activities;
   int currentActivityIndex = 0;
 
@@ -32,7 +46,37 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
       RoomArrangementLevel1Stage1(
         key: room_arrangement11Key,
         onNextStage: goToNextActivity,
-      ),
+      ),ShapeAndShadowLevel1Stage1(
+        key: shape_and_shadow_12Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel1Stage2(
+    key: shape_and_shadow_13Key,
+    onNextStage: goToNextActivity,
+    ),ShapeAndShadowLevel2Stage1(
+        key: shape_and_shadow_14Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel2Stage2(
+        key: shape_and_shadow_15Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel3Stage1(
+        key: shape_and_shadow_16Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel3Stage2(
+        key: shape_and_shadow_17Key,
+        onNextStage: goToNextActivity,
+      ),VisualClosureLevel1Stage1(
+        key: visual_closure_18Key,
+        onNextStage: goToNextActivity,
+      ),VisualClosureLevel2Stage1(
+        key: visual_closure_19Key,
+        onNextStage: goToNextActivity,
+      ),VisualClosureLevel3Stage1(
+        key: visual_closure_20Key,
+        onNextStage: goToNextActivity,
+      )
+
+
+
 
     ];
   }
@@ -40,6 +84,8 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
   void repeatCurrentSound() {
     if (currentActivityIndex == 0) {
       room_arrangement11Key.currentState?.repeatSound();
+    } if (currentActivityIndex == 1) {
+      shape_and_shadow_12Key.currentState?.repeatSound();
     }
 
   }

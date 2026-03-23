@@ -16,7 +16,7 @@ import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activ
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/right_and_left_acrivities/right_left_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_base_screen.dart';
-import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_spatial_perception_activites/Activity1/shape_and_shadow_base_activity_screen.dart';
+
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_spatial_perception_base_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot_screen.dart';
@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.spatialRelationsActivitiesBaseScreenRouteName:(context)=>SpatialRelationsBaseScreen(),
         AppRoutes.outsideBaseActivityScreenRouteName:(context)=>OutsideBaseActivityScreen(),
         AppRoutes.visualSpatialPerceptionScreenRouteName:(context)=>VisualSpatialPerceptionBaseScreen(),
-        AppRoutes.shapeAndShadowBaseActivityScreenRouteName:(context)=>ShapeAndShadowBaseActivityScreen(),
+
       },
       theme: AppTheme.lightTheme,
       locale: Locale(languageProvider.appLanguage),
