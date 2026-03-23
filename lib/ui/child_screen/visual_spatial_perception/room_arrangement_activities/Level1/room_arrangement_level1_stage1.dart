@@ -125,19 +125,16 @@ class RoomArrangementLevel1Stage1State
 
               // ================= أماكن Drop Zones =================
               List<Offset> dropPositions = [
-                Offset(constraints.maxWidth * 0.30, constraints.maxHeight * 0.40),
-                Offset(constraints.maxWidth * 0.7, constraints.maxHeight * 0.48),
+                Offset(constraints.maxWidth * 0.32, constraints.maxHeight * 0.44),
+                Offset(constraints.maxWidth * 0.7, constraints.maxHeight * 0.49),
               ];
 
               return Stack(
                 children: [
 
                   // ================= Anchor =================
-                  Positioned(
-                    top: 190,
-                    left: 0,
-                    right: 0,
-                    bottom: 250,
+                  Center(
+
                     child: Image.network(
                       anchor.imageUrl ?? '',
                       fit: BoxFit.cover,
@@ -195,8 +192,8 @@ class RoomArrangementLevel1Stage1State
                   for (int i = 0; i < actors.length; i++)
                     if (placed[i] != true)
                       Positioned(
-                        bottom: 260.0 + (i * 80),
-                        left: 40.0 + (i * 20),
+                        bottom: constraints.maxHeight * 0.38 + (i * constraints.maxHeight * 0.08),
+                        left: constraints.maxWidth * 0.08 + (i * constraints.maxWidth * 0.15),
                         child: Draggable<int>(
                           data: i,
                           feedback: Material(

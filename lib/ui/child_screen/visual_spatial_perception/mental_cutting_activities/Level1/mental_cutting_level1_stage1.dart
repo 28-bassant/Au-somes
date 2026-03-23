@@ -222,7 +222,7 @@ class MentalCuttingLevel1Stage1State extends State<MentalCuttingLevel1Stage1>
 
     final double actorSize = MediaQuery.of(context).size.width * 0.3;
     final double anchorSize = MediaQuery.of(context).size.width * 0.3;
-
+    var height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -271,7 +271,7 @@ class MentalCuttingLevel1Stage1State extends State<MentalCuttingLevel1Stage1>
                 ),
               ),
 
-              const SizedBox(height: 50),
+               SizedBox(height: height *.04),
 
               // جميع الـ Actors تحت بعض (تظل ظاهرة حتى بعد الإجابة الصحيحة)
               // Actor الصحيح (الإجابة الصحيحة)
