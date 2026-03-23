@@ -20,6 +20,7 @@ import '../../../../../utils/app_routes.dart';
 import '../reinforcement_widgets/confetti_overlay.dart';
 import 'geoboard_activities/Level1/geoboard_level1_stage2.dart';
 import 'geoboard_activities/Level2/geoboard_level2_stage1.dart';
+import 'geoboard_activities/level3/geoboard_level3_stage1.dart';
 import 'mental_cutting_activities/Level2/mental_cutting_level2_stage1.dart';
 import 'mental_cutting_activities/Level3/mental_cutting_level3_stage1.dart';
 import 'mental_cutting_activities/Level3/mental_cutting_level3_stage2.dart';
@@ -50,7 +51,7 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
   final geoboard11Key = GlobalKey<GeoboardLevel1Stage1State>();
   final geoboard12Key = GlobalKey<GeoboardLevel1Stage2State>();
   final geoboard21Key = GlobalKey<GeoboardLevel2Stage1State>();
-
+  final geoboard22Key = GlobalKey<GeoboardLevel3Stage1State>();
 
 
   late final List<Widget> activities;
@@ -126,6 +127,9 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
       ),
       GeoboardLevel2Stage1(
         key: geoboard21Key,
+        onNextStage: goToNextActivity,
+      ),GeoboardLevel3Stage1(
+        key: geoboard22Key,
         onNextStage: goToNextActivity,
       ),
 
