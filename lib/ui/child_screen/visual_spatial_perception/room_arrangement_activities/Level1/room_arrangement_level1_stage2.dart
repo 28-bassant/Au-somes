@@ -65,8 +65,8 @@ class RoomArrangementLevel1Stage2State
     await _player.stop();
     await _player.play(UrlSource(_activity.audioUrl!));
   }
-
   void repeatSound() => playSound();
+
 
   @override
   void dispose() {
@@ -94,7 +94,6 @@ class RoomArrangementLevel1Stage2State
             .where((e) => e.role == 'Actor')
             .toList();
 
-        // تهيئة حالة الـ placed و _soundPlayed
         for (int i = 0; i < actors.length; i++) {
           placed.putIfAbsent(i, () => false);
           _soundPlayed.putIfAbsent(i, () => false);
@@ -111,44 +110,51 @@ class RoomArrangementLevel1Stage2State
           body: LayoutBuilder(
             builder: (context, constraints) {
 
-              // ================= أحجام مختلفة لكل Actor =================
-              final List<double> actorSizes = [
-                constraints.maxWidth * 0.12,
-                constraints.maxWidth * 0.13,
-                constraints.maxWidth * 0.13,
-                constraints.maxWidth * 0.15,
-              ];
+              // ================= Sizes =================
+              final List<double> actorSizes = List.generate(
+                actors.length,
+                    (i) => constraints.maxWidth * 0.13,
+              );
 
-              final List<double> placedActorSizes = [
-                constraints.maxWidth * 0.13,
-                constraints.maxWidth * 0.12,
-                constraints.maxWidth * 0.12,
-                constraints.maxWidth * 0.13,
-              ];
-              final List<double> placedActorHeight = [
-                constraints.maxWidth * 0.14,
-                constraints.maxWidth * 0.15,
-                constraints.maxWidth * 0.15,
-                constraints.maxWidth * 0.14,
-              ];
+              final List<double> placedActorSizes = List.generate(
+                actors.length,
+                    (i) => constraints.maxWidth * 0.12,
+              );
+
+              final List<double> placedActorHeight = List.generate(
+                actors.length,
+                    (i) => constraints.maxWidth * 0.15,
+              );
 
               // ================= Drop Zones =================
               final List<Offset> dropPositions = [
-                Offset(constraints.maxWidth * 0.02, constraints.maxHeight * 0.44),
-                Offset(constraints.maxWidth * 0.75, constraints.maxHeight * 0.45),
-                Offset(constraints.maxWidth * 0.88, constraints.maxHeight * 0.45),
-                Offset(constraints.maxWidth * 0.02, constraints.maxHeight * 0.366),
+                Offset(constraints.maxWidth * 0.06, constraints.maxHeight * 0.46),
+                Offset(constraints.maxWidth * 0.75, constraints.maxHeight * 0.46),
+                Offset(constraints.maxWidth * 0.88, constraints.maxHeight * 0.47),
+                Offset(constraints.maxWidth * 0.06, constraints.maxHeight * 0.39),
+              ];
+
+              // ================= التحكم في مكان كل Actor =================
+              final List<double> actorLeft = [
+                constraints.maxWidth * 0.26, // Actor 0
+                constraints.maxWidth * 0.25, // Actor 1
+                constraints.maxWidth * 0.55, // Actor 2
+                constraints.maxWidth * 0.8,  // Actor 3
+              ];
+
+              final List<double> actorBottom = [
+                constraints.maxHeight * 0.47, // Actor 0
+                constraints.maxHeight * 0.38, // Actor 1
+                constraints.maxHeight * 0.38, // Actor 2
+                constraints.maxHeight * 0.47, // Actor 3
               ];
 
               return Stack(
                 children: [
 
                   // ================= Anchor =================
-                  Positioned(
-                    top: 230,
-                    left: 0,
-                    right: 0,
-                    bottom: 250,
+                  Center(
+
                     child: Image.network(
                       anchor.imageUrl ?? '',
                       fit: BoxFit.cover,
@@ -169,13 +175,11 @@ class RoomArrangementLevel1Stage2State
                             placed[i] = true;
                           });
 
-                          // تشغيل صوت الإجابة الصحيحة إذا لم يتم تشغيله من قبل
                           if (!_soundPlayed[i]!) {
                             _soundPlayed[i] = true;
                             TrueAnswerSound.play();
                           }
 
-                          // لو كل العناصر اتوضعت صح
                           if (placed.values.every((e) => e == true)) {
                             WellDoneOverlay.show(context);
                             Future.delayed(const Duration(seconds: 2), () {
@@ -187,17 +191,17 @@ class RoomArrangementLevel1Stage2State
                           return Container(
                             width: placedActorSizes[i],
                             height: placedActorHeight[i],
-                            decoration: BoxDecoration(
-                              // border: Border.all(color: Colors.black, width: 2),
-                            ),
+                            // decoration: BoxDecoration(
+                            //   border: Border.all(
+                            //     color: Colors.black
+                            //   )
+                            // ),
                             child: placed[i] == true
                                 ? Image.network(
                               actors[i].imageUrl ?? '',
-                              width: placedActorSizes[i],
-                              height: placedActorSizes[i],
                               fit: BoxFit.contain,
                             )
-                                : Container(),
+                                : const SizedBox(),
                           );
                         },
                       ),
@@ -207,8 +211,8 @@ class RoomArrangementLevel1Stage2State
                   for (int i = 0; i < actors.length; i++)
                     if (placed[i] != true)
                       Positioned(
-                        bottom: 260,
-                        left: 40.0 + (i * 90),
+                        left: actorLeft[i],
+                        bottom: actorBottom[i],
                         child: Draggable<int>(
                           data: i,
                           feedback: Material(

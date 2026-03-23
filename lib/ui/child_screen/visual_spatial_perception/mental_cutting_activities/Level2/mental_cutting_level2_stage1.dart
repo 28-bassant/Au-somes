@@ -247,6 +247,7 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
 
     final double actorSize = MediaQuery.of(context).size.width * 0.3;
     final double anchorSize = MediaQuery.of(context).size.width * 0.3;
+    var height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SafeArea(
@@ -296,7 +297,7 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
                 ),
               ),
 
-              const SizedBox(height: 50),
+               SizedBox(height: height * .04),
 
               // جميع الـ Actors تحت بعض (كلهم Draggable)
               // Actor الصحيح (Draggable) - يختفي بعد السحب

@@ -142,20 +142,20 @@ class RoomArrangementLevel2Stage1State
               // ================= Drop Zones =================
               // ممكن بعدين تستخدم targetedZoneId لتحديد مكان كل Actor بالضبط
               final List<Offset> dropPositions = [
-                Offset(constraints.maxWidth * 0.02, constraints.maxHeight * 0.44),
-                Offset(constraints.maxWidth * 0.55, constraints.maxHeight * 0.455),
-                Offset(constraints.maxWidth * 0.88, constraints.maxHeight * 0.45),
-                Offset(constraints.maxWidth * 0.71, constraints.maxHeight * 0.5),
-                Offset(constraints.maxWidth * 0.35, constraints.maxHeight * 0.44),
-                Offset(constraints.maxWidth * 0.02, constraints.maxHeight * 0.37),
-                Offset(constraints.maxWidth * 0.73, constraints.maxHeight * 0.445),
+                Offset(constraints.maxWidth * 0.05, constraints.maxHeight * 0.46),
+                Offset(constraints.maxWidth * 0.52, constraints.maxHeight * 0.47),
+                Offset(constraints.maxWidth * 0.86, constraints.maxHeight * 0.47),
+                Offset(constraints.maxWidth * 0.68, constraints.maxHeight * 0.52),
+                Offset(constraints.maxWidth * 0.35, constraints.maxHeight * 0.46),
+                Offset(constraints.maxWidth * 0.06, constraints.maxHeight * 0.39),
+                Offset(constraints.maxWidth * 0.73, constraints.maxHeight * 0.46),
               ];
 
               // ================= Initial positions لكل Actor قبل السحب =================
               final List<Offset> initialPositions = [
                 Offset(35, constraints.maxHeight * 0.58), // Actor 0
-                Offset(70, constraints.maxHeight * 0.45), // Actor 1
-                Offset(95, constraints.maxHeight * 0.5), // Actor 2
+                Offset(75, constraints.maxHeight * 0.45), // Actor 1
+                Offset(100, constraints.maxHeight * 0.5), // Actor 2
                 Offset(87, constraints.maxHeight * 0.52), // Actor 3
                 Offset(320, constraints.maxHeight * 0.58), // Actor 4
                 Offset(300, constraints.maxHeight * 0.48), // Actor 5
@@ -165,11 +165,8 @@ class RoomArrangementLevel2Stage1State
                 children: [
 
                   // ================= Anchor =================
-                  Positioned(
-                    top: 230,
-                    left: 0,
-                    right: 0,
-                    bottom: 250,
+                  Center(
+
                     child: Image.network(
                       anchor.imageUrl ?? '',
                       fit: BoxFit.cover,
