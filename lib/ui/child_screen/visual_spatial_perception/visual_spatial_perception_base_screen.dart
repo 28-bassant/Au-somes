@@ -10,9 +10,17 @@ import 'package:au_somes/ui/child_screen/visual_spatial_perception/tower_buildin
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/tower_building_activities/Level2/tower_building_level2_stage2.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/tower_building_activities/Level3/tower_building_level3_stage1.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/tower_building_activities/Level3/tower_building_level3_stage2.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level1/shape_and_shadow_level1_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level1/shape_and_shadow_level1_stage2.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level2/shape_and_shadow_level2_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level2/shape_and_shadow_level2_stage2.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level3/shape_and_shadow_level3_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/shape_and_shapow_avtivites/level3/shape_and_shadow_level3_stage2.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_closure/level1/visual_closure_level1_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_closure/level2/visual_closure_level2_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_closure/level3/visual_closure_level3_stage1.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
@@ -52,8 +60,15 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
   final geoboard12Key = GlobalKey<GeoboardLevel1Stage2State>();
   final geoboard21Key = GlobalKey<GeoboardLevel2Stage1State>();
   final geoboard22Key = GlobalKey<GeoboardLevel3Stage1State>();
-
-
+  final shape_and_shadow_12Key = GlobalKey<ShapeAndShadowLevel1Stage1State>();
+  final shape_and_shadow_13Key = GlobalKey<ShapeAndShadowLevel1Stage2State>();
+  final shape_and_shadow_14Key = GlobalKey<ShapeAndShadowLevel2Stage1State>();
+  final shape_and_shadow_15Key = GlobalKey<ShapeAndShadowLevel2Stage2State>();
+  final shape_and_shadow_16Key = GlobalKey<ShapeAndShadowLevel3Stage1State>();
+  final shape_and_shadow_17Key = GlobalKey<ShapeAndShadowLevel3Stage2State>();
+  final visual_closure_18Key = GlobalKey<VisualClosureLevel1Stage1State>();
+  final visual_closure_19Key = GlobalKey<VisualClosureLevel2Stage1State>();
+  final visual_closure_20Key = GlobalKey<VisualClosureLevel3Stage1State>();
   late final List<Widget> activities;
   int currentActivityIndex = 0;
 
@@ -61,16 +76,33 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
   void initState() {
     super.initState();
     activities = [
-      RoomArrangementLevel1Stage1(
-        key: room_arrangement11Key,
+      ShapeAndShadowLevel1Stage1(
+        key: shape_and_shadow_12Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel1Stage2(
+        key: shape_and_shadow_13Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel2Stage1(
+        key: shape_and_shadow_14Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel2Stage2(
+        key: shape_and_shadow_15Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel3Stage1(
+        key: shape_and_shadow_16Key,
+        onNextStage: goToNextActivity,
+      ),ShapeAndShadowLevel3Stage2(
+        key: shape_and_shadow_17Key,
         onNextStage: goToNextActivity,
       ),
-      RoomArrangementLevel1Stage2(
-        key: room_arrangement12Key,
+      VisualClosureLevel1Stage1(
+        key: visual_closure_18Key,
         onNextStage: goToNextActivity,
-      ),
-      RoomArrangementLevel2Stage1(
-        key: room_arrangement21Key,
+      ),VisualClosureLevel2Stage1(
+        key: visual_closure_19Key,
+        onNextStage: goToNextActivity,
+      ),VisualClosureLevel3Stage1(
+        key: visual_closure_20Key,
         onNextStage: goToNextActivity,
       ),
       TowerBuildingLevel1Stage1(
@@ -97,6 +129,19 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
         key: tower_building32Key,
         onNextStage: goToNextActivity,
       ),
+      RoomArrangementLevel1Stage1(
+        key: room_arrangement11Key,
+        onNextStage: goToNextActivity,
+      ),
+      RoomArrangementLevel1Stage2(
+        key: room_arrangement12Key,
+        onNextStage: goToNextActivity,
+      ),
+      RoomArrangementLevel2Stage1(
+        key: room_arrangement21Key,
+        onNextStage: goToNextActivity,
+      ),
+
       MentalCuttingLevel1Stage1(
         key: mental_cutting11Key,
         onNextStage: goToNextActivity,
@@ -133,44 +178,65 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
         onNextStage: goToNextActivity,
       ),
 
+
     ];
   }
 
   void repeatCurrentSound() {
     if (currentActivityIndex == 0) {
-      room_arrangement11Key.currentState?.repeatSound();
+      // shape_and_shadow_12Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 1) {
-      room_arrangement12Key.currentState?.repeatSound();
+      // shape_and_shadow_13Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 2) {
-      room_arrangement21Key.currentState?.repeatSound();
+      // shape_and_shadow_14Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 3) {
-      tower_building11Key.currentState?.repeatSound();
+      // shape_and_shadow_15Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 4) {
-      tower_building12Key.currentState?.repeatSound();
+      //shape_and_shadow_16Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 5) {
-      tower_building21Key.currentState?.repeatSound();
+      // shape_and_shadow_17Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 6) {
-      tower_building22Key.currentState?.repeatSound();
+      // visual_closure_18Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 7) {
-      tower_building31Key.currentState?.repeatSound();
+      // visual_closure_19Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 8) {
-      tower_building32Key.currentState?.repeatSound();
+      // visual_closure_20Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 9) {
-      mental_cutting11Key.currentState?.repeatSound();
+      tower_building11Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 10) {
-      mental_cutting21Key.currentState?.repeatSound();
+      tower_building12Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 11) {
-      mental_cutting31Key.currentState?.repeatSound();
+      tower_building21Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 12) {
-      mental_cutting32Key.currentState?.repeatSound();
+      tower_building22Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 13) {
-      mental_cutting33Key.currentState?.repeatSound();
+      tower_building31Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 14) {
-      geoboard11Key.currentState?.repeatSound();
+      tower_building32Key.currentState?.repeatSound();
     } else if (currentActivityIndex == 15) {
-      geoboard12Key.currentState?.repeatSound();
+      room_arrangement11Key.currentState?.repeatSound();
     } else if (currentActivityIndex == 16) {
+      room_arrangement12Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 17) {
+      room_arrangement21Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 18) {
+      mental_cutting11Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 19) {
+      mental_cutting21Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 20) {
+      mental_cutting31Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 21) {
+      mental_cutting32Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 22) {
+      mental_cutting33Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 23) {
+      geoboard11Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 24) {
+      geoboard12Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 25) {
       geoboard21Key.currentState?.repeatSound();
+    }  else if (currentActivityIndex == 26) {
+      // geoboard22Key.currentState?.repeatSound();
     }
 
   }

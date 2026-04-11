@@ -97,5 +97,7 @@ class AppAssets{
   static const String shirtOutside = 'assets/images/shirt_outside.png';
   static const String ball_image= 'assets/images/ball_image.png';
   static const String dress_outside= 'assets/images/dress_outside.png';
+  static const String star= 'assets/images/star.jpg';
   static const String geo= 'assets/images/geo.jpg';
+
 }
