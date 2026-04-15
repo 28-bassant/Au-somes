@@ -16,6 +16,8 @@ import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activ
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/right_and_left_acrivities/right_left_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_base_screen.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/mental_cutting_activities/Level3/mental_cutting_level3_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/mental_cutting_activities/Level3/mental_cutting_level3_stage2.dart';
 
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_spatial_perception_base_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
@@ -87,6 +89,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.spatialRelationsActivitiesBaseScreenRouteName:(context)=>SpatialRelationsBaseScreen(),
         AppRoutes.outsideBaseActivityScreenRouteName:(context)=>OutsideBaseActivityScreen(),
         AppRoutes.visualSpatialPerceptionScreenRouteName:(context)=>VisualSpatialPerceptionBaseScreen(),
+        AppRoutes.mentalCutting32ActivityScreenRouteName:(context)=>MentalCuttingLevel3Stage2(),
 
       },
       theme: AppTheme.lightTheme,

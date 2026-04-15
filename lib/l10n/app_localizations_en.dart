@@ -403,4 +403,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get complete_activity =>
       'Well done 👏\nYou completed all the activities';
+
+  @override
+  String get asperger =>
+      'The next 3 activities are for children with Asperger’s';
+
+  @override
+  String get asperger2 => 'The next activity is for children with Asperger’s';
+
+  @override
+  String get ok => 'Ok';
+
+  @override
+  String get skip => 'Skip';
 }

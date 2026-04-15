@@ -399,4 +399,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get complete_activity => 'أحسنت 👏\nخلصت كل الأنشطة';
+
+  @override
+  String get asperger =>
+      ' الأنشطةالثلاثة القادمة مخصصة للأطفال المصابين بمتلازمة أسبرجر';
+
+  @override
+  String get asperger2 =>
+      ' النشاط القادم مخصص للأطفال المصابين بمتلازمة أسبرجر';
+
+  @override
+  String get ok => 'حسنا';
+
+  @override
+  String get skip => 'تخطي';
 }

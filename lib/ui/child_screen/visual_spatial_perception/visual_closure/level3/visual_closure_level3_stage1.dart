@@ -1,3 +1,4 @@
+import 'package:au_somes/l10n/app_localizations.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
@@ -7,20 +8,8 @@ import '../../../../../models/activities/activity_element.dart';
 import '../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
-
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:collection/collection.dart'; // لازم للـ firstWhereOrNull
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import '../../visual_spatial_perception_base_screen.dart';
+import '../../widgets/asperger_widget.dart';
 
 class VisualClosureLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
@@ -48,11 +37,45 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
   List<String> stepInstructions = [];
   List<String> stepSuccess = [];
 
+  bool _canPlayAfterOk = false;
+  String? _audioUrl;
+
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final screenContext = context;
+
+      AspergerWidget().aspergerFun(
+        screenContext,
+        msg: AppLocalizations.of(context)!.asperger2,
+        onSkip: () {
+          final parent = screenContext
+              .findAncestorStateOfType<VisualSpatialPerceptionBaseScreenState>();
+          parent?.goToActivity(9);
+        },
+        onOk: () {
+          _canPlayAfterOk = true;
+          _playAfterDialog();
+        },
+      );
+    });
+
     _loadActivity();
+  }
+
+  void _playAfterDialog() async {
+    if (!_canPlayAfterOk) return;
+    if (_audioUrl == null || _audioUrl!.isEmpty) return;
+
+    try {
+      await _player.stop();
+      await _player.play(UrlSource(_audioUrl!));
+    } catch (e) {
+      debugPrint("Error playing audio after dialog: $e");
+    }
   }
 
   void _resetActorTry() {
@@ -75,6 +98,8 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
       1,
     );
 
+    _audioUrl = response.audioUrl;
+
     anchor = response.elements!.firstWhere((e) => e.role == 'Anchor');
     shadows = response.elements!.where((e) => e.role == 'Shadow').toList();
     actors = response.elements!.where((e) => e.role == 'Actor').toList();
@@ -89,14 +114,9 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
       {'actor': actors[3], 'shadow': shadows[1]}, // خطوة 3
     ];
 
-    // أصوات لكل خطوة (مثال، عدّلي حسب الأصوات الحقيقية)
+    // أصوات لكل خطوة
     stepInstructions = response.deceptionInstructions ?? [];
     stepSuccess = response.deceptionInstructions ?? [];
-
-    // 🔹 تشغيل أول صوت عند فتح النشاط
-    if (response.audioUrl != null && response.audioUrl!.isNotEmpty) {
-      await _playSound(response.audioUrl!);
-    }
 
     setState(() {});
   }
@@ -114,9 +134,9 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
 
       WellDoneOverlay.show(context);
 
-      // تشغيل صوت الخطوة الحالية بدون await لتجنب توقف UI
+      // تشغيل صوت الخطوة الحالية
       if (stepSuccess.length >= currentStep) {
-        _playSound(stepSuccess[currentStep - 1]); // currentStep بعد الزيادة، لذلك -1
+        _playSound(stepSuccess[currentStep - 1]);
       }
 
       // لو خلصنا كل الخطوات
@@ -132,74 +152,96 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
 
     return Stack(
-        children: [
+      children: [
         /// ⭐ Anchor
         if (anchor != null)
-    Positioned(
-      top: h * 0.1,
-      left: w * 0.07,
-      child: Image.network(
-        anchor!.imageUrl ?? '',
-        width: w * 0.9,
-        height: h * 0.39,
-      ),
-    ),/// 🔹 Shadows مع Container وردي خلفهم
-          if (shadows.length >= 4) ...[
-            Positioned(top: h * 0.19,
-                left: w * 0.21, width: w * 0.134,
-                height: h * 0.15, child: _buildShadow(shadows[1])),
+          Positioned(
+            top: h * 0.1,
+            left: w * 0.07,
+            child: Image.network(
+              anchor!.imageUrl ?? '',
+              width: w * 0.9,
+              height: h * 0.39,
+            ),
+          ),
 
-            Positioned(top: h * 0.189, left: w * 0.58, width: w * 0.12, height: h * 0.15, child: _buildShadow(shadows[3])),
-            Positioned(top: h * 0.389, left: w * 0.51, width: w * 0.14, height: h * 0.15, child: _buildShadow(shadows[0])),
-            Positioned(top: h * 0.306, left: w * 0.76, width: w * 0.09, height: h * 0.15, child: _buildShadow(shadows[2])),
-          ],
+        /// 🔹 Shadows مع Container وردي خلفهم
+        if (shadows.length >= 4) ...[
+          Positioned(
+              top: h * 0.16,
+              left: w * 0.21,
+              width: w * 0.134,
+              height: h * 0.15,
+              child: _buildShadow(shadows[1])
+          ),
+          Positioned(
+              top: h * 0.14,
+              left: w * 0.58,
+              width: w * 0.12,
+              height: h * 0.15,
+              child: _buildShadow(shadows[3])
+          ),
+          Positioned(
+              top: h * 0.35,
+              left: w * 0.51,
+              width: w * 0.14,
+              height: h * 0.15,
+              child: _buildShadow(shadows[0])
+          ),
+          Positioned(
+              top: h * 0.25,
+              left: w * 0.76,
+              width: w * 0.09,
+              height: h * 0.15,
+              child: _buildShadow(shadows[2])
+          ),
+        ],
 
-          /// 🟠 Actors draggable
-          for (int i = 0; i < actors.length; i++)
-            if (!placed.values.contains(actors[i].imageUrl))
-              Positioned(
-                bottom: h * 0.1,
-                left: w * (0.1 + i * 0.2),
-                child: Draggable<ActivityElement>(
-                  data: actors[i],
-                  feedback: Image.network(
-                    actors[i].imageUrl ?? '',
-                    width: w * 0.14,
-                  ),
-                  childWhenDragging: const SizedBox(),
-                  child: Image.network(
-                    actors[i].imageUrl ?? '',
-                    width: w * 0.14,
-                  ),
+        /// 🟠 Actors draggable
+        for (int i = 0; i < actors.length; i++)
+          if (!placed.values.contains(actors[i].imageUrl))
+            Positioned(
+              bottom: h * 0.1,
+              left: w * (0.1 + i * 0.2),
+              child: Draggable<ActivityElement>(
+                data: actors[i],
+                feedback: Image.network(
+                  actors[i].imageUrl ?? '',
+                  width: w * 0.14,
+                ),
+                childWhenDragging: const SizedBox(),
+                child: Image.network(
+                  actors[i].imageUrl ?? '',
+                  width: w * 0.14,
                 ),
               ),
-        ],
+            ),
+      ],
     );
   }
 
   Widget _buildShadow(ActivityElement shadow) {
     bool isPlaced = placed.containsKey(shadow.id);
-    return Stack(
-      children: [
-        // 🔹 Container وردي أكبر من Shadow
-
-        // 🔹 Shadow أو Actor إذا ثبت مكانه
-        DragTarget<ActivityElement>(
-          onWillAccept: (_) => true,
-          onAccept: (actor) => onActorDragEnd(actor, shadow),
-          builder: (context, candidateData, rejectedData) {
-            return isPlaced
-                ? Image.network(placed[shadow.id]!)
-                : Image.network(shadow.imageUrl ?? '', fit: BoxFit.contain);
-          },
-        ),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: DragTarget<ActivityElement>(
+        onWillAccept: (_) => true,
+        onAccept: (actor) => onActorDragEnd(actor, shadow),
+        builder: (context, candidateData, rejectedData) {
+          return isPlaced
+              ? Image.network(placed[shadow.id]!)
+              : Image.network(shadow.imageUrl ?? '', fit: BoxFit.contain);
+        },
+      ),
     );
   }
 
