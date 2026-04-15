@@ -4,10 +4,13 @@ import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/true_answer_sound.dart';
+import 'package:au_somes/utils/app_routes.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
+import '../../visual_spatial_perception_base_screen.dart';
+import '../../widgets/asperger_widget.dart';
 
 class MentalCuttingLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
@@ -46,10 +49,35 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
   // GlobalKeys لكل Anchor
   final Map<String, GlobalKey> _anchorKeys = {};
 
+
+  void _playAfterDialog() async {
+    _canPlaySound = true;
+    // تأخير بسيط للتأكد من أن كل شيء جاهز
+    await Future.delayed(const Duration(milliseconds: 100));
+    await playSound();
+    _hasPlayedSound = true;
+  }
   @override
   void initState() {
     super.initState();
+
+    // تهيئة AudioPlayer أولاً
     _player = AudioPlayer();
+
+    // استخدام Future.delayed للتأكد من اكتمال التهيئة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AspergerWidget().aspergerFun(
+        context,
+        onSkip: () {
+          final parent = context.findAncestorStateOfType<VisualSpatialPerceptionBaseScreenState>();
+          parent?.goToActivity(23);
+        },
+        onOk: () {
+          _playAfterDialog();
+        },
+      );
+    });
+
     _loadActivity();
 
     _animationController = AnimationController(
@@ -99,10 +127,7 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
           _imagesLoaded = true;
         });
 
-        if (!_hasPlayedSound) {
-          await playSound();
-          _hasPlayedSound = true;
-        }
+
 
         setState(() {
           _isLoading = false;
@@ -134,8 +159,17 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
     await Future.wait(precacheFutures);
     print('All images preloaded successfully');
   }
+  bool _canPlaySound = false;
 
   Future<void> playSound() async {
+    if (!_canPlaySound) return;
+
+    // التأكد من أن player تم تهيئته
+    if (_player == null) {
+      print('AudioPlayer not initialized');
+      return;
+    }
+
     if (!_dataLoaded || !_imagesLoaded) {
       print('Waiting for data and images to load before playing sound');
       return;

@@ -37,11 +37,11 @@ import 'mental_cutting_activities/Level3/mental_cutting_level3_stage3.dart';
 
 class VisualSpatialPerceptionBaseScreen extends StatefulWidget {
   @override
-  _VisualSpatialPerceptionBaseScreenState createState() =>
-      _VisualSpatialPerceptionBaseScreenState();
+  VisualSpatialPerceptionBaseScreenState createState() =>
+      VisualSpatialPerceptionBaseScreenState();
 }
 
-class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPerceptionBaseScreen> {
+class VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPerceptionBaseScreen> {
   final room_arrangement11Key = GlobalKey<RoomArrangementLevel1Stage1State>();
   final room_arrangement12Key = GlobalKey<RoomArrangementLevel1Stage2State>();
   final room_arrangement21Key = GlobalKey<RoomArrangementLevel2Stage1State>();
@@ -72,6 +72,11 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
   late final List<Widget> activities;
   int currentActivityIndex = 0;
 
+  void goToActivity(int index) {
+    setState(() {
+      currentActivityIndex = index;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -318,9 +323,8 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
                       color: AppColors.blackColorWithOpacity60, width: 1),
                 ),
                 child: Icon(
-                  languageProvider.isArabic()
-                      ? Icons.arrow_forward
-                      : Icons.arrow_back,
+                       Icons.arrow_back
+                      ,
                   color: AppColors.blackColorWithOpacity60,
                   size: 25,
                 ),

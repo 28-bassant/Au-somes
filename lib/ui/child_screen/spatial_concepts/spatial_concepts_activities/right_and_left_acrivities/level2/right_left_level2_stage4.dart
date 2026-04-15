@@ -122,22 +122,14 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
   }
 
   Future<void> playSound() async {
-    if (!_dataLoaded || !_imagesLoaded) {
-      print('Waiting for data and images to load before playing sound');
-      return;
-    }
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
 
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-
-    try {
-      await _player.stop();
-      await _player.play(UrlSource(_activity!.audioUrl!));
-      print('Sound played successfully after data and images loaded');
-    } catch (e) {
-      print('Error playing sound: $e');
-    }
+    await _player.stop();
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
-
   void repeatSound() {
     if (_dataLoaded && _imagesLoaded) {
       playSound();
