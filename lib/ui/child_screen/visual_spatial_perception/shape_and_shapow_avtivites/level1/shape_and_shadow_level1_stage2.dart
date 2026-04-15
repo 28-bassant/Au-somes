@@ -6,6 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 import 'package:flutter/material.dart';
@@ -40,10 +41,11 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
   List<ActivityElement> shadows = [];
   List<ActivityElement> actors = [];
 
-  // 🟢 كل Shadow مرتبط بالأكتور الصح بتاعه
-  Map<String, String> placed = {}; // shadowId -> actorImage
+
+  Map<String, String> placed = {};
 
   int _wrongAttempts = 0;
+  bool _isCompleted = false;
 
   @override
   void initState() {
@@ -110,6 +112,8 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
 
 
   void onActorTap(int index) {
+    if (_isCompleted) return;
+
     final actor = actors[index];
 
     ActivityElement? correctShadow;
@@ -129,18 +133,28 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
     }
 
     setState(() {
-      // 🟢 نحط الأكتور في مكان الشادو الصح بس
       placed[correctShadow!.id!] = actor.imageUrl ?? '';
     });
 
-    _animationController.forward(from: 0);
-    WellDoneOverlay.show(context);
+    final isLast = placed.length == shadows.length;
 
-    if (placed.length == shadows.length) {
-      Future.delayed(const Duration(milliseconds: 700), () {
-        widget.onNextStage?.call();
-      });
+    if (isLast) {
+      // 🟢 آخر إجابة صحيحة
+      if (!_isCompleted) {
+        _isCompleted = true;
+
+        WellDoneOverlay.show(context);
+
+        Future.delayed(const Duration(milliseconds: 700), () {
+          widget.onNextStage?.call();
+        });
+      }
+    } else {
+      // 🟢 إجابة صحيحة عادية
+      TrueAnswerSound.play();
     }
+
+    _animationController.forward(from: 0);
   }
 
   @override

@@ -7,6 +7,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 import 'package:flutter/material.dart';
@@ -64,15 +65,18 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
   bool hasPlayedSound = false;
   String? audioUrl;
   Map<String, bool> wrongPlayed = {};
+  bool _isCompleted = false;
+  String audioAsset = 'sounds/sound.mp3';
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
+
     _loadActivity();
 
-    Future.delayed(Duration.zero, () async {
-      await playSound();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      playSound();
     });
   }
 
@@ -141,30 +145,45 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
 
   Widget _buildShadow(ActivityElement shadow, double w, double h) {
     return DragTarget<ActivityElement>(
-      onWillAccept: (actor) => true,
+      onWillAccept: (_) => !_isCompleted,
       onAccept: (actor) {
-        if (actor == null) return;
+        if (_isCompleted) return;
 
-        // ✅ لو صح
-        if (actor.targetedZoneId == shadow.id) {
+        final isCorrect = actor.targetedZoneId == shadow.id;
+
+        if (isCorrect) {
           setState(() {
             placed[shadow.id!] = actor.imageUrl!;
           });
 
-          WellDoneOverlay.show(context);
+          // reset wrong attempts for better UX
+          wrongPlayed.clear();
 
-          if (placed.length == 4) {
-            Future.delayed(const Duration(seconds: 2), () {
-              widget.onNextStage?.call();
-            });
+          final isLast = placed.length == 4;
+
+          if (isLast) {
+            if (!_isCompleted) {
+              _isCompleted = true;
+
+              WellDoneOverlay.show(context);
+
+              Future.delayed(const Duration(seconds: 2), () {
+                widget.onNextStage?.call();
+              });
+            }
+          } else {
+            TrueAnswerSound.play();
           }
 
-        } else {
-          // ❌ لو غلط → يشغل الصوت مرة واحدة بس لكل Actor
-          if (wrongPlayed[actor.id] != true) {
-            TryAgainSound.play();
-            wrongPlayed[actor.id!] = true;
-          }
+          return;
+        }
+
+        // ❌ Wrong answer
+        final actorId = actor.id ?? '';
+
+        if (wrongPlayed[actorId] != true) {
+          TryAgainSound.play();
+          wrongPlayed[actorId] = true;
         }
       },
       builder: (context, candidateData, rejectedData) {
@@ -172,7 +191,9 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
           width: w,
           height: h,
           child: buildActorImage(
-            placed.containsKey(shadow.id) ? placed[shadow.id]! : shadow.imageUrl!,
+            placed.containsKey(shadow.id)
+                ? placed[shadow.id]!
+                : shadow.imageUrl!,
             width: w,
             height: h,
           ),
@@ -191,12 +212,18 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
           : SizedBox(width: width, height: height, child: buildActorImage(actor.imageUrl!, width: width, height: height)),
     );
   }
-  Future playSound() async {
-    if (audioUrl == null || audioUrl!.isEmpty) return;
 
-    await _player.stop();
-    await _player.play(UrlSource(audioUrl!));
-    hasPlayedSound = true;
+  Future playSound() async {
+    try {
+      debugPrint("PLAY SOUND START");
+
+      await _player.stop();
+      await _player.play(AssetSource(audioAsset));
+
+      debugPrint("PLAY SOUND DONE");
+    } catch (e) {
+      debugPrint("AUDIO ERROR: $e");
+    }
   }
 
   void repeatSound() => playSound();
