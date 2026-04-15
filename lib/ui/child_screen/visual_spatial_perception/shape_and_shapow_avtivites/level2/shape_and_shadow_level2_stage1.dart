@@ -6,6 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 import 'package:flutter/material.dart';
@@ -37,16 +38,16 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
   List<ActivityElement> shadows = [];
   List<ActivityElement> actors = [];
 
-  Map<String, String> placed = {}; // shadowId -> actorImage
+  Map<String, String> placed = {};
 
-  // لكل Actor: هل ممكن يعمل Try في الدور الحالي
   Map<String, bool> _actorCanTry = {};
+
 
   // ترتيب محدد للActors: العنصر الأول هو العنب
   late List<ActivityElement> orderedActors;
   int _grapeTryCount = 0; // عدد محاولات Try في الدور الحالي
   bool _firstAnswerDone = false; // هل تم وضع أي Actor صح؟
-
+  bool _isCompleted = false;
   @override
   void initState() {
     super.initState();
@@ -113,6 +114,7 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
   }
+  void repeatSound() => _playSound();
 
   double safe(num? value) => (value ?? 0).toDouble();
 
@@ -161,22 +163,38 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
                             : w * (0.1 + (1 - i) * 0.34),
                         child: DragTarget<ActivityElement>(
                           onWillAccept: (actor) => true,
-                          onAccept: (actor) {
-                            if (actor.targetedZoneId == shadows[i].id) {
-                              setState(() {
-                                placed[shadows[i].id!] = actor.imageUrl ?? '';
-                                _firstAnswerDone = true;
-                                _grapeTryCount = 0;
-                              });
+                            onAccept: (actor) {
+                              if (_isCompleted) return;
 
-                              WellDoneOverlay.show(context);
+                              final isCorrect = actor.targetedZoneId == shadows[i].id;
 
-                              if (placed.length == shadows.length) {
-                                Future.delayed(const Duration(milliseconds: 700), () {
-                                  widget.onNextStage?.call();
+                              if (isCorrect) {
+                                setState(() {
+                                  placed[shadows[i].id!] = actor.imageUrl ?? '';
+                                  _firstAnswerDone = true;
+                                  _grapeTryCount = 0;
                                 });
+
+                                final isLast = placed.length == shadows.length;
+
+                                if (isLast) {
+                                  if (!_isCompleted) {
+                                    _isCompleted = true;
+
+                                    WellDoneOverlay.show(context);
+
+                                    Future.delayed(const Duration(milliseconds: 700), () {
+                                      widget.onNextStage?.call();
+                                    });
+                                  }
+                                } else {
+                                  TrueAnswerSound.play();
+                                }
+
+                                return;
                               }
-                            } else {
+
+                              // ❌ Wrong answer logic (grape special handling)
                               final isGrape = actor == orderedActors[2];
 
                               if (isGrape) {
@@ -188,8 +206,7 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
                                   _grapeTryCount++;
                                 }
                               }
-                            }
-                          },
+                            },
                           builder: (context, candidateData, rejectedData) {
                             return SizedBox(
                               width: w * 0.25,

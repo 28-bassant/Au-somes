@@ -6,6 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 import 'package:flutter/material.dart';
@@ -53,9 +54,8 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
 
   Map<String, String> placed = {}; // shadowId -> actorImage
 
-  // ✅ Track Try لكل Actor مرة واحدة
   Map<String, bool> _actorCanTry = {};
-
+  bool _isCompleted = false;
   @override
   void initState() {
     super.initState();
@@ -120,6 +120,7 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
   }
+  void repeatSound() => _playSound();
 
   double safe(num? value) => (value ?? 0).toDouble();
 
@@ -190,26 +191,45 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
 
   Widget _buildShadow(ActivityElement? shadow, ActivityElement? actor, double w) {
     return DragTarget<ActivityElement>(
-      onWillAccept: (_) => true,
+      onWillAccept: (_) => !_isCompleted,
       onAccept: (droppedActor) {
-        if (droppedActor.targetedZoneId == shadow?.id) {
+        if (_isCompleted) return;
+
+        final isCorrect = droppedActor.targetedZoneId == shadow?.id;
+
+        if (isCorrect) {
           setState(() {
             placed[shadow!.id!] = droppedActor.imageUrl ?? '';
-            _resetActorTry(); // إعادة Try لكل دور جديد
           });
-          WellDoneOverlay.show(context);
-          if (placed.length == 3) {
-            Future.delayed(const Duration(milliseconds: 700), () {
-              widget.onNextStage?.call();
-            });
+
+          // Reset Try لكل Round (صح فقط)
+          _actorCanTry.updateAll((key, value) => true);
+
+          final isLast = placed.length == 3;
+
+          if (isLast) {
+            if (!_isCompleted) {
+              _isCompleted = true;
+
+              WellDoneOverlay.show(context);
+
+              Future.delayed(const Duration(milliseconds: 700), () {
+                widget.onNextStage?.call();
+              });
+            }
+          } else {
+            TrueAnswerSound.play();
           }
-        } else {
-          // ✅ Actor غلط → شغل TryOnce
-          final actorId = droppedActor.id ?? '';
-          if (_actorCanTry[actorId] == true) {
-            TryAgainSound.play();
-            _actorCanTry[actorId] = false;
-          }
+
+          return;
+        }
+
+        // ❌ Wrong answer
+        final actorId = droppedActor.id ?? '';
+
+        if (_actorCanTry[actorId] == true) {
+          TryAgainSound.play();
+          _actorCanTry[actorId] = false;
         }
       },
       builder: (context, candidateData, rejectedData) {
@@ -217,7 +237,9 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
           width: w * 0.20,
           height: w * 0.20,
           child: Image.network(
-            placed.containsKey(shadow?.id) ? placed[shadow!.id]! : shadow?.imageUrl ?? '',
+            placed.containsKey(shadow?.id)
+                ? placed[shadow!.id]!
+                : shadow?.imageUrl ?? '',
             fit: BoxFit.contain,
           ),
         );

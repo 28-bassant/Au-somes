@@ -8,12 +8,25 @@ import '../../../../../models/activities/activity_element.dart';
 import '../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
-import '../../visual_spatial_perception_base_screen.dart';
-import '../../widgets/asperger_widget.dart';
 
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:collection/collection.dart'; // لازم للـ firstWhereOrNull
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 class VisualClosureLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
-  const VisualClosureLevel3Stage1({Key? key, this.onNextStage}) : super(key: key);
+
+  const VisualClosureLevel3Stage1({Key? key, this.onNextStage})
+      : super(key: key);
 
   @override
   State createState() => VisualClosureLevel3Stage1State();
@@ -26,19 +39,17 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
   List<ActivityElement> shadows = [];
   List<ActivityElement> actors = [];
 
-  Map<String, String> placed = {}; // shadowId -> actorImage
-  Map<String, bool> actorCanTry = {}; // actorId -> true لو ممكن TryAgain
+  Map<String, String> placed = {};
+  Map<String, bool> actorCanTry = {};
+
   int currentStep = 0;
 
-  // ترتيب الإجابة الصحيحة لكل خطوة
   late List<Map<String, ActivityElement>> stepCorrect;
-
-  // أصوات لكل خطوة
   List<String> stepInstructions = [];
   List<String> stepSuccess = [];
 
-  bool _canPlayAfterOk = false;
-  String? _audioUrl;
+  // ⭐ الجديد: فقط لحفظ آخر صوت اتشغل (بدون التأثير على الترتيب)
+  String? _currentPlayingInstruction;
 
   @override
   void initState() {
@@ -87,8 +98,18 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
 
   Future<void> _playSound(String url) async {
     if (url.isEmpty) return;
+
+    _currentPlayingInstruction = url; // ⭐ أهم سطر هنا
+
     await _player.stop();
     await _player.play(UrlSource(url));
+  }
+
+  // ⭐ Repeat بدون تغيير أي logic
+  void repeatSound() {
+    if (_currentPlayingInstruction != null) {
+      _playSound(_currentPlayingInstruction!);
+    }
   }
 
   Future<void> _loadActivity() async {
@@ -106,22 +127,26 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
 
     _resetActorTry();
 
-    // ترتيب الإجابة الصحيحة حسب المطلوب
     stepCorrect = [
-      {'actor': actors[1], 'shadow': shadows[0]}, // خطوة 0
-      {'actor': actors[2], 'shadow': shadows[2]}, // خطوة 1
-      {'actor': actors[0], 'shadow': shadows[3]}, // خطوة 2
-      {'actor': actors[3], 'shadow': shadows[1]}, // خطوة 3
+      {'actor': actors[1], 'shadow': shadows[0]},
+      {'actor': actors[2], 'shadow': shadows[2]},
+      {'actor': actors[0], 'shadow': shadows[3]},
+      {'actor': actors[3], 'shadow': shadows[1]},
     ];
 
-    // أصوات لكل خطوة
     stepInstructions = response.deceptionInstructions ?? [];
     stepSuccess = response.deceptionInstructions ?? [];
+
+    // ⭐ أول صوت (instruction)
+    if (response.audioUrl != null && response.audioUrl!.isNotEmpty) {
+      _currentPlayingInstruction = response.audioUrl!;
+      await _playSound(_currentPlayingInstruction!);
+    }
 
     setState(() {});
   }
 
-  void onActorDragEnd(ActivityElement actor, ActivityElement shadow) {
+  void onActorDragEnd(ActivityElement actor, ActivityElement shadow) async {
     var correctActor = stepCorrect[currentStep]['actor'];
     var correctShadow = stepCorrect[currentStep]['shadow'];
 
@@ -134,12 +159,13 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
 
       WellDoneOverlay.show(context);
 
-      // تشغيل صوت الخطوة الحالية
+      // ⭐ success sound (بدون تغيير sequence)
       if (stepSuccess.length >= currentStep) {
         _playSound(stepSuccess[currentStep - 1]);
       }
 
-      // لو خلصنا كل الخطوات
+      // ❌ مهم: مفيش أي تغيير لترتيب instruction هنا
+
       if (currentStep == stepCorrect.length) {
         Future.delayed(const Duration(milliseconds: 700), () {
           widget.onNextStage?.call();
@@ -172,39 +198,39 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
             ),
           ),
 
-        /// 🔹 Shadows مع Container وردي خلفهم
+        /// ⭐ Shadows (زي الأصل بالظبط)
         if (shadows.length >= 4) ...[
           Positioned(
-              top: h * 0.16,
-              left: w * 0.21,
-              width: w * 0.134,
-              height: h * 0.15,
-              child: _buildShadow(shadows[1])
+            top: h * 0.15,
+            left: w * 0.21,
+            width: w * 0.134,
+            height: h * 0.15,
+            child: _buildShadow(shadows[1]),
           ),
           Positioned(
-              top: h * 0.14,
-              left: w * 0.58,
-              width: w * 0.12,
-              height: h * 0.15,
-              child: _buildShadow(shadows[3])
+            top: h * 0.1399,
+            left: w * 0.58,
+            width: w * 0.12,
+            height: h * 0.15,
+            child: _buildShadow(shadows[3]),
           ),
           Positioned(
-              top: h * 0.35,
-              left: w * 0.51,
-              width: w * 0.14,
-              height: h * 0.15,
-              child: _buildShadow(shadows[0])
+            top: h * 0.355,
+            left: w * 0.51,
+            width: w * 0.14,
+            height: h * 0.15,
+            child: _buildShadow(shadows[0]),
           ),
           Positioned(
-              top: h * 0.25,
-              left: w * 0.76,
-              width: w * 0.09,
-              height: h * 0.15,
-              child: _buildShadow(shadows[2])
+            top: h * 0.25,
+            left: w * 0.76,
+            width: w * 0.09,
+            height: h * 0.15,
+            child: _buildShadow(shadows[2]),
           ),
         ],
 
-        /// 🟠 Actors draggable
+        /// ⭐ Actors
         for (int i = 0; i < actors.length; i++)
           if (!placed.values.contains(actors[i].imageUrl))
             Positioned(
@@ -229,19 +255,15 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
 
   Widget _buildShadow(ActivityElement shadow) {
     bool isPlaced = placed.containsKey(shadow.id);
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: DragTarget<ActivityElement>(
-        onWillAccept: (_) => true,
-        onAccept: (actor) => onActorDragEnd(actor, shadow),
-        builder: (context, candidateData, rejectedData) {
-          return isPlaced
-              ? Image.network(placed[shadow.id]!)
-              : Image.network(shadow.imageUrl ?? '', fit: BoxFit.contain);
-        },
-      ),
+
+    return DragTarget<ActivityElement>(
+      onWillAccept: (_) => true,
+      onAccept: (actor) => onActorDragEnd(actor, shadow),
+      builder: (context, _, __) {
+        return isPlaced
+            ? Image.network(placed[shadow.id]!)
+            : Image.network(shadow.imageUrl ?? '');
+      },
     );
   }
 

@@ -7,6 +7,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +74,8 @@ class ShapeAndShadowLevel3Stage2State
 
   // 🔥 لكل actor محاولة واحدة فقط
   Map<String, int> actorTryCount = {};
+  bool _isCompleted = false;
+  Map<String, bool> wrongPlayed = {};
 
   @override
   void initState() {
@@ -141,6 +144,7 @@ class ShapeAndShadowLevel3Stage2State
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
   }
+  void repeatSound() => _playSound();
 
 
   @override
@@ -196,30 +200,48 @@ class ShapeAndShadowLevel3Stage2State
 
   Widget _buildShadow(ActivityElement? shadow, double w) {
     return DragTarget<ActivityElement>(
-        onWillAccept: (_) => true,
-    onAccept: (actor) {
-    if (actor.targetedZoneId == shadow?.id) {
-    // ✅ صح
-      setState(() {
-        placed[shadow!.id!] = actor;
+      onWillAccept: (_) => !_isCompleted,
 
-        // 🔥 reset المحاولات لكل actors (دور جديد)
-        actorTryCount.updateAll((key, value) => 0);
-      });
-    WellDoneOverlay.show(context);if (placed.length == 2) {
-      Future.delayed(const Duration(milliseconds: 700), () {
-        widget.onNextStage?.call();
-      });
-    }
-    } else {
-      // ❌ غلط → مرة واحدة بس لكل actor
-      final id = actor.id!;
-      if (actorTryCount[id]! < 1) {
-        TryAgainSound.play();
-        actorTryCount[id] = 1;
-      }
-    }
-    },
+      onAccept: (actor) {
+        if (_isCompleted) return;
+
+        final isCorrect = actor.targetedZoneId == shadow?.id;
+
+        if (isCorrect) {
+          setState(() {
+            placed[shadow!.id!] = actor;
+          });
+
+          // reset wrong attempts AFTER correct placement
+          wrongPlayed.clear();
+
+          final isLast = placed.length == 2;
+
+          if (isLast) {
+            if (!_isCompleted) {
+              _isCompleted = true;
+
+              WellDoneOverlay.show(context);
+
+              Future.delayed(const Duration(milliseconds: 700), () {
+                widget.onNextStage?.call();
+              });
+            }
+          } else {
+            TrueAnswerSound.play();
+          }
+          return;
+        }
+
+        //  Wrong answer logic
+        final actorId = actor.id ?? '';
+
+        if (wrongPlayed[actorId] != true) {
+          TryAgainSound.play();
+          wrongPlayed[actorId] = true;
+        }
+      },
+
       builder: (context, candidateData, rejectedData) {
         return SizedBox(
           width: w * 0.22,
