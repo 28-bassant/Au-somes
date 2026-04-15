@@ -180,9 +180,7 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
                         color: AppColors.blackColorWithOpacity60, width: 1),
                   ),
                   child: Icon(
-                    languageProvider.isArabic()
-                        ? Icons.arrow_forward
-                        : Icons.arrow_back,
+                   Icons.arrow_back,
                     color: AppColors.blackColorWithOpacity60,
                     size: 25,
                   ),

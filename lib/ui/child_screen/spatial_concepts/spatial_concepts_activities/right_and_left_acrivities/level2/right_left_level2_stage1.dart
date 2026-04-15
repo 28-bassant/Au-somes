@@ -112,9 +112,13 @@ class RightLeftLevel2Stage1State extends State<RightLeftLevel2Stage1>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
 
   void repeatSound() => playSound();

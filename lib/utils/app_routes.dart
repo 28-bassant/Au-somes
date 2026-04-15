@@ -24,4 +24,6 @@ class AppRoutes {
   static String nearFarBaseActivityScreenRouteName = "near_far_base_activity_screen";
   static String spatialRelationsActivitiesBaseScreenRouteName = "spatial_relations_base_activity_screen";
   static String visualSpatialPerceptionScreenRouteName = "visual_spatial_perception_screen";
-  static String shapeAndShadowBaseActivityScreenRouteName = "shape_and_shadow_base_activity_screen";}
+  static String shapeAndShadowBaseActivityScreenRouteName = "shape_and_shadow_base_activity_screen";
+  static String mentalCutting32ActivityScreenRouteName = "mental_cutting32_activity_screen";
+}

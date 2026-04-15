@@ -204,9 +204,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
                         color: AppColors.blackColorWithOpacity60, width: 1),
                   ),
                   child: Icon(
-                    languageProvider.isArabic()
-                        ? Icons.arrow_forward
-                        : Icons.arrow_back,
+                     Icons.arrow_back,
                     color: AppColors.blackColorWithOpacity60,
                     size: 25,
                   ),

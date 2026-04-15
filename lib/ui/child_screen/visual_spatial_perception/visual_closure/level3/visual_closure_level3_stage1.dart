@@ -1,3 +1,4 @@
+import 'package:au_somes/l10n/app_localizations.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
@@ -54,7 +55,38 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
   void initState() {
     super.initState();
     _player = AudioPlayer();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final screenContext = context;
+
+      AspergerWidget().aspergerFun(
+        screenContext,
+        msg: AppLocalizations.of(context)!.asperger2,
+        onSkip: () {
+          final parent = screenContext
+              .findAncestorStateOfType<VisualSpatialPerceptionBaseScreenState>();
+          parent?.goToActivity(9);
+        },
+        onOk: () {
+          _canPlayAfterOk = true;
+          _playAfterDialog();
+        },
+      );
+    });
+
     _loadActivity();
+  }
+
+  void _playAfterDialog() async {
+    if (!_canPlayAfterOk) return;
+    if (_audioUrl == null || _audioUrl!.isEmpty) return;
+
+    try {
+      await _player.stop();
+      await _player.play(UrlSource(_audioUrl!));
+    } catch (e) {
+      debugPrint("Error playing audio after dialog: $e");
+    }
   }
 
   void _resetActorTry() {
@@ -86,6 +118,8 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
       3,
       1,
     );
+
+    _audioUrl = response.audioUrl;
 
     anchor = response.elements!.firstWhere((e) => e.role == 'Anchor');
     shadows = response.elements!.where((e) => e.role == 'Shadow').toList();

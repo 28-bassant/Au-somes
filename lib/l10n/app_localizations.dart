@@ -865,6 +865,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Well done 👏\nYou completed all the activities'**
   String get complete_activity;
+
+  /// No description provided for @asperger.
+  ///
+  /// In en, this message translates to:
+  /// **'The next 3 activities are for children with Asperger’s'**
+  String get asperger;
+
+  /// No description provided for @asperger2.
+  ///
+  /// In en, this message translates to:
+  /// **'The next activity is for children with Asperger’s'**
+  String get asperger2;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'Ok'**
+  String get ok;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
 }
 
 class _AppLocalizationsDelegate

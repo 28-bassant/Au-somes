@@ -137,7 +137,11 @@
     "am":"AM",
     "pm":"PM",
     "level":"Level",
-    "complete_activity":"Well done 👏\nYou completed all the activities"
+    "complete_activity":"Well done 👏\nYou completed all the activities",
+    "asperger":"The next 3 activities are for children with Asperger’s",
+    "asperger2":"The next activity is for children with Asperger’s",
+    "ok":"Ok",
+    "skip":"Skip"
 
 
 
