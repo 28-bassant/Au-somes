@@ -112,13 +112,9 @@ class RightLeftLevel4Stage3State extends State<RightLeftLevel4Stage3>
   }
 
   Future<void> playSound() async {
-    if (_activity?.deceptionInstructions == null ||
-        _activity!.deceptionInstructions!.isEmpty) return;
-
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(
-      UrlSource(_activity!.deceptionInstructions![0]!),
-    );
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
 
 
