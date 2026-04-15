@@ -418,18 +418,3 @@ class CircleConnectionPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
-
-// ================= Dummy =================
-
-class TryAgainSound {
-  static void play() => print('Try Again Sound');
-}
-
-class TrueAnswerSound {
-  static void play() => print('True Answer Sound');
-}
-
-class WellDoneOverlay {
-  static void show(BuildContext context) => print('Well Done!');
-}
-

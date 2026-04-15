@@ -84,6 +84,7 @@ class ShapeAndShadowLevel1Stage1State extends State<ShapeAndShadowLevel1Stage1>
     await _player.play(UrlSource(activity!.audioUrl!));
     hasPlayedSound = true;
   }
+  void repeatSound() => playSound();
 
 
   int _wrongAttempts = 0; // عدد مرات الضغط على Actors الغلط
@@ -91,25 +92,24 @@ class ShapeAndShadowLevel1Stage1State extends State<ShapeAndShadowLevel1Stage1>
   void onActorTap(ActivityElement actor) {
     if (isPlacedCorrectly || shadowElement == null) return;
 
-    // -------------------- Actor صح --------------------
-    if (actor.targetedZoneId != null &&
-        actor.targetedZoneId == shadowElement!.id) {
+    final isCorrect = actor.targetedZoneId == shadowElement!.id;
+
+    if (isCorrect) {
       setState(() => isPlacedCorrectly = true);
 
-      // تشغيل حركة بسيطة
       _animationController.forward(from: 0);
 
-      // بعد فترة قصيرة الانتقال للمرحلة التالية
-      Future.delayed(const Duration(milliseconds: 700), () {
+      WellDoneOverlay.show(context);
+
+      Future.delayed(const Duration(seconds: 2), () {
         widget.onNextStage?.call();
       });
+
     } else {
-      // -------------------- Actor غلط --------------------
       if (_wrongAttempts == 0) {
-        TryAgainSound.play(); // شغل الصوت لأول مرة فقط
+        TryAgainSound.play();
       }
 
-      // زيادة العدادات
       setState(() {
         _wrongAttempts++;
       });

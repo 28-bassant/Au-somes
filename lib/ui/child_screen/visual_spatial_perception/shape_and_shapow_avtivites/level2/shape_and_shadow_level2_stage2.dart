@@ -120,6 +120,7 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
   }
+  void repeatSound() => _playSound();
 
   double safe(num? value) => (value ?? 0).toDouble();
 

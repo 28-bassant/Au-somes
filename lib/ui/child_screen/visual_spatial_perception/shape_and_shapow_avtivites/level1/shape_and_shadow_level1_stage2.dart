@@ -96,6 +96,7 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
   }
+  void repeatSound() => _playSound();
 
   Future<void> _preloadImages() async {
     final images = _activity!.elements!

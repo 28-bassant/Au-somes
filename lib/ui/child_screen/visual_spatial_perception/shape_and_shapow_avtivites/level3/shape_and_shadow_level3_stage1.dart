@@ -60,12 +60,22 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
   late ActivityElement actorSquareBlue;
   late ActivityElement actorTriangleRed;
   late ActivityElement actorTriangleBlue;
+  late AudioPlayer _player;
+  bool hasPlayedSound = false;
+  String? audioUrl;
+  Map<String, bool> wrongPlayed = {};
 
   @override
   void initState() {
     super.initState();
+    _player = AudioPlayer();
     _loadActivity();
+
+    Future.delayed(Duration.zero, () async {
+      await playSound();
+    });
   }
+
 
   void _loadActivity() {
     // Shadows
@@ -133,18 +143,27 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
     return DragTarget<ActivityElement>(
       onWillAccept: (actor) => true,
       onAccept: (actor) {
-        if (actor!.targetedZoneId == shadow.id) {
+        if (actor == null) return;
+
+        // ✅ لو صح
+        if (actor.targetedZoneId == shadow.id) {
           setState(() {
             placed[shadow.id!] = actor.imageUrl!;
           });
 
-          WellDoneOverlay.show(context); // ✅ يظهر عند كل إجابة صحيحة
+          WellDoneOverlay.show(context);
 
-          // لو كل الشادو اتملأوا
           if (placed.length == 4) {
-            Future.delayed(const Duration(milliseconds: 700), () {
+            Future.delayed(const Duration(seconds: 2), () {
               widget.onNextStage?.call();
             });
+          }
+
+        } else {
+          // ❌ لو غلط → يشغل الصوت مرة واحدة بس لكل Actor
+          if (wrongPlayed[actor.id] != true) {
+            TryAgainSound.play();
+            wrongPlayed[actor.id!] = true;
           }
         }
       },
@@ -171,6 +190,21 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
           ? const SizedBox()
           : SizedBox(width: width, height: height, child: buildActorImage(actor.imageUrl!, width: width, height: height)),
     );
+  }
+  Future playSound() async {
+    if (audioUrl == null || audioUrl!.isEmpty) return;
+
+    await _player.stop();
+    await _player.play(UrlSource(audioUrl!));
+    hasPlayedSound = true;
+  }
+
+  void repeatSound() => playSound();
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
   }
   Widget build(BuildContext context) {
     final w = MediaQuery
@@ -243,11 +277,3 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
     );
   }}
 
-// Dummy classes
-class ActivityElement {
-  final String? id;
-  final String? imageUrl;
-  final String? role;
-  final String? targetedZoneId;
-  ActivityElement({this.id, this.imageUrl, this.role, this.targetedZoneId});
-}

@@ -184,23 +184,23 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
 
   void repeatCurrentSound() {
     if (currentActivityIndex == 0) {
-      // shape_and_shadow_12Key.currentState?.repeatSound();
+       shape_and_shadow_12Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 1) {
-      // shape_and_shadow_13Key.currentState?.repeatSound();
+       shape_and_shadow_13Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 2) {
-      // shape_and_shadow_14Key.currentState?.repeatSound();
+       shape_and_shadow_14Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 3) {
-      // shape_and_shadow_15Key.currentState?.repeatSound();
+       shape_and_shadow_15Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 4) {
-      //shape_and_shadow_16Key.currentState?.repeatSound();
+      shape_and_shadow_16Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 5) {
-      // shape_and_shadow_17Key.currentState?.repeatSound();
+       shape_and_shadow_17Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 6) {
-      // visual_closure_18Key.currentState?.repeatSound();
+       visual_closure_18Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 7) {
-      // visual_closure_19Key.currentState?.repeatSound();
+       visual_closure_19Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 8) {
-      // visual_closure_20Key.currentState?.repeatSound();
+       visual_closure_20Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 9) {
       tower_building11Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 10) {

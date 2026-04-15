@@ -141,6 +141,7 @@ class ShapeAndShadowLevel3Stage2State
     await _player.stop();
     await _player.play(UrlSource(_activity!.audioUrl!));
   }
+  void repeatSound() => _playSound();
 
 
   @override
