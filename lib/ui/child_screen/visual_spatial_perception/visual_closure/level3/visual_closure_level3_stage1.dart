@@ -8,20 +8,11 @@ import '../../../../../models/activities/activity_element.dart';
 import '../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:collection/collection.dart'; // لازم للـ firstWhereOrNull
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import '../../visual_spatial_perception_base_screen.dart';
+import '../../widgets/asperger_widget.dart';
+
 class VisualClosureLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
@@ -42,14 +33,25 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
   Map<String, String> placed = {};
   Map<String, bool> actorCanTry = {};
 
+  bool _canPlayAfterOk = false;
+  String? _audioUrl;
+
   int currentStep = 0;
 
   late List<Map<String, ActivityElement>> stepCorrect;
   List<String> stepInstructions = [];
   List<String> stepSuccess = [];
 
-  // ⭐ الجديد: فقط لحفظ آخر صوت اتشغل (بدون التأثير على الترتيب)
+  // لحفظ آخر صوت اتشغل
   String? _currentPlayingInstruction;
+
+  // ✅ متغيرات تتبع تحميل الصور
+  bool _allImagesLoaded = false;
+  int _totalImages = 0;
+  int _loadedImagesCount = 0;
+
+  // ✅ متغير لمنع تشغيل الصوت الأولي أكثر من مرة
+  bool _initialSoundPlayed = false;
 
   @override
   void initState() {
@@ -69,7 +71,7 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
         },
         onOk: () {
           _canPlayAfterOk = true;
-          _playAfterDialog();
+          _playAfterDialog(); // ✅ تشغيل الصوت بعد الضغط على OK
         },
       );
     });
@@ -81,11 +83,16 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
     if (!_canPlayAfterOk) return;
     if (_audioUrl == null || _audioUrl!.isEmpty) return;
 
-    try {
-      await _player.stop();
-      await _player.play(UrlSource(_audioUrl!));
-    } catch (e) {
-      debugPrint("Error playing audio after dialog: $e");
+    // ✅ فقط تشغل الصوت بعد تحميل الصور والضغط على OK
+    if (_allImagesLoaded && !_initialSoundPlayed) {
+      _initialSoundPlayed = true;
+      try {
+        await _player.stop();
+        await _player.play(UrlSource(_audioUrl!));
+        _currentPlayingInstruction = _audioUrl;
+      } catch (e) {
+        debugPrint("Error playing audio after dialog: $e");
+      }
     }
   }
 
@@ -96,18 +103,32 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
     }
   }
 
+  void _checkAllImagesLoaded() {
+    _loadedImagesCount++;
+    if (_loadedImagesCount >= _totalImages && !_allImagesLoaded) {
+      _allImagesLoaded = true;
+      // ✅ مش هنشغل الصوت هنا تلقائياً، هنستنى الضغط على OK
+      // _playInitialSoundIfReady(); // ❌ تم إلغاء التشغيل التلقائي
+    }
+  }
+
+  // ❌ تم إلغاء هذه الدالة لأننا مش عايزين الصوت يشتغل تلقائياً
+  // Future<void> _playInitialSoundIfReady() async { ... }
+
   Future<void> _playSound(String url) async {
     if (url.isEmpty) return;
 
-    _currentPlayingInstruction = url; // ⭐ أهم سطر هنا
+    // ✅ فقط تشغل الصوت بعد تحميل الصور
+    if (!_allImagesLoaded) return;
+
+    _currentPlayingInstruction = url;
 
     await _player.stop();
     await _player.play(UrlSource(url));
   }
 
-  // ⭐ Repeat بدون تغيير أي logic
   void repeatSound() {
-    if (_currentPlayingInstruction != null) {
+    if (_currentPlayingInstruction != null && _allImagesLoaded) {
       _playSound(_currentPlayingInstruction!);
     }
   }
@@ -137,16 +158,56 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
     stepInstructions = response.deceptionInstructions ?? [];
     stepSuccess = response.deceptionInstructions ?? [];
 
-    // ⭐ أول صوت (instruction)
-    if (response.audioUrl != null && response.audioUrl!.isNotEmpty) {
-      _currentPlayingInstruction = response.audioUrl!;
-      await _playSound(_currentPlayingInstruction!);
-    }
+    // ✅ حساب العدد الإجمالي للصور
+    _totalImages = 1 + shadows.length + actors.length; // Anchor + Shadows + Actors
+
+    // ✅ تحميل كل الصور مسبقاً
+    _preloadAllImages();
 
     setState(() {});
   }
 
+  void _preloadAllImages() {
+    // تحميل صورة Anchor
+    if (anchor?.imageUrl != null && anchor!.imageUrl!.isNotEmpty) {
+      _preloadImage(anchor!.imageUrl!, 'anchor');
+    }
+
+    // تحميل صور Shadows
+    for (var shadow in shadows) {
+      if (shadow.imageUrl != null && shadow.imageUrl!.isNotEmpty) {
+        _preloadImage(shadow.imageUrl!, 'shadow_${shadow.id}');
+      }
+    }
+
+    // تحميل صور Actors
+    for (var actor in actors) {
+      if (actor.imageUrl != null && actor.imageUrl!.isNotEmpty) {
+        _preloadImage(actor.imageUrl!, 'actor_${actor.id}');
+      }
+    }
+  }
+
+  void _preloadImage(String url, String key) {
+    Image.network(
+      url,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          _checkAllImagesLoaded();
+        }
+        return child;
+      },
+      errorBuilder: (context, error, stackTrace) {
+        _checkAllImagesLoaded(); // Count as loaded even if error
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
   void onActorDragEnd(ActivityElement actor, ActivityElement shadow) async {
+    // ✅ منع التفاعل قبل تحميل كل الصور
+    if (!_allImagesLoaded) return;
+
     var correctActor = stepCorrect[currentStep]['actor'];
     var correctShadow = stepCorrect[currentStep]['shadow'];
 
@@ -157,14 +218,23 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
         _resetActorTry();
       });
 
-      WellDoneOverlay.show(context);
+      // ✅ التحقق: لو مش اخر خطوة → TrueAnswerSound
+      // ✅ لو اخر خطوة → WellDoneOverlay
+      if (currentStep < stepCorrect.length) {
+        // مش اخر خطوة
+        TrueAnswerSound.play();
 
-      // ⭐ success sound (بدون تغيير sequence)
-      if (stepSuccess.length >= currentStep) {
-        _playSound(stepSuccess[currentStep - 1]);
+        // ✅ انتظار 300 مللي ثانية عشان صوت TrueAnswerSound يخلص
+        await Future.delayed(const Duration(milliseconds: 800));
+
+        // ⭐ success sound
+        if (stepSuccess.length >= currentStep) {
+          await _playSound(stepSuccess[currentStep - 1]);
+        }
+      } else {
+        // اخر خطوة
+        WellDoneOverlay.show(context);
       }
-
-      // ❌ مهم: مفيش أي تغيير لترتيب instruction هنا
 
       if (currentStep == stepCorrect.length) {
         Future.delayed(const Duration(milliseconds: 700), () {
@@ -173,7 +243,9 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
       }
     } else {
       if (actorCanTry[actor.id ?? ''] == true) {
-        TryAgainSound.play();
+        if (_allImagesLoaded) {
+          TryAgainSound.play();
+        }
         actorCanTry[actor.id ?? ''] = false;
       }
     }
@@ -195,10 +267,16 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
               anchor!.imageUrl ?? '',
               width: w * 0.9,
               height: h * 0.39,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) {
+                  _checkAllImagesLoaded();
+                }
+                return child;
+              },
             ),
           ),
 
-        /// ⭐ Shadows (زي الأصل بالظبط)
+        /// ⭐ Shadows
         if (shadows.length >= 4) ...[
           Positioned(
             top: h * 0.15,
@@ -241,11 +319,23 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
                 feedback: Image.network(
                   actors[i].imageUrl ?? '',
                   width: w * 0.14,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      _checkAllImagesLoaded();
+                    }
+                    return child;
+                  },
                 ),
                 childWhenDragging: const SizedBox(),
                 child: Image.network(
                   actors[i].imageUrl ?? '',
                   width: w * 0.14,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      _checkAllImagesLoaded();
+                    }
+                    return child;
+                  },
                 ),
               ),
             ),
@@ -257,12 +347,20 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
     bool isPlaced = placed.containsKey(shadow.id);
 
     return DragTarget<ActivityElement>(
-      onWillAccept: (_) => true,
+      onWillAccept: (_) => _allImagesLoaded, // ✅ فقط لما الصور تتحمل
       onAccept: (actor) => onActorDragEnd(actor, shadow),
       builder: (context, _, __) {
         return isPlaced
             ? Image.network(placed[shadow.id]!)
-            : Image.network(shadow.imageUrl ?? '');
+            : Image.network(
+          shadow.imageUrl ?? '',
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              _checkAllImagesLoaded();
+            }
+            return child;
+          },
+        );
       },
     );
   }
