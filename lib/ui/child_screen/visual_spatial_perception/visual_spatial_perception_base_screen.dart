@@ -343,12 +343,12 @@ class VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercepti
             ),
           ),
           SizedBox(height: height * .04),
-          InkWell(
-            onTap: goToNextActivity,
-            child: Center(
-              child: Icon(Icons.add),
-            ),
-          ),
+          // InkWell(
+          //   onTap: goToNextActivity,
+          //   child: Center(
+          //     child: Icon(Icons.add),
+          //   ),
+          // ),
         ],
       ),
     );

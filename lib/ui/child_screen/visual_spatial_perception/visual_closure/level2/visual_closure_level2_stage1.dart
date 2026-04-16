@@ -7,14 +7,8 @@ import '../../../../../models/activities/activity_element.dart';
 import '../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:collection/collection.dart'; // لازم للـ firstWhereOrNull
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 class VisualClosureLevel2Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
   const VisualClosureLevel2Stage1({Key? key, this.onNextStage}) : super(key: key);
@@ -40,8 +34,14 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
   List<String> stepSuccess = [];
   int currentStep = 0;
 
-  // ✅ الجديد: تخزين آخر instruction
+  // ✅ تخزين آخر instruction
   String? lastInstructionAudio;
+
+  // ✅ متغيرات تتبع تحميل الصور
+  Map<String, bool> _imagesLoaded = {};
+  bool _allImagesLoaded = false;
+  int _totalImages = 0;
+  int _loadedImagesCount = 0;
 
   @override
   void initState() {
@@ -57,15 +57,32 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
     }
   }
 
+  void _checkAllImagesLoaded() {
+    _loadedImagesCount++;
+    if (_loadedImagesCount >= _totalImages && !_allImagesLoaded) {
+      _allImagesLoaded = true;
+      _playInitialSoundIfReady();
+    }
+  }
+
+  Future<void> _playInitialSoundIfReady() async {
+    if (_allImagesLoaded && lastInstructionAudio != null) {
+      await _playSound(lastInstructionAudio!);
+    }
+  }
+
   Future<void> _playSound(String url) async {
     if (url.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(url));
+    // ✅ فقط شغل الصوت لو كل الصور تحملت
+    if (_allImagesLoaded) {
+      await _player.stop();
+      await _player.play(UrlSource(url));
+    }
   }
 
   // ✅ repeat
   void repeatSound() {
-    if (lastInstructionAudio != null) {
+    if (lastInstructionAudio != null && _allImagesLoaded) {
       _playSound(lastInstructionAudio!);
     }
   }
@@ -93,10 +110,24 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
     stepInstructions = response.deceptionInstructions ?? [];
     stepSuccess = response.deceptionInstructions ?? [];
 
-    // ✅ أول صوت (instruction)
+    // ✅ تخزين أول instruction بدون تشغيله حالياً
     if (response.audioUrl != null && response.audioUrl!.isNotEmpty) {
       lastInstructionAudio = response.audioUrl!;
-      await _playSound(lastInstructionAudio!);
+    }
+
+    // ✅ حساب العدد الإجمالي للصور
+    _totalImages = 1 + actors.length; // Anchor + Actors
+
+    // ✅ تحميل صورة الـ Anchor
+    if (anchor?.imageUrl != null) {
+      _preloadImage(anchor!.imageUrl!, 'anchor');
+    }
+
+    // ✅ تحميل صور Actors
+    for (var actor in actors) {
+      if (actor.imageUrl != null) {
+        _preloadImage(actor.imageUrl!, 'actor_${actor.id}');
+      }
     }
 
     setState(() {
@@ -104,7 +135,30 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
     });
   }
 
+  void _preloadImage(String url, String key) {
+    if (_imagesLoaded.containsKey(key)) return;
+
+    _imagesLoaded[key] = false;
+
+    Image.network(
+      url,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          _checkAllImagesLoaded();
+        }
+        return child;
+      },
+      errorBuilder: (context, error, stackTrace) {
+        _checkAllImagesLoaded(); // Count as loaded even if error
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
   void onActorDragEnd(ActivityElement actor, String targetId) async {
+    // ✅ منع التفاعل قبل تحميل كل الصور
+    if (!_allImagesLoaded) return;
+
     bool isCorrect = false;
 
     if (currentStep == 0) {
@@ -127,16 +181,27 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
         currentStep++;
       });
 
-      WellDoneOverlay.show(context);
+      // ✅ التحقق: لو مش اخر خطوة → TrueAnswerSound
+      // ✅ لو اخر خطوة → WellDoneOverlay
+      if (currentStep < actors.length) {
+        // مش اخر خطوة
+        TrueAnswerSound.play();
 
-      // 🔹 صوت success (مش بيتخزن)
-      if (currentStep - 1 < stepSuccess.length) {
-        await _playSound(stepSuccess[currentStep - 1]);
+        // ✅ انتظار 300 مللي ثانية عشان صوت TrueAnswerSound يخلص
+        await Future.delayed(const Duration(milliseconds: 800));
+
+        // 🔹 صوت success
+        if (currentStep - 1 < stepSuccess.length) {
+          await _playSound(stepSuccess[currentStep - 1]);
+        }
+      } else {
+        // اخر خطوة
+        WellDoneOverlay.show(context);
       }
 
       if (currentStep < actors.length) _resetActorTry();
 
-      // ✅ الصوت الجديد + تخزينه
+      // ✅ الصوت الجديد + تخزينه (بس لو مش اخر خطوة)
       if (currentStep < actors.length &&
           stepInstructions.length > currentStep - 1) {
         lastInstructionAudio = stepInstructions[currentStep - 1];
@@ -150,7 +215,9 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
       }
     } else {
       if (actorCanTry[actor.id ?? ''] == true) {
-        TryAgainSound.play();
+        if (_allImagesLoaded) {
+          TryAgainSound.play();
+        }
         actorCanTry[actor.id ?? ''] = false;
       }
     }
@@ -175,8 +242,15 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
             anchor!.imageUrl ?? '',
             width: w * 0.9,
             height: h * 0.36,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) {
+                _checkAllImagesLoaded();
+              }
+              return child;
+            },
           ),
         ),
+
         /// 🟦 المربعات
         Positioned(
           top: h * 0.182,
@@ -184,7 +258,7 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
           width: w * 0.234,
           height: w * 0.239,
           child: DragTarget<ActivityElement>(
-            onWillAccept: (_) => true,
+            onWillAccept: (_) => _allImagesLoaded,
             onAccept: (actor) => onActorDragEnd(actor, targetIds[0]),
             builder: (context, _, __) {
               return placed.containsKey(targetIds[0])
@@ -200,7 +274,7 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
           width: w * 0.234,
           height: w * 0.239,
           child: DragTarget<ActivityElement>(
-            onWillAccept: (_) => true,
+            onWillAccept: (_) => _allImagesLoaded,
             onAccept: (actor) => onActorDragEnd(actor, targetIds[1]),
             builder: (context, _, __) {
               return placed.containsKey(targetIds[1])
@@ -216,7 +290,7 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
           width: w * 0.234,
           height: w * 0.239,
           child: DragTarget<ActivityElement>(
-            onWillAccept: (_) => true,
+            onWillAccept: (_) => _allImagesLoaded,
             onAccept: (actor) => onActorDragEnd(actor, targetIds[2]),
             builder: (context, _, __) {
               return placed.containsKey(targetIds[2])
@@ -237,11 +311,23 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
                 feedback: Image.network(
                   actors[i].imageUrl ?? '',
                   width: w * 0.2,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      _checkAllImagesLoaded();
+                    }
+                    return child;
+                  },
                 ),
                 childWhenDragging: const SizedBox(),
                 child: Image.network(
                   actors[i].imageUrl ?? '',
                   width: w * 0.2,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      _checkAllImagesLoaded();
+                    }
+                    return child;
+                  },
                 ),
               ),
             ),
