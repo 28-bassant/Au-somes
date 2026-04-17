@@ -10,32 +10,14 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+
 class GeoboardLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
   const GeoboardLevel3Stage1({Key? key, this.onNextStage}) : super(key: key);
 
   @override
-  GeoboardLevel3Stage1State createState() =>
-      GeoboardLevel3Stage1State();
+  GeoboardLevel3Stage1State createState() => GeoboardLevel3Stage1State();
 }
 
 class Line {
@@ -89,17 +71,14 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
       duration: const Duration(milliseconds: 800),
     );
 
-
- for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
       _circleWrongPressCount[i] = 0;
     }
 
-    // تحديث حالة الدوائر بعد أول رسم
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) setState(() {});
     });
     _loadActivity();
-
   }
 
   @override
@@ -210,7 +189,8 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
 
     if (_currentStageIndex >= stages.length) {
       _isCompleted = true;
-      WellDoneOverlay.show(context);Future.delayed(const Duration(seconds: 3), () {
+      WellDoneOverlay.show(context);
+      Future.delayed(const Duration(seconds: 3), () {
         widget.onNextStage?.call();
       });
     }
@@ -273,9 +253,6 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
       );
     }
 
-
-
-
     final anchorImageUrl =
     (_activity?.elements != null && _activity!.elements!.isNotEmpty)
         ? _activity!.elements!.first.imageUrl ?? ''
@@ -283,89 +260,94 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
 
     return Scaffold(
       body: SafeArea(
-      child: Center(
-      child: Stack(
-      children: [
-    // Anchor
-    Center(
-    child: Container(
-    key: _anchorKey,
-      width: screenWidth * 0.9,
-      height: screenWidth * 0.9,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child:Image.network(
-          anchorImageUrl,
-          fit: BoxFit.contain,
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            if (frame != null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) setState(() {});
-              });
-            }
-            return child;
-          },
-        )
-      ),
-    ),
-    ),
+        child: Center(
+          child: Stack(
+            children: [
+              // Anchor
+              Center(
+                child: Container(
+                  key: _anchorKey,
+                  width: screenWidth * 0.9,
+                  height: screenWidth * 0.9,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.network(
+                        anchorImageUrl,
+                        fit: BoxFit.contain,
+                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                          if (frame != null) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (mounted) setState(() {});
+                            });
+                          }
+                          return child;
+                        },
+                      )
+                  ),
+                ),
+              ),
 
-    // Lines
-    CustomPaint(
-    size: Size(screenWidth, screenWidth),
-    painter: CircleConnectionPainter(
-    circleKeys: _circleKeys,
-    lines: _lines,
-    ),
-    ),
+              // Lines
+              CustomPaint(
+                size: Size(screenWidth, screenWidth),
+                painter: CircleConnectionPainter(
+                  circleKeys: _circleKeys,
+                  lines: _lines,
+                ),
+              ),
 
-    // Circles
-    Positioned.fill(
-    child: Stack(
-    children: List.generate(5, (index) {
-    Offset pos = _getCirclePosition(index);
+              // Circles
+              Positioned.fill(
+                child: Stack(
+                  children: List.generate(5, (index) {
+                    Offset pos = _getCirclePosition(index);
 
-    return Positioned(
-    left: pos.dx,
-    top: pos.dy,
-    child: AnimatedBuilder(
-    animation: _circleAnimationController!,
-    builder: (context, child) {
-    double shakeValue = 0;
+                    return Positioned(
+                      left: pos.dx,
+                      top: pos.dy,
+                      child: AnimatedBuilder(
+                        animation: _circleAnimationController!,
+                        builder: (context, child) {
+                          double shakeValue = 0;
 
-    if (_isAnimatingCircle &&
-    index == _shakingIndex) {
-    shakeValue = 10 *
-    sin(_circleAnimationController!.value * pi);
-    }
+                          if (_isAnimatingCircle &&
+                              index == _shakingIndex) {
+                            shakeValue = 10 *
+                                sin(_circleAnimationController!.value * pi);
+                          }
 
-    return Transform.translate(
-    offset: Offset(shakeValue, 0),
-    child: GestureDetector(
-    onTap: () => _handleCircleTap(index),
-    child: Container(
-    key: _circleKeys[index],
-    width: 27,
-    height: 23,
-    decoration: const BoxDecoration(color: Colors.yellow,
-      shape: BoxShape.circle,
-    ),
-    ),
-    ),
-    );
-    },
-    ),
-    );
-    }),
-    ),
-    ),
-      ],
-      ),
-      ),
+                          return Transform.translate(
+                            offset: Offset(shakeValue, 0),
+                            child: GestureDetector(
+                              onTap: () => _handleCircleTap(index),
+                              child: Container(
+                                key: _circleKeys[index],
+                                width: 27,
+                                height: 23,
+                                decoration: const BoxDecoration(
+                                  color: Colors.yellow,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
+
+// ================= Painter =================
+
+// ================= Painter =================
 
 // ================= Painter =================
 
@@ -389,7 +371,7 @@ class CircleConnectionPainter extends CustomPainter {
 
     return Offset(
       pos.dx + size.width / 2,
-      pos.dy + size.height / 2 - 117,
+      pos.dy + size.height / 2 - 117,  // الأصلي مع -117
     );
   }
 

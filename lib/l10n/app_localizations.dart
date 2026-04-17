@@ -889,6 +889,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get skip;
+
+  /// No description provided for @first_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'This is actually the first activity!'**
+  String get first_activity;
 }
 
 class _AppLocalizationsDelegate

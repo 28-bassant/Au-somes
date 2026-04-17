@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
+import '../../../../../utils/app_styles.dart';
 import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/between_level1_stage1_activity.dart';
 import 'level1/between_level1_stage2_activity.dart';
@@ -118,7 +120,26 @@ class _BetweenBaseActivityScreenState extends State<BetweenBaseActivityScreen> {
         currentActivityIndex--;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.first_activity,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
         );
       }
     });

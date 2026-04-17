@@ -235,41 +235,7 @@ class Activity1Level1Stage2State extends State<Activity1Level1Stage2>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 
-                // ❌ الإجابة الغلط (الشمال) – نازلة لتحت
-                Padding(
-                  padding: EdgeInsets.only(top: topPadding),
-                  child: GestureDetector(
-                    onTap: _handleWrongAnswer,
-                    child: Image.network(
-                      wrongElement.imageUrl ?? '',
-                      width: optionWidth,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: optionWidth,
-                          height: optionWidth,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.error),
-                        );
-                      },
-                    ),
-                  ),
-                ),
 
-                // ⚓ الـ Anchor (ثابت في النص)
-                Image.network(
-                  anchorElement.imageUrl ?? '',
-                  width: anchorWidth,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: anchorWidth,
-                      height: anchorWidth,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.error),
-                    );
-                  },
-                ),
-
-                // ✅ الإجابة الصح (اليمين) – نازلة لتحت
                 Padding(
                   padding: EdgeInsets.only(top: topPadding),
                   child: AnimatedBuilder(
@@ -288,7 +254,7 @@ class Activity1Level1Stage2State extends State<Activity1Level1Stage2>
                     child: GestureDetector(
                       onTap: _handleCorrectAnswer,
                       child: Image.network(
-                        correctElement.imageUrl ?? '',
+                        wrongElement.imageUrl ?? '',
                         width: optionWidth,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -299,6 +265,39 @@ class Activity1Level1Stage2State extends State<Activity1Level1Stage2>
                           );
                         },
                       ),
+                    ),
+                  ),
+                ),
+                // ⚓ الـ Anchor (ثابت في النص)
+                Image.network(
+                  anchorElement.imageUrl ?? '',
+                  width: anchorWidth,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: anchorWidth,
+                      height: anchorWidth,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error),
+                    );
+                  },
+                ),
+
+                // ✅ الإجابة الصح (اليمين) – نازلة لتحت
+                Padding(
+                  padding: EdgeInsets.only(top: topPadding),
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Image.network(
+                      correctElement.imageUrl ?? '',
+                      width: optionWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: optionWidth,
+                          height: optionWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
                     ),
                   ),
                 ),
