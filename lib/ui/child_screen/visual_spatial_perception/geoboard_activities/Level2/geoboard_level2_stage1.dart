@@ -57,6 +57,7 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
   final GlobalKey _anchorKey = GlobalKey();
   final List<GlobalKey> _pointKeys = List.generate(9, (index) => GlobalKey());
 
+  // 🔥 التعديل الوحيد: من -80 إلى 0
   final double _lineOffset = -75;
 
   @override

@@ -413,4 +413,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get skip => 'تخطي';
+
+  @override
+  String get first_activity => 'ده أول نشاط بالفعل!';
 }

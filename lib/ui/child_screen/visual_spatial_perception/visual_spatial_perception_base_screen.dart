@@ -1,4 +1,5 @@
 
+import 'package:au_somes/l10n/app_localizations.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/geoboard_activities/Level1/geoboard_level1_stage1.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/mental_cutting_activities/Level1/mental_cutting_level1_stage1.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/room_arrangement_activities/Level1/room_arrangement_level1_stage1.dart';
@@ -25,6 +26,7 @@ import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
+import '../../../utils/app_styles.dart';
 import '../reinforcement_widgets/confetti_overlay.dart';
 import 'geoboard_activities/Level1/geoboard_level1_stage2.dart';
 import 'geoboard_activities/Level2/geoboard_level2_stage1.dart';
@@ -271,7 +273,26 @@ class VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercepti
         currentActivityIndex--;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.first_activity,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+              horizontal: 34,
+              vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
         );
       }
     });

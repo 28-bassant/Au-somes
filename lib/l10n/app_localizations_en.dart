@@ -416,4 +416,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get skip => 'Skip';
+
+  @override
+  String get first_activity => 'This is actually the first activity!';
 }
