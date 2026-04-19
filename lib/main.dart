@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget{
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       navigatorObservers: [routeObserver],
-      initialRoute: AppRoutes.selectScreenRouteName,
+      initialRoute: AppRoutes.loginScreenRouteName,
       routes:  {
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),

@@ -99,14 +99,14 @@ class _SpatialRelationsBaseScreenState extends State<SpatialRelationsBaseScreen>
         key: stage122Key,
         onNextStage: goToNextActivity,
       ),
-      Activity1Level3Stage1(
-        key: stage131Key,
-        onNextStage: goToNextActivity,
-      ),
-     Activity1Level3Stage2(
-        key: stage132Key,
-        onNextStage: goToNextActivity,
-      ),
+     //  Activity1Level3Stage1(
+     //    key: stage131Key,
+     //    onNextStage: goToNextActivity,
+     //  ),
+     // Activity1Level3Stage2(
+     //    key: stage132Key,
+     //    onNextStage: goToNextActivity,
+     //  ),
  Activity1Level4Stage1(
         key: stage141Key,
         onNextStage: goToNextActivity,
@@ -202,71 +202,72 @@ Activity5Level1Stage5(
      stage121Key.currentState?.repeatSound();
     }
     else if (currentActivityIndex == 3) {
-     stage122Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 4) {
-     stage131Key.currentState?.repeatSound();
+      stage122Key.currentState?.repeatSound();
     }
-   else if (currentActivityIndex == 5) {
-     stage132Key.currentState?.repeatSound();
-    }
-else if (currentActivityIndex == 6) {
+   //  }else if (currentActivityIndex == 4) {
+   //   stage131Key.currentState?.repeatSound();
+   //  }
+   // else if (currentActivityIndex == 5) {
+   //   stage132Key.currentState?.repeatSound();
+   //  }
+else if (currentActivityIndex == 4) {
      stage141Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 7) {
+else if (currentActivityIndex == 5) {
      stage142Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 8) {
+else if (currentActivityIndex == 6) {
      stage151Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 9) {
+else if (currentActivityIndex == 7) {
      stage211Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 10) {
+else if (currentActivityIndex == 8) {
      stage212Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 11) {
+else if (currentActivityIndex == 9) {
      stage311Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 12) {
+else if (currentActivityIndex == 10) {
      stage411Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 13) {
+else if (currentActivityIndex == 11) {
      stage412Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 14) {
+else if (currentActivityIndex == 12) {
      stage413Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 15) {
+else if (currentActivityIndex == 13) {
      stage511Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 16) {
+else if (currentActivityIndex == 14) {
      stage512Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 17) {
+else if (currentActivityIndex == 15) {
      stage513Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 18) {
+else if (currentActivityIndex == 16) {
      stage514Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 19) {
+else if (currentActivityIndex == 17) {
      stage515Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 20) {
+    }else if (currentActivityIndex == 18) {
       stage611Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 21) {
+    }else if (currentActivityIndex == 19) {
       stage612Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 20) {
+      stage613Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 21) {
+      stage613Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 22) {
-      stage613Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 23) {
-      stage613Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 24) {
       stage614Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 25) {
+    }else if (currentActivityIndex == 23) {
       stage615Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 26) {
+    }else if (currentActivityIndex == 24) {
       stage616Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 27) {
+    }else if (currentActivityIndex == 25) {
       stage711Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 28) {
+    }else if (currentActivityIndex == 26) {
       stage712Key.currentState?.repeatSound();
     }
 
