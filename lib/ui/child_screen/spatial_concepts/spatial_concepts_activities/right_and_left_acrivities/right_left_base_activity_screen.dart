@@ -172,10 +172,7 @@ RightLeftLevel4Stage4(
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -227,7 +224,7 @@ RightLeftLevel4Stage4(
         actions: [
           GestureDetector(
             onTap: () =>
-                Navigator.pushReplacementNamed(context, AppRoutes.spatialConceptsScreenRouteName),
+            Navigator.pop(context)  ,
             child: Container(
               width: 40,
               height: 40,
@@ -276,7 +273,7 @@ RightLeftLevel4Stage4(
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
+          SizedBox(height: height * .04),
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

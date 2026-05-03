@@ -175,10 +175,7 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -229,8 +226,8 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
         actions: [
           GestureDetector(
             onTap: () =>
-                Navigator.pushReplacementNamed(context, AppRoutes.spatialConceptsScreenRouteName),
-            child: Container(
+        Navigator.pop(context),
+    child: Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(

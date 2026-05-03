@@ -199,7 +199,7 @@ class InsideLevel2Stage2ActivityState
 
         // تحويل القيم الثابتة إلى قيم متجاوبة
         final double shadow2Left = 15 * scale;
-        final double shadow2Top = 410 * scale;
+        final double shadow2Top = 350 * scale;
         final double shadow2Width = 90 * scale;
         final double anchorRight = 5 * scale;
         final double anchorTop = 85 * scale;

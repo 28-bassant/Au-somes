@@ -165,7 +165,7 @@ class _ForgetPasswordScreen3State extends State<ForgetPasswordScreen3> {
       Future.delayed(Duration(seconds: 1), () {
         Navigator.pushReplacementNamed(
           context,
-          AppRoutes.selectScreenRouteName,
+          AppRoutes.childScreenRouteName,
         );
       });
 

@@ -184,8 +184,7 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> wit
         centerTitle: true,
         actions: [
           GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-                context, AppRoutes.spatialConceptsScreenRouteName),
+            onTap: () => Navigator.pop(context),
             child: Container(
               width: 40,
               height: 40,
@@ -236,7 +235,7 @@ class _InsideBaseActivityScreenState extends State<InsideBaseActivityScreen> wit
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
+          SizedBox(height: height * .04),
 
 
 

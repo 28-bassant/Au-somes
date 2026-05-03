@@ -197,17 +197,12 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
             Positioned(
               right: wrong1Right,
               top: wrong1Top,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  child: Image.network(
-                    anchorElement.imageUrl ?? '',
-                    fit: BoxFit.fill,
-                    width: wrong1Width,
-                    height: wrong1Height,
-                  ),
+              child: Container(
+                child: Image.network(
+                  anchorElement.imageUrl ?? '',
+                  fit: BoxFit.fill,
+                  width: wrong1Width,
+                  height: wrong1Height,
                 ),
               ),
             ),
