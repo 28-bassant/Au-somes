@@ -104,10 +104,7 @@ class _BetweenBaseActivityScreenState extends State<BetweenBaseActivityScreen> {
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -157,8 +154,7 @@ class _BetweenBaseActivityScreenState extends State<BetweenBaseActivityScreen> {
             centerTitle: true,
             actions: [
             GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-        context, AppRoutes.spatialConceptsScreenRouteName),
+            onTap: () => Navigator.pop(context),
     child: Container(
     width: 40,
     height: 40,

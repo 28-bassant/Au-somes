@@ -257,10 +257,7 @@ class VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercepti
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.childScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -310,8 +307,7 @@ class VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercepti
         centerTitle: true,
         actions: [
           GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-                context, AppRoutes.childScreenRouteName),
+            onTap: () => Navigator.pop(context),
             child: Container(
               width: 40,
               height: 40,

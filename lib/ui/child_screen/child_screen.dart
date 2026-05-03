@@ -16,12 +16,12 @@ class ChildScreen extends StatelessWidget{
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
-          },
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () {
+        //     Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
+        //   },
+        // ),
       ),
       body: Padding(
         padding:  EdgeInsets.symmetric(horizontal: width * .04),

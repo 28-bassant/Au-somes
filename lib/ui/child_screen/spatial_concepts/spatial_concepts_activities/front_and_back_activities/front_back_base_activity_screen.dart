@@ -135,10 +135,7 @@ FrontBackLevel4Stage3Activity(key: stage43Key,
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -188,7 +185,7 @@ FrontBackLevel4Stage3Activity(key: stage43Key,
         actions: [
           InkWell(
             onTap: () =>
-                Navigator.pushReplacementNamed(context, AppRoutes.spatialConceptsScreenRouteName),
+            Navigator.pop(context) ,
             child: Container(
               width: 40,
               height: 40,

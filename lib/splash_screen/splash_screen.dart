@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (token != null && token.isNotEmpty) {
         if (expiry != null && now < expiry) {
           //todo:  valid token => navigate to select screen
-          Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
+          Navigator.pushReplacementNamed(context, AppRoutes.childScreenRouteName);
         } else {
           //todo: token expired => refresh token
           bool success = await TokenUtils.refreshAccessToken();

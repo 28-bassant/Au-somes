@@ -282,10 +282,7 @@ else if (currentActivityIndex == 17) {
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -335,8 +332,7 @@ else if (currentActivityIndex == 17) {
         centerTitle: true,
         actions: [
           GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-                context, AppRoutes.childScreenRouteName),
+            onTap: () => Navigator.pop(context),
             child: Container(
               width: 40,
               height: 40,

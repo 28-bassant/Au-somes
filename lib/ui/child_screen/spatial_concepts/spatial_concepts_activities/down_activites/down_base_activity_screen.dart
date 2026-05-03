@@ -114,10 +114,7 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.spatialConceptsScreenRouteName,(route) => false,);
           }
         });
       }
@@ -146,8 +143,7 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
             centerTitle: true,
             actions: [
             GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-        context, AppRoutes.spatialConceptsScreenRouteName),
+            onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.spatialConceptsScreenRouteName,(route) => false,),
     child: Container(
     width: 40,
     height: 40,
@@ -198,7 +194,7 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
+          SizedBox(height: height * .04),
 
 
           // InkWell(

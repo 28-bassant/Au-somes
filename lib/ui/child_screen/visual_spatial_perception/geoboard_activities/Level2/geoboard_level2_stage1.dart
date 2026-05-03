@@ -1,14 +1,4 @@
-import 'dart:math';
-
-import 'package:au_somes/api/api_constants.dart';
-import 'package:au_somes/api/api_manager.dart';
-import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
-import 'package:au_somes/ui/child_screen/reinforcement_widgets/true_answer_sound.dart';
-import 'package:au_somes/utils/app_colors.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import '../../../../../../models/activities/activity_response.dart';
-import '../../../reinforcement_widgets/well_done_overlay.dart';
+import 'dart:math';  import 'package:au_somes/api/api_constants.dart'; import 'package:au_somes/api/api_manager.dart'; import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart'; import 'package:au_somes/ui/child_screen/reinforcement_widgets/true_answer_sound.dart'; import 'package:au_somes/utils/app_colors.dart'; import 'package:audioplayers/audioplayers.dart'; import 'package:flutter/material.dart'; import '../../../../../../models/activities/activity_response.dart'; import '../../../reinforcement_widgets/well_done_overlay.dart';
 
 class GeoboardLevel2Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
@@ -37,7 +27,7 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
   Offset? _dragStartPosition;
   Offset? _dragCurrentPosition;
   bool _isDragging = false;
-  bool _hasMoved = false; // لتتبع ما إذا كان المستخدم قد سحب بالفعل
+  bool _hasMoved = false;
 
   // متغيرات للخطوط
   bool _showLine4to1 = false;
@@ -57,7 +47,6 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
   final GlobalKey _anchorKey = GlobalKey();
   final List<GlobalKey> _pointKeys = List.generate(9, (index) => GlobalKey());
 
-  // 🔥 التعديل الوحيد: من -80 إلى 0
   final double _lineOffset = -75;
 
   @override
@@ -149,7 +138,6 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     }
   }
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     if (_isCompleted) return;
 
@@ -157,16 +145,13 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
       _wrongAttempts++;
     });
 
-    // تشغيل صوت Try Again في كل مرة يخطئ فيها المستخدم
     TryAgainSound.play();
 
-    // عند المحاولة الخاطئة الثانية، نهتز النقطة الصحيحة
     if (_wrongAttempts >= 2) {
       _startCorrectPointAnimation();
     }
   }
 
-  // دالة لبدء حركة النقطة الصحيحة
   void _startCorrectPointAnimation() {
     if (!_isAnimatingAnswer && _animationController != null && !_connectedPoints[1]) {
       setState(() {
@@ -187,10 +172,9 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     }
   }
 
-  // دالة للتعامل مع الضغط على النقاط الخاطئة (كل النقاط ما عدا النقطة 1)
   void _handleWrongContainerTap(int index) {
     if (_isCompleted) return;
-    if (index == 1) return; // النقطة الصحيحة لا نتعامل معها هنا
+    if (index == 1) return;
     _handleWrongAnswer();
   }
 
@@ -201,7 +185,7 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
       setState(() {
         _isFirstCorrectClick = false;
         _showLine4to1 = true;
-        _wrongAttempts = 0; // إعادة تعيين عدد المحاولات الخاطئة
+        _wrongAttempts = 0;
       });
 
       TrueAnswerSound.play();
@@ -280,16 +264,13 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
       return;
     }
 
-    // إذا لم يتحرك المستخدم (مجرد ضغط)، لا نفعل شيئاً
     if (!_hasMoved) {
       _resetDrag();
       return;
     }
 
-    // حساب المسافة التي تم سحبها
     final dragDistance = (_dragStartPosition! - position).distance;
 
-    // إذا كانت مسافة السحب أقل من 10 بكسل، نعتبرها ضغط وليس سحب حقيقي
     if (dragDistance < 10) {
       _resetDrag();
       return;
@@ -305,12 +286,10 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
         TrueAnswerSound.play();
       }
 
-      // إعادة تعيين عدد المحاولات الخاطئة عند النجاح
       setState(() {
         _wrongAttempts = 0;
       });
     } else {
-      // سحب خاطئ - نفس معالجة الإجابة الخاطئة
       _handleWrongAnswer();
     }
 
@@ -345,30 +324,37 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     }
 
     final elements = _activity!.elements!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+
+    // 🔥 احسب الـ SafeArea padding عشان تتطابق النقاط على كل الأجهزة
+    final topPadding = mediaQuery.padding.top;
+    final bottomPadding = mediaQuery.padding.bottom;
+    final safeHeight = screenHeight - topPadding - bottomPadding;
 
     final anchorElement = elements[1];
     final double pointSize = screenWidth * 0.12;
 
     // جميع النقاط (9 نقاط) - كلها خاطئة ما عدا النقطة 1
     final List<Offset> pointPositions = [
-      Offset(screenWidth * 0.17, screenHeight * 0.53),   // 0 - خاطئة
-      Offset(screenWidth * 0.7, screenHeight * 0.53),    // 1 - الصحيحة الوحيدة
-      Offset(screenWidth * 0.45, screenHeight * 0.37),   // 2 - خاطئة
-      Offset(screenWidth * 0.72, screenHeight * 0.37),   // 3 - خاطئة
-      Offset(screenWidth * 0.45, screenHeight * 0.53),   // 4 - خاطئة
-      Offset(screenWidth * 0.17, screenHeight * 0.18),   // 5 - خاطئة
-      Offset(screenWidth * 0.45, screenHeight * 0.18),   // 6 - خاطئة
-      Offset(screenWidth * 0.72, screenHeight * 0.18),   // 7 - خاطئة
-      Offset(screenWidth * 0.17, screenHeight * 0.37),   // 8 - خاطئة
+      Offset(screenWidth * 0.17, topPadding + safeHeight * 0.53),  // 0 - خاطئة
+      Offset(screenWidth * 0.7,  topPadding + safeHeight * 0.53),  // 1 - الصحيحة الوحيدة
+      Offset(screenWidth * 0.45, topPadding + safeHeight * 0.37),  // 2 - خاطئة
+      Offset(screenWidth * 0.72, topPadding + safeHeight * 0.37),  // 3 - خاطئة
+      Offset(screenWidth * 0.45, topPadding + safeHeight * 0.53),  // 4 - خاطئة
+      Offset(screenWidth * 0.17, topPadding + safeHeight * 0.18),  // 5 - خاطئة
+      Offset(screenWidth * 0.45, topPadding + safeHeight * 0.18),  // 6 - خاطئة
+      Offset(screenWidth * 0.72, topPadding + safeHeight * 0.18),  // 7 - خاطئة
+      Offset(screenWidth * 0.17, topPadding + safeHeight * 0.37),  // 8 - خاطئة
     ];
 
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
-            Center(
+            Align(
+              alignment: Alignment(0, -0.09), // غير الـ -0.3 حسب اللي يناسبك (من -1.0 لفوق لـ 1.0 لتحت)
               child: Container(
                 key: _anchorKey,
                 width: screenWidth * 0.9,
@@ -525,7 +511,6 @@ class ConnectionPainter extends CustomPainter {
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
 
-    // الخطوط الثابتة
     if (showFixedLine2to0) {
       Offset? point2Top = _getPointTopPositionWithOffset(2);
       Offset? point0Top = _getPointTopPositionWithOffset(0);
@@ -566,7 +551,6 @@ class ConnectionPainter extends CustomPainter {
       }
     }
 
-    // خطوط التوصيل لجميع النقاط المتصلة
     final paint = Paint()
       ..color = Colors.green
       ..strokeWidth = 4
@@ -582,7 +566,6 @@ class ConnectionPainter extends CustomPainter {
       }
     }
 
-    // خط السحب
     if (draggingLine != null) {
       final draggingPaint = Paint()
         ..color = Colors.orange

@@ -62,14 +62,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
 
-                          Positioned(top: 0,
-                              right: languageProvider.appLanguage == 'en'
-                                  ? 0
-                                  : null,
-                              left: languageProvider.appLanguage == 'ar'
-                                  ? 0
-                                  : null,
-                              child: CustomLanguageWidget()),
+                          // Positioned(top: 0,
+                          //     right: languageProvider.appLanguage == 'en'
+                          //         ? 0
+                          //         : null,
+                          //     left: languageProvider.appLanguage == 'ar'
+                          //         ? 0
+                          //         : null,
+                          //     child: CustomLanguageWidget()),
                         ],
                       ),
                       SizedBox(height: height * 0.02),
@@ -225,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
             posAction: () {
               Navigator.pushReplacementNamed(
                 context,
-                AppRoutes.selectScreenRouteName,
+                AppRoutes.childScreenRouteName,
               );
             },
           );

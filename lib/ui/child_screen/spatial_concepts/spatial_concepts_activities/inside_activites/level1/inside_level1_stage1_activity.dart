@@ -198,15 +198,10 @@ class InsideLevel1Stage1ActivityState extends State<InsideLevel1Stage1Activity>
               left: anchorLeft,
               right: anchorRight,
               top: anchorTop,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  child: Image.network(
-                    anchorElement.imageUrl ?? '',
-                    fit: BoxFit.contain,
-                  ),
+              child: Container(
+                child: Image.network(
+                  anchorElement.imageUrl ?? '',
+                  fit: BoxFit.contain,
                 ),
               ),
             ),

@@ -18,7 +18,7 @@ class SpatialConceptsScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, AppRoutes.childScreenRouteName);
+            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.childScreenRouteName, (route) => false,);
           },
         ),
         backgroundColor: AppColors.lightPastelBlue,

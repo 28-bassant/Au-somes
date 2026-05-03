@@ -192,17 +192,12 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
             Positioned(
               right: wrong1Right,
               top: wrong1Top,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  child: Image.network(
-                    anchorElement.imageUrl ?? '',
-                    fit: BoxFit.contain,
-                    width: wrong1Width,
-                    height: wrong1Height,
-                  ),
+              child: Container(
+                child: Image.network(
+                  anchorElement.imageUrl ?? '',
+                  fit: BoxFit.contain,
+                  width: wrong1Width,
+                  height: wrong1Height,
                 ),
               ),
             ),
