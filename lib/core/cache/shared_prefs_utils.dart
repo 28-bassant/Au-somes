@@ -1,37 +1,33 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPrefsUtils{
+class SharedPrefsUtils {
   static late SharedPreferences sharedPrefs;
 
-  static Future<SharedPreferences> init()async{
-    return sharedPrefs = await SharedPreferences.getInstance();
+  static Future<void> init() async {
+    sharedPrefs = await SharedPreferences.getInstance();
   }
 
-  //todo: save data => write
-  static Future<bool> saveData({required String key,required dynamic value})async{
-    if(value is int){
-      return await sharedPrefs.setInt(key, value);
-    }else if(value is String){
-      return await sharedPrefs.setString(key, value);
-    }else if(value is bool){
-      return await sharedPrefs.setBool(key, value);
-    }else if(value is double){
-      return await sharedPrefs.setDouble(key, value);
-    }else{
-      return await sharedPrefs.setStringList(key, value);
+  static Future<bool> saveData({required String key, required dynamic value}) async {
+    if (value is int) {
+      return sharedPrefs.setInt(key, value);
+    } else if (value is String) {
+      return sharedPrefs.setString(key, value);
+    } else if (value is bool) {
+      return sharedPrefs.setBool(key, value);
+    } else if (value is double) {
+      return sharedPrefs.setDouble(key, value);
+    } else if (value is List<String>) {
+      return sharedPrefs.setStringList(key, value);
     }
+    return false;
   }
 
-  //todo: get data => read
-  static Object? getData({required String key}){
+  static Object? getData({required String key}) {
+    if (!sharedPrefs.containsKey(key)) return null;
     return sharedPrefs.get(key);
   }
 
-
-  //todo: remove data
-  static Future<bool> removeData({required String key})async{
-    return await sharedPrefs.remove(key);
+  static Future<bool> removeData({required String key}) async {
+    return sharedPrefs.remove(key);
   }
-
-
 }

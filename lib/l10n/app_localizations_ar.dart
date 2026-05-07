@@ -293,7 +293,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notifications => 'الإشعارات';
 
   @override
-  String get visual_spatial_perception => 'الإدراك البصري المكاني';
+  String get visual_spatial_perception => 'التصور البصري المكاني';
 
   @override
   String get spatial_concepts => 'المفاهيم المكانية';
