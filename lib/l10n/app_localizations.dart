@@ -653,7 +653,7 @@ abstract class AppLocalizations {
   /// No description provided for @visual_spatial_perception.
   ///
   /// In en, this message translates to:
-  /// **'Visual Spatial Perception'**
+  /// **'Spatial Visualization'**
   String get visual_spatial_perception;
 
   /// No description provided for @spatial_concepts.

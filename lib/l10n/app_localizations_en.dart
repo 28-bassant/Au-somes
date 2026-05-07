@@ -296,7 +296,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
-  String get visual_spatial_perception => 'Visual Spatial Perception';
+  String get visual_spatial_perception => 'Spatial Visualization';
 
   @override
   String get spatial_concepts => 'Spatial Concepts';

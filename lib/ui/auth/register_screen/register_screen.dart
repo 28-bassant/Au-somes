@@ -65,10 +65,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
 
-                  // Positioned(top: 0,
-                  //     right: languageProvider.appLanguage == 'en' ? 0 : null,
-                  //     left: languageProvider.appLanguage == 'ar' ? 0 : null,
-                  //     child: CustomLanguageWidget()),
+                  Positioned(top: 0,
+                      right: languageProvider.appLanguage == 'en' ? 0 : null,
+                      left: languageProvider.appLanguage == 'ar' ? 0 : null,
+                      child: CustomLanguageWidget()),
                 ],
               ),
               Text(

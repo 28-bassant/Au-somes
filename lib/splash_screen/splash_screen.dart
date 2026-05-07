@@ -1,12 +1,12 @@
-import 'package:au_somes/utils/app_assets.dart';
-import 'package:au_somes/utils/app_colors.dart';
-import 'package:au_somes/utils/app_routes.dart';
 import 'package:flutter/material.dart';
-
 import '../core/cache/token_utils.dart';
+import 'package:au_somes/utils/app_assets.dart';
+import 'package:au_somes/utils/app_routes.dart';
+import 'package:au_somes/utils/app_styles.dart';
+
 class SplashScreen extends StatefulWidget {
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen>
@@ -18,47 +18,61 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    _initAnimation();
+    _initApp();
+  }
 
+  void _initAnimation() {
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 820),
+      duration: const Duration(milliseconds: 800),
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 2),
-      end: Offset(0, 0),
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+      begin: const Offset(0, 2),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
 
     _controller.forward();
+  }
 
-    //todo: check token
-    Future.delayed(Duration(seconds: 3), () async {
-      final token = TokenUtils.getToken();
-      final expiry = TokenUtils.getTokenExpiry();
-      final now = DateTime.now().millisecondsSinceEpoch;
+  Future<void> _initApp() async {
+    await Future.delayed(const Duration(seconds: 3));
 
-      if (token != null && token.isNotEmpty) {
-        if (expiry != null && now < expiry) {
-          //todo:  valid token => navigate to select screen
-          Navigator.pushReplacementNamed(context, AppRoutes.childScreenRouteName);
-        } else {
-          //todo: token expired => refresh token
-          bool success = await TokenUtils.refreshAccessToken();
+    final token = TokenUtils.getToken();
+    final expiry = TokenUtils.getTokenExpiry();
+    final now = DateTime.now().millisecondsSinceEpoch;
 
-          if (success) {
-            Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
-          } else {
-            //todo:  refresh failed
-            Navigator.pushReplacementNamed(context, AppRoutes.loginScreenRouteName);
-          }
-        }
-      } else {
-        Navigator.pushReplacementNamed(context, AppRoutes.loginScreenRouteName);
-      }
-    });
+    if (!mounted) return;
+
+    // No token → Login
+    if (token == null || token.isEmpty) {
+      _goTo(AppRoutes.loginScreenRouteName);
+      return;
+    }
+
+    // Token exists but expiry missing or valid
+    if (expiry == null || now < expiry) {
+      _goTo(AppRoutes.childScreenRouteName);
+      return;
+    }
+
+    // Token expired → try refresh
+    bool success = await TokenUtils.refreshAccessToken();
+
+    if (!mounted) return;
+
+    if (success) {
+      _goTo(AppRoutes.childScreenRouteName);
+    } else {
+      _goTo(AppRoutes.loginScreenRouteName);
+    }
+  }
+
+  void _goTo(String route) {
+    Navigator.pushReplacementNamed(context, route);
   }
 
   @override
@@ -69,18 +83,37 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+
             Image(image: AssetImage(AppAssets.logoImage)),
+
             SizedBox(height: height * .01),
+
             SlideTransition(
               position: _slideAnimation,
               child: Image(image: AssetImage(AppAssets.appNameImage)),
+            ),
+
+            SizedBox(height: height * .02),
+
+            Text(
+              'تطبيق إلكتروني لتنمية مهارة التصور البصري المكاني',
+              textAlign: TextAlign.center,
+              style: AppStyles.bold16MintGreen,
+            ),
+
+            SizedBox(height: height * .008),
+
+            Text(
+              'للأطفال ذوي اضطراب التوحد البسيط وذوي متلازمة أسبرجر',
+              textAlign: TextAlign.center,
+              style: AppStyles.bold16MintGreen,
             ),
           ],
         ),
