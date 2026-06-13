@@ -48,6 +48,7 @@ dependencies:
   audioplayers: ^6.5.1
   expandable_text: ^2.3.0
   confetti: ^0.7.0
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

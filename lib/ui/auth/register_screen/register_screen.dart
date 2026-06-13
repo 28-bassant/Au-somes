@@ -222,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             posAction: () {
               Navigator.pushReplacementNamed(
                 context,
-                AppRoutes.childScreenRouteName,
+                AppRoutes.selectScreenRouteName,
               );
             },
           );
