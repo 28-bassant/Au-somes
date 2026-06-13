@@ -419,4 +419,283 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get first_activity => 'This is actually the first activity!';
+
+  @override
+  String get helpful_tips => 'Helpful tips for today';
+
+  @override
+  String get all_tips => 'All Tips';
+
+  @override
+  String get sensory_tips => 'Sensory Tips';
+
+  @override
+  String get sensory => 'Sensory';
+
+  @override
+  String get communication_tips => 'Communication Tips';
+
+  @override
+  String get communication => 'Communication';
+
+  @override
+  String get behavioural_tips => 'Behavioural Tips';
+
+  @override
+  String get behavioural => 'Behavioural';
+
+  @override
+  String get featured_article => 'Featured Article';
+
+  @override
+  String get view_all => 'View All';
+
+  @override
+  String get expert_advice => 'Expert Advice';
+
+  @override
+  String get article_title => 'Establishing Morning Routines';
+
+  @override
+  String get article_content =>
+      'Learn how visual schedules can significantly reduce transition anxiety for your child during the busy morning rush';
+
+  @override
+  String get sensory_tip1_title => 'Sound (Auditory)';
+
+  @override
+  String get sensory_tip1_content1 =>
+      '• Noise reduction: Use high-quality noise-cancelling earmuffs or soft silicone earplugs in loud or echoey environments.';
+
+  @override
+  String get sensory_tip1_content2 =>
+      '• Calming sounds: Utilize white noise, pink noise, or ambient, soothing playlists during stressful moments or before bedtime.';
+
+  @override
+  String get sensory_tip1_content3 =>
+      '• Headphone pairing: If your child is sensitive to sound but dislikes how headphones feel, slowly desensitize them by pairing headphones with highly preferred activities (e.g., watching a favorite video).';
+
+  @override
+  String get sensory_tip2_title => 'Touch (Tactile)';
+
+  @override
+  String get sensory_tip2_content1 =>
+      '• Clothing modifications: Cut out scratchy tags, flip clothes inside out to hide seams, or opt for seamless, soft-knit clothing and Lycra undergarments.';
+
+  @override
+  String get sensory_tip2_content2 =>
+      '• Deep pressure: Offer comforting, deep-pressure input through weighted lap pads, weighted blankets, or tight, secure hugs.';
+
+  @override
+  String get sensory_tip2_content3 =>
+      '• Tactile play: Encourage hands-on play with non-food or food items to build tolerance to different textures. Examples include kinetic sand, playdough, dry beans, or water beads.';
+
+  @override
+  String get sensory_tip3_title =>
+      'Balance and Movement (Vestibular & Proprioceptive)';
+
+  @override
+  String get sensory_tip3_content1 =>
+      '• Heavy work: Heavy lifting, pushing, or pulling gives muscles and joints feedback that helps the brain relax. Try wheelbarrow walking or carrying weighted objects.';
+
+  @override
+  String get sensory_tip3_content2 =>
+      '• Movement breaks: Incorporate a small indoor trampoline, a therapy ball to bounce on, or a sensory swing to give them the motion they crave safely.';
+
+  @override
+  String get sensory_tip3_content3 =>
+      '• Active seating: Use wobble stools or inflatable canoe chairs to allow movement while staying seated at a desk or table.';
+
+  @override
+  String get sensory_tip4_title => 'Sight (Visual)';
+
+  @override
+  String get sensory_tip4_content1 =>
+      '• Adjust lighting: Dim overhead fluorescent lights and utilize softer, warmer lamps, or string lights in specific zones.';
+
+  @override
+  String get sensory_tip4_content2 =>
+      '• Sensory go-bags: Always carry good-quality sunglasses and a wide-brimmed hat to protect against bright lights in public.';
+
+  @override
+  String get sensory_tip4_content3 =>
+      '• Visual calming: Use visually mesmerizing, calming tools like lava lamps, bubble walls, or DIY \"calm down\" bottles (glitter and water in a sealed jar).';
+
+  @override
+  String get sensory_tip5_title => 'Smell & Taste (Olfactory & Gustatory)';
+
+  @override
+  String get sensory_tip5_content1 =>
+      '• Masking triggers: If your child is overwhelmed by smells (like perfumes or cleaning supplies), apply a drop of a calming, preferred essential oil or lotion to a sweatband they can wear and sniff.';
+
+  @override
+  String get sensory_tip5_content2 =>
+      '• Oral sensory tools: Provide safe chewing options like chewable jewelry or chew toys to satisfy oral fixation.';
+
+  @override
+  String get sensory_tip5_content3 =>
+      '• Flavor exploration: Encourage food play and gradual exposure to strongly flavored or distinct temperature foods to help with aversions.';
+
+  @override
+  String get sensory_tip6_title => 'Create a \"Calm Corner\"';
+
+  @override
+  String get sensory_tip6_content1 =>
+      '• Designate a specific, quiet, and clutter-free space in your home featuring low lighting, pillows, and a weighted blanket. Allow your child to retreat to this space when they feel overwhelmed or just need to \"recharge\" their batteries.';
+
+  @override
+  String get general_sensory_tip_title => 'Supporting Sensory Needs';
+
+  @override
+  String get general_sensory_tip_description =>
+      'Many children with autism are sensitive to sound, light, touch, or textures.';
+
+  @override
+  String get general_sensory_tip_title1 =>
+      '• Create a quiet, safe space at home.';
+
+  @override
+  String get general_sensory_tip_title2 =>
+      '• Allow headphones if noise is stressful.';
+
+  @override
+  String get general_sensory_tip_title3 =>
+      '• Respect food texture preferences.';
+
+  @override
+  String get general_sensory_tip_title4 => '• Introduce new sensations slowly.';
+
+  @override
+  String get general_communication_tip_title => 'Supporting Communication';
+
+  @override
+  String get general_communication_tip_description =>
+      'Children with autism may communicate in different ways including words or gestures.';
+
+  @override
+  String get general_communication_tip_title1 =>
+      '• Get your child’s attention before speaking.';
+
+  @override
+  String get general_communication_tip_title2 => '• Speak slowly and clearly.';
+
+  @override
+  String get general_communication_tip_title3 => '• Use consistent words.';
+
+  @override
+  String get general_communication_tip_title4 =>
+      '• Allow extra time to respond.';
+
+  @override
+  String get general_behavioural_tip_title => 'Understanding Behaviour';
+
+  @override
+  String get general_behavioural_tip_description =>
+      'Behaviour is a form of communication for children with autism. Challenging behaviour often means the child is feeling overwhelmed, confused, or unable to express needs.';
+
+  @override
+  String get general_behavioural_tip_title1 =>
+      '• Observe behaviour patterns carefully.';
+
+  @override
+  String get general_behavioural_tip_title2 =>
+      '• Look for reasons behind the behaviour.';
+
+  @override
+  String get general_behavioural_tip_title3 =>
+      '• Remember that behaviour is not intentional misbehaviour.';
+
+  @override
+  String get general_behavioural_tip_title4 =>
+      '• Focus on understanding, not punishment.';
+
+  @override
+  String get communication_tip1_title => 'Speak directly and literally:';
+
+  @override
+  String get communication_tip1_content =>
+      'Avoid sarcasm, idioms, or abstract concepts. Use short, clear phrases and tell them exactly what you want them to do, rather than what not to do.';
+
+  @override
+  String get communication_tip2_title => 'Allow processing time:';
+
+  @override
+  String get communication_tip2_content =>
+      'It can take autistic children longer to process spoken information. Ask your question or give your instruction, then wait at least 10 seconds before speaking again.';
+
+  @override
+  String get communication_tip3_title => 'Use visual supports:';
+
+  @override
+  String get communication_tip3_content =>
+      'Many autistic children are highly visual learners. Pair your words with pointing, gestures, or use visual schedules and picture boards (like PECS) to help them understand daily routines and choices.';
+
+  @override
+  String get communication_tip4_title => 'Follow their lead:';
+
+  @override
+  String get communication_tip4_content =>
+      'Instead of interrupting their focus to prompt speech, join in and comment on what they are doing. This builds trust and shared attention.';
+
+  @override
+  String get communication_tip5_title => 'Offer clear choices:';
+
+  @override
+  String get communication_tip5_content =>
+      'Open-ended questions (e.g., \"What do you want to do?\") can be overwhelming. Instead, offer a clear, limited set of physical choices (e.g., \"Do you want the red cup or the blue cup?\").';
+
+  @override
+  String get communication_tip6_title => 'Accept all forms of communication:';
+
+  @override
+  String get communication_tip6_content =>
+      ' Speech is only one way to communicate. Be responsive to gestures, sounds, pointing, and Augmentative and Alternative Communication (AAC) devices.';
+
+  @override
+  String get behavioural_tip1_title => 'Identify the Root Cause';
+
+  @override
+  String get behavioural_tip1_content1 =>
+      '• Observe Triggers: Figure out what happens immediately before a behavior. Is the child trying to avoid a task, seeking sensory input, or feeling overstimulated in a noisy environment?';
+
+  @override
+  String get behavioural_tip1_content2 =>
+      '• Address Sensory Needs: If a child becomes overwhelmed, provide a safe, calm-down space with sensory tools like weighted blankets or noise-canceling headphones.';
+
+  @override
+  String get behavioural_tip2_title => 'Communicate Clearly & Predictably';
+
+  @override
+  String get behavioural_tip2_content1 =>
+      '• Use Visual Schedules: Use pictures or a timeline to help the child understand daily routines and transitions, which reduces anxiety.';
+
+  @override
+  String get behavioural_tip2_content2 =>
+      '• Give \"First/Then\" Statements: Instead of saying \"stop playing,\" say, \"First we finish our lunch, then we can play\".';
+
+  @override
+  String get behavioural_tip2_content3 =>
+      '• Limit \"Don\'ts\": Phrase instructions positively. Instead of \"Don\'t run,\" try \"Walk on the sidewalk\".';
+
+  @override
+  String get behavioural_tip3_title => 'Foster Agency and Success';
+
+  @override
+  String get behavioural_tip3_content1 =>
+      '• Offer Controlled Choices: Give a sense of control by offering limited, acceptable choices (e.g., \"Do you want to wear the red or blue shirt?\").';
+
+  @override
+  String get behavioural_tip3_content2 =>
+      '• Chunk Tasks: Break down overwhelming tasks (like homework) into small, manageable steps.';
+
+  @override
+  String get behavioural_tip4_title => 'Apply Positive Reinforcement';
+
+  @override
+  String get behavioural_tip4_content1 =>
+      '• Catch Them Being Good: Praise specific positive behaviors immediately. (e.g., \"I love how nicely you are sitting at the table!\")';
+
+  @override
+  String get behavioural_tip4_content2 =>
+      '• Provide Breaks: Teach your child to request a break using a specific cue or \"Break\" card to regroup when frustrated.';
 }

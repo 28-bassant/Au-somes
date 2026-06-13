@@ -1,4 +1,8 @@
+import 'package:au_somes/l10n/app_localizations.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/widgets/article_card.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/widgets/behavioural_tips_widget.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/widgets/communication_tips_widget.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/widgets/sensory_tips_widget.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/widgets/tip_header.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/widgets/tip_section.dart';
 import 'package:au_somes/utils/app_assets.dart';
@@ -32,12 +36,12 @@ class DailyTipsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  'Daily Tips',
+                  AppLocalizations.of(context)!.daily_tips,
                   style: AppStyles.bold22Black
               ),
               SizedBox(height: 4),
               Text(
-                  'Helpful tips for today',
+                  AppLocalizations.of(context)!.helpful_tips,
                   style:AppStyles.regular14BlackWithOpacity60
               ),
             ],
@@ -62,14 +66,14 @@ class DailyTipsScreen extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
-              tabs: const [
-                Tab(text: 'All Tips'),
-                Tab(text: 'Sensory'),
-                Tab(text: 'Communication'),
-                Tab(text: 'Behavioural'),
+              tabs:  [
+                Tab(text: AppLocalizations.of(context)!.all_tips),
+                Tab(text: AppLocalizations.of(context)!.sensory),
+                Tab(text: AppLocalizations.of(context)!.communication),
+                Tab(text: AppLocalizations.of(context)!.behavioural),
               ],
             ),
-
+            SizedBox(height: height * .02,),
             Expanded(
               child: Builder(
                 builder: (context) {
@@ -78,9 +82,9 @@ class DailyTipsScreen extends StatelessWidget {
                     child: TabBarView(
                       children: [
                         _allTips(context),
-                        const Center(child: Text('Sensory Tips')),
-                        const Center(child: Text('Communication Tips')),
-                        const Center(child: Text('Behavioural Tips')),
+                         SensoryTipsWidget(),
+                         CommunicationTipsWidget(),
+                        BehaviouralTipsWidget()
 
 
                       ],
@@ -100,10 +104,10 @@ class DailyTipsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 5),
-          Text("Featured Article",style: AppStyles.bold14Black,),
+          Text(AppLocalizations.of(context)!.featured_article,style: AppStyles.bold14Black,),
           ArticleCard(),
           TipHeader(
-            title: 'Sensory Tips',
+            title: AppLocalizations.of(context)!.sensory_tips,
             onViewAll: () {
               final tabController = DefaultTabController.of(context);
               tabController?.animateTo(1);
@@ -112,20 +116,23 @@ class DailyTipsScreen extends StatelessWidget {
            SizedBox(height: 8),
            TipSection(
             iconPath: AppAssets.sensoryIcon,
-            title: 'Supporting Sensory Needs',
-            description:
-            'Many children with autism are sensitive to sound, light, touch, or textures.',
-            content:
-            '• Create a quiet, safe space at home.\n'
-                '• Allow headphones if noise is stressful.\n'
-                '• Respect food texture preferences.\n'
-                '• Introduce new sensations slowly.',
+            title: AppLocalizations.of(context)!.general_sensory_tip_title,
+            description:AppLocalizations.of(context)!.general_sensory_tip_description,
+
+               content:[
+                 {
+                   'text' :  '${AppLocalizations.of(context)!.general_sensory_tip_title1}\n'
+                       '${AppLocalizations.of(context)!.general_sensory_tip_title2}\n'
+                       '${AppLocalizations.of(context)!.general_sensory_tip_title3}\n'
+                       '${AppLocalizations.of(context)!.general_sensory_tip_title4}',
+                 }
+               ],
             backgroundColor:AppColors.mintGreen
           ),
          SizedBox(height: 12),
 
           TipHeader(
-            title: 'Communication Tips',
+            title: AppLocalizations.of(context)!.communication_tips,
             onViewAll: () {
               final tabController = DefaultTabController.of(context);
               tabController?.animateTo(2);
@@ -134,19 +141,22 @@ class DailyTipsScreen extends StatelessWidget {
           SizedBox(height: 8),
            TipSection(
             iconPath: AppAssets.communicationIcon,
-            title: 'Supporting Communication',
-            description:
-            'Children with autism may communicate in different ways including words or gestures.',
-            content:
-            '• Get your child’s attention before speaking.\n'
-                '• Speak slowly and clearly.\n'
-                '• Use consistent words.\n'
-                '• Allow extra time to respond.',
+               title: AppLocalizations.of(context)!.general_communication_tip_title,
+               description:AppLocalizations.of(context)!.general_communication_tip_description,
+
+               content:[
+                 {
+                   'text' :  '${AppLocalizations.of(context)!.general_communication_tip_title1}\n'
+                       '${AppLocalizations.of(context)!.general_communication_tip_title2}\n'
+                       '${AppLocalizations.of(context)!.general_communication_tip_title3}\n'
+                       '${AppLocalizations.of(context)!.general_communication_tip_title4}',
+                 }
+               ],
             backgroundColor: AppColors.softBlue
           ),
           SizedBox(height: 12),
           TipHeader(
-            title: 'Behavioral Tips',
+            title: AppLocalizations.of(context)!.behavioural_tips,
             onViewAll: () {
               final tabController = DefaultTabController.of(context);
               tabController?.animateTo(3);
@@ -155,14 +165,17 @@ class DailyTipsScreen extends StatelessWidget {
            SizedBox(height: 8),
           TipSection(
             iconPath: AppAssets.behaviorIcon,
-            title: 'Understanding Behaviour',
-            description:
-            'Behaviour is a form of communication for children with autism. Challenging behaviour often means the child is feeling overwhelmed, confused, or unable to express needs.',
-            content:
-            '• Observe behaviour patterns carefully.\n'
-                '• Look for reasons behind the behaviour.\n'
-                '•Remember that behaviour is not intentional misbehaviour.\n'
-                '• Focus on understanding, not punishment.',
+              title: AppLocalizations.of(context)!.general_behavioural_tip_title,
+              description:AppLocalizations.of(context)!.general_behavioural_tip_description,
+
+              content:[
+                {
+                  'text' :  '${AppLocalizations.of(context)!.general_behavioural_tip_title1}\n'
+                      '${AppLocalizations.of(context)!.general_behavioural_tip_title2}\n'
+                      '${AppLocalizations.of(context)!.general_behavioural_tip_title3}\n'
+                      '${AppLocalizations.of(context)!.general_behavioural_tip_title4}',
+                }
+              ],
             backgroundColor:AppColors.lightPastelBlue
           ),
 

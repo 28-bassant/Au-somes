@@ -1,27 +1,44 @@
+import 'package:au_somes/providers/app_language_provider.dart';
 import 'package:au_somes/utils/app_colors.dart';
 import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TipSection extends StatelessWidget {
-  final String iconPath;
+  final String? iconPath;
   final String title;
-  final String description;
-  final String content;
+  final String? description;
+
+  // structured content
+  final List<dynamic> content;
+
   final Color backgroundColor;
 
   const TipSection({
     super.key,
-    required this.iconPath,
+    this.iconPath,
     required this.title,
-    required this.description,
+    this.description,
     required this.content,
     required this.backgroundColor,
   });
+
+  Future<void> _openUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+
+    await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
+
+    var languageProvider = Provider.of<AppLanguageProvider>(context);
 
     return Stack(
       children: [
@@ -35,7 +52,7 @@ class TipSection extends StatelessWidget {
               BoxShadow(
                 color: Colors.black.withOpacity(.05),
                 blurRadius: 8,
-                offset:  Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -44,8 +61,10 @@ class TipSection extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Image.asset(iconPath),
-                  SizedBox(width: width * .02),
+                  if (iconPath != null) ...[
+                    Image.asset(iconPath!),
+                    SizedBox(width: width * .02),
+                  ],
                   Expanded(
                     child: Text(
                       title,
@@ -54,30 +73,68 @@ class TipSection extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: height * .004),
-              Text(
-                description,
-                style: AppStyles.regular12Black,
-              ),
+
+              if (description != null && description!.isNotEmpty) ...[
+                SizedBox(height: height * .004),
+                Text(
+                  description!,
+                  style: AppStyles.regular12Black,
+                ),
+              ],
+
               SizedBox(height: height * .01),
-              Text(
-                content,
-                style: AppStyles.regular12Black,
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: content.map((item) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item["text"],
+                            style: AppStyles.regular12Black,
+                          ),
+                        ),
+
+                        if (item["hasLink"] == true) ...[
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: () {
+                              _openUrl(item["url"]);
+                            },
+                            child: const Icon(
+                              Icons.link,
+                              size: 16,
+                              color: AppColors.softBlue,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           ),
         ),
+
         Positioned(
-          left: 0,
+          left: languageProvider.isArabic() ? null : 0,
+          right: languageProvider.isArabic() ? 0 : null,
           top: 5,
           bottom: 5,
           child: Container(
-            width: width*.02,
+            width: width * .02,
             decoration: BoxDecoration(
               color: backgroundColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(24),
-                bottomLeft: Radius.circular(24),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(languageProvider.isArabic() ? 0 : 24),
+                bottomLeft: Radius.circular(languageProvider.isArabic() ? 0 : 24),
+                topRight: Radius.circular(languageProvider.isArabic() ? 24 : 0),
+                bottomRight: Radius.circular(languageProvider.isArabic() ? 24 : 0),
               ),
             ),
           ),

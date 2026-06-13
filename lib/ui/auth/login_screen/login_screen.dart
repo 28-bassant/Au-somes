@@ -225,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
             posAction: () {
               Navigator.pushReplacementNamed(
                 context,
-                AppRoutes.childScreenRouteName,
+                AppRoutes.selectScreenRouteName,
               );
             },
           );
