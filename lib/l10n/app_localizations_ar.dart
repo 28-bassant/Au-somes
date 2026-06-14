@@ -699,4 +699,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get behavioural_tip4_content2 =>
       '• توفير فترات راحة: علم طفلك طلب استراحة باستخدام إشارة محددة أو بطاقة \"استراحة\" لإعادة تنظيم نفسه عند الشعور بالإحباط.';
+
+  @override
+  String get profile_updated => 'تم تحديث الملف الشخصي بنجاح';
+
+  @override
+  String get failed_profile_updated => 'فشل تحديث الملف الشخصي';
+
+  @override
+  String get enter_valid_age => 'ادخل عمر صحيح';
 }
