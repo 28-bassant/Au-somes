@@ -1363,6 +1363,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'• Provide Breaks: Teach your child to request a break using a specific cue or \"Break\" card to regroup when frustrated.'**
   String get behavioural_tip4_content2;
+
+  /// No description provided for @profile_updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Updated Successfully'**
+  String get profile_updated;
+
+  /// No description provided for @failed_profile_updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile'**
+  String get failed_profile_updated;
+
+  /// No description provided for @enter_valid_age.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Valid Age'**
+  String get enter_valid_age;
 }
 
 class _AppLocalizationsDelegate

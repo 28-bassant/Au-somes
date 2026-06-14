@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import '../core/cache/shared_prefs_utils.dart';
 import '../core/cache/token_utils.dart';
 import '../models/activities/activity_response.dart';
 import '../models/login_response.dart';
@@ -269,4 +270,53 @@ class ApiManager {
     }
   }
 
+
+  static Future<void> updateProfile({
+    required String email,
+    required String childName,
+    required int childAge,
+  }) async {
+    Uri url = Uri.parse(
+      ApiConstants.baseUrl + ApiEndpoints.updateProfile,
+    );
+
+    String? token = TokenUtils.getToken();
+
+    final body = {
+      "email": email,
+      "childName": childName,
+      "childAge": childAge,
+    };
+
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer ${token?.trim()}",
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 204) {
+
+      // تحديث البيانات المحلية
+      await TokenUtils.saveChildInfo(
+        childName,
+        childAge,
+      );
+
+      await SharedPrefsUtils.saveData(
+        key: "email",
+        value: email,
+      );
+
+      return;
+    }
+
+    throw Exception(
+      "Failed to update profile: ${response.statusCode}",
+    );
+  }
 }

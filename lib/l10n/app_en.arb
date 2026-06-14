@@ -221,7 +221,12 @@
     "behavioural_tip3_content2":"• Chunk Tasks: Break down overwhelming tasks (like homework) into small, manageable steps.",
     "behavioural_tip4_title":"Apply Positive Reinforcement",
     "behavioural_tip4_content1":"• Catch Them Being Good: Praise specific positive behaviors immediately. (e.g., \"I love how nicely you are sitting at the table!\")",
-    "behavioural_tip4_content2": "• Provide Breaks: Teach your child to request a break using a specific cue or \"Break\" card to regroup when frustrated."
+    "behavioural_tip4_content1":"• Catch Them Being Good: Praise specific positive behaviors immediately. (e.g., \"I love how nicely you are sitting at the table!\")",
+    "behavioural_tip4_content2": "• Provide Breaks: Teach your child to request a break using a specific cue or \"Break\" card to regroup when frustrated.",
+    "profile_updated": "Profile Updated Successfully",
+     "failed_profile_updated": "Failed to update profile",
+     "enter_valid_age": "Enter Valid Age"
+
 
 
 }

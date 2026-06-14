@@ -698,4 +698,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get behavioural_tip4_content2 =>
       '• Provide Breaks: Teach your child to request a break using a specific cue or \"Break\" card to regroup when frustrated.';
+
+  @override
+  String get profile_updated => 'Profile Updated Successfully';
+
+  @override
+  String get failed_profile_updated => 'Failed to update profile';
+
+  @override
+  String get enter_valid_age => 'Enter Valid Age';
 }

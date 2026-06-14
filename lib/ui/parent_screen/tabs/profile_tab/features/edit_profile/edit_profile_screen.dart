@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../../api/api_manager.dart';
 import '../../../../../../core/cache/token_utils.dart';
 import '../../../../../../custom_widgets/custom_elevated_button.dart';
 import '../../../../../../custom_widgets/custom_text_form_field.dart';
@@ -119,6 +120,171 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  void updateProfile() {
+  void updateProfile() async {
+    // Validate age first
+    int? age;
+    try {
+      age = int.parse(ageController.text.trim());
+      if (age <= 0 || age > 120) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.enter_valid_age,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
+        );
+        return;
+      }else if (age > 12){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.enter_valid_age,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
+        );
+         return;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            textAlign: TextAlign.center,
+            AppLocalizations.of(context)!.enter_valid_age,
+            style: AppStyles.regular16White,
+          ),
+          backgroundColor: AppColors.redColor,
+
+          behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+          margin: EdgeInsets.symmetric(
+              horizontal: 34,
+              vertical: 16
+          ), // مسافة من كل الجهات
+
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+          ),
+        ),
+
+      );
+      return;
+    }
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      // Call updateProfile from ApiManager
+      await ApiManager.updateProfile(
+        childName: childNameController.text.trim(),
+        childAge: age,
+        email: parentEmailController.text.trim(),
+      );
+
+      // Close loading dialog
+      if (mounted) {
+        Navigator.pop(context);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.profile_updated,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.greenColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
+        );
+
+        // Pop the screen after successful update
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            Navigator.pop(context, true);
+          }
+        });
+      }
+
+    } catch (e) {
+      // Close loading dialog if open
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.failed_profile_updated,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
+        );
+      }
+
+      print('Update profile error: $e');
+    }
   }
 }
+

@@ -6,6 +6,7 @@ class ApiEndpoints {
   static const String verifyCode = "/Author/verify-code";
   static const String resetPassword = "/Author/reset-password";
   static const String getActivity = "/api/Activity/get-activity";
+  static const String updateProfile = "/Account/update-profile";
 
 }
 
