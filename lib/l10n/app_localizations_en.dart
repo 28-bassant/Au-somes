@@ -707,4 +707,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enter_valid_age => 'Enter Valid Age';
+
+  @override
+  String get autism_centers => 'Specialized Autism Centers in Egypt';
+
+  @override
+  String get nearest => 'Nearest';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get sort => 'Sorts';
+
+  @override
+  String get no_centers_found => 'No Centers Found';
 }

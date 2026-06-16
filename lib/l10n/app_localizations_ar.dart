@@ -708,4 +708,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enter_valid_age => 'ادخل عمر صحيح';
+
+  @override
+  String get autism_centers => 'مراكز التوحد المتخصصة في مصر';
+
+  @override
+  String get nearest => 'الأقرب';
+
+  @override
+  String get reset => 'إعادة تعيين';
+
+  @override
+  String get sort => 'ترتيب';
+
+  @override
+  String get no_centers_found => 'لا توجد مراكز';
 }
