@@ -1381,6 +1381,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter Valid Age'**
   String get enter_valid_age;
+
+  /// No description provided for @autism_centers.
+  ///
+  /// In en, this message translates to:
+  /// **'Specialized Autism Centers in Egypt'**
+  String get autism_centers;
+
+  /// No description provided for @nearest.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest'**
+  String get nearest;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @sort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorts'**
+  String get sort;
+
+  /// No description provided for @no_centers_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No Centers Found'**
+  String get no_centers_found;
 }
 
 class _AppLocalizationsDelegate
