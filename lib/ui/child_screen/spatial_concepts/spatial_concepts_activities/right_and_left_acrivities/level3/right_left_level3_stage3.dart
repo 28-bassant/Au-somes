@@ -28,7 +28,7 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -104,13 +104,12 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
@@ -139,15 +138,31 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
   }
 
   // دالة للإجابة الصحيحة
-  void _handleCorrectAnswer() {
+  Future<void> _handleCorrectAnswer() async {
     setState(() {
-      _wrongAttempts = 0;
       _isAnimatingAnswer = false;
     });
+
     _animationController?.stop();
     _animationController?.value = 0;
 
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _usedHint,
+    );
+
+    print("RESULT: ${result?.isPassed}");
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
+    }
+
+    setState(() {
+      _wrongAttempts = 0;
+    });
+
     WellDoneOverlay.show(context);
+
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         widget.onNextStage?.call();
@@ -222,9 +237,8 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
                       );
                     },
                     child: GestureDetector(
-                      onTap: () {
-                        // كامل الصورة يعتبر إجابة صحيحة
-                        _handleCorrectAnswer();
+                      onTap: () async {
+                        await _handleCorrectAnswer();
                       },
                       child: Image.network(
                         width: 180 * scale,

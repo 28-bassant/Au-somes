@@ -223,7 +223,7 @@ class FrontBackLevel1Stage2ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -231,6 +231,17 @@ class FrontBackLevel1Stage2ActivityState
 
                     _animationController?.stop();
                     _animationController?.value = 0;
+
+                    /// ===== LOG PROGRESS =====
+                    final result = await ApiManager.logAttemptStatus(
+                      phaseId: _activity!.phaseId!,
+                      userHint: false,
+                    );
+
+                    /// (اختياري) تحديث السجل العام للتقدم
+                    if (result?.isPassed == true) {
+                      await ApiManager.getProgressSummary();
+                    }
 
                     WellDoneOverlay.show(context);
 

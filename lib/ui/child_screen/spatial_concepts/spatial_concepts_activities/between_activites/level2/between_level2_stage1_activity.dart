@@ -31,7 +31,7 @@ class BetweenLevel2Stage1ActivityState
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
   bool isPlacedCorrectly = false;
-
+  bool _usedHint = false;
   late AudioPlayer _player;
   late ActivityElement actor;
   late ActivityElement shadow; // الصح
@@ -111,7 +111,10 @@ class BetweenLevel2Stage1ActivityState
 
   // ===== منطق الخطأ =====
   void _handleWrongAnswer() {
-    setState(() => _wrongAttempts++);
+    setState(() {
+      _wrongAttempts++;
+      _usedHint = true;
+    });
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
@@ -253,7 +256,7 @@ class BetweenLevel2Stage1ActivityState
                   actor.imageUrl ?? '',
                   width: actorWidth,
                 ),
-                onDragEnd: (details) {
+                onDragEnd: (details) async {
 
                   final actorCenter = Offset(
                     details.offset.dx + actorWidth / 2,
@@ -285,6 +288,15 @@ class BetweenLevel2Stage1ActivityState
 
                       _animationController.stop();
 
+                      final result = await ApiManager.logAttemptStatus(
+                        phaseId: _activity!.phaseId!,
+                        userHint: _usedHint,
+                      );
+
+                      if (result?.isPassed == true) {
+                        await ApiManager.getProgressSummary();
+                      }
+
                       WellDoneOverlay.show(context);
 
                       Future.delayed(const Duration(seconds: 3), () {
@@ -292,6 +304,7 @@ class BetweenLevel2Stage1ActivityState
                           widget.onNextStage?.call();
                         }
                       });
+
                       return;
                     }
                   }

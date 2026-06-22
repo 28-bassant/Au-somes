@@ -28,6 +28,7 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -126,8 +127,8 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
-
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
@@ -154,7 +155,7 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
     });
   }
 
-  void _handleCorrectAnswer() {
+  Future<void> _handleCorrectAnswer() async {
     setState(() {
       _wrongAttempts = 0;
       _isAnimatingAnswer = false;
@@ -163,14 +164,33 @@ class Activity1Level2Stage2State extends State<Activity1Level2Stage2>
     _animationController?.stop();
     _animationController?.value = 0;
 
+    await _logProgress();
+
     WellDoneOverlay.show(context);
+
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         widget.onNextStage?.call();
       }
     });
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   @override
   void dispose() {
     _player.dispose();

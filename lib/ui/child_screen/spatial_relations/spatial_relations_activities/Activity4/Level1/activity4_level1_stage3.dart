@@ -28,7 +28,7 @@ class Activity4Level1Stage3State extends State<Activity4Level1Stage3>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -105,6 +105,7 @@ class Activity4Level1Stage3State extends State<Activity4Level1Stage3>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -136,6 +137,23 @@ class Activity4Level1Stage3State extends State<Activity4Level1Stage3>
           _animationController!.value = 0;
         }
       });
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -297,15 +315,19 @@ class Activity4Level1Stage3State extends State<Activity4Level1Stage3>
                       );
                     },
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           _wrongAttempts = 0;
                           _isAnimatingAnswer = false;
                         });
+
                         _animationController?.stop();
                         _animationController?.value = 0;
 
+                        await _logProgress();
+
                         WellDoneOverlay.show(context);
+
                         Future.delayed(const Duration(seconds: 3), () {
                           if (mounted) {
                             widget.onNextStage?.call();

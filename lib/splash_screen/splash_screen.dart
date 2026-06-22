@@ -41,10 +41,10 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _initApp() async {
     await Future.delayed(const Duration(seconds: 3));
 
-    final token = TokenUtils.getToken();
-    final expiry = TokenUtils.getTokenExpiry();
+    final token = await TokenUtils.getToken();
+    final expiry = await TokenUtils.getTokenExpiry();
     final now = DateTime.now().millisecondsSinceEpoch;
-
+    print("TOKEN = $token");
     if (!mounted) return;
 
     // No token → Login
@@ -53,22 +53,22 @@ class _SplashScreenState extends State<SplashScreen>
       return;
     }
 
-    // Token exists but expiry missing or valid
+    // Token valid
     if (expiry == null || now < expiry) {
       _goTo(AppRoutes.childScreenRouteName);
       return;
     }
 
-    // Token expired → try refresh
-    bool success = await TokenUtils.refreshAccessToken();
+    // Token expired → refresh
+    final success = await TokenUtils.refreshAccessToken();
 
     if (!mounted) return;
 
-    if (success) {
-      _goTo(AppRoutes.childScreenRouteName);
-    } else {
-      _goTo(AppRoutes.loginScreenRouteName);
-    }
+    _goTo(
+      success
+          ? AppRoutes.childScreenRouteName
+          : AppRoutes.loginScreenRouteName,
+    );
   }
 
   void _goTo(String route) {

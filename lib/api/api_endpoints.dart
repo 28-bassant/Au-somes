@@ -7,6 +7,10 @@ class ApiEndpoints {
   static const String resetPassword = "/Author/reset-password";
   static const String getActivity = "/api/Activity/get-activity";
   static const String updateProfile = "/Account/update-profile";
+  static const String progressSummary =
+      "/api/Progress/summary";
 
+  static const String logAttemptStatus =
+      "/api/Progress/log-attempt-Status";
 }
 

@@ -144,6 +144,25 @@ class FrontBackLevel3Stage3ActivityState
       });
     }
   }
+  Future<void> _logProgress() async {
+    print("🔥 LOG PROGRESS STAGE 3-3");
+
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _wrongAttempts > 0,
+      );
+
+      print("📡 isPassed = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+        print("📊 PROGRESS UPDATED");
+      }
+    } catch (e) {
+      print("❌ PROGRESS ERROR = $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -212,21 +231,26 @@ class FrontBackLevel3Stage3ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     // هذا هو الصحيح في الواجهة: يؤدي للفوز
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
                     });
+
                     _animationController?.stop();
                     _animationController?.value = 0;
 
+// 🔥 IMPORTANT
+                    await _logProgress();
+
                     WellDoneOverlay.show(context);
-                    Future.delayed(const Duration(seconds: 3), () {
-                      if (mounted) {
-                        widget.onNextStage?.call();
-                      }
-                    });
+
+                    await Future.delayed(const Duration(seconds: 3));
+
+                    if (mounted) {
+                      widget.onNextStage?.call();
+                    }
                   },
                   child: Image.network(
                     correctElement.imageUrl ?? '',

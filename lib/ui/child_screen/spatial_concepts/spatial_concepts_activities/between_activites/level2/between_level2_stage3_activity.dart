@@ -140,6 +140,16 @@ class BetweenLevel2Stage3ActivityState
       }
     });
   }
+  Future<void> _logProgress() async {
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _wrongAttempts > 0,
+    );
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
+    }
+  }
 
   @override
   void dispose() {
@@ -302,7 +312,7 @@ class BetweenLevel2Stage3ActivityState
                     width: actorWidth,
                     fit: BoxFit.contain,
                   ),
-                  onDragEnd: (details) {
+                  onDragEnd: (details) async {
                     if (isPlacedCorrectly) return;
 
                     final actorCenter = Offset(
@@ -329,6 +339,9 @@ class BetweenLevel2Stage3ActivityState
                         });
 
                         _animationController?.stop();
+
+                        await _logProgress(); // 🔥 مهم هنا
+
                         WellDoneOverlay.show(context);
 
                         Future.delayed(const Duration(seconds: 3), () {
@@ -336,6 +349,7 @@ class BetweenLevel2Stage3ActivityState
                             widget.onNextStage?.call();
                           }
                         });
+
                         return;
                       }
                     }

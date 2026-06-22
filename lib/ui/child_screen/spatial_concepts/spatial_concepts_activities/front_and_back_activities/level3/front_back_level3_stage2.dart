@@ -145,6 +145,22 @@ class FrontBackLevel3Stage2ActivityState
       });
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _wrongAttempts > 0,
+      );
+
+      print("PROGRESS RESULT => ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -196,8 +212,7 @@ class FrontBackLevel3Stage2ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTap: () {
-                    // الضغط على الإجابة الصحيحة يؤدي للفوز
+                  onTap: () async {
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -205,6 +220,9 @@ class FrontBackLevel3Stage2ActivityState
 
                     _animationController?.stop();
                     _animationController?.value = 0;
+
+                    // 🔥 أهم سطر: تسجيل الـ progress
+                    await _logProgress();
 
                     WellDoneOverlay.show(context);
 

@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../core/cache/shared_prefs_utils.dart';
 import '../core/cache/token_utils.dart';
 import '../models/activities/activity_response.dart';
 import '../models/login_response.dart';
+import '../models/progress/log_attempt_response.dart';
+import '../models/progress/progress_summary_response.dart';
 import '../models/register_response.dart';
 import '../utils/app_routes.dart';
 import 'api_constants.dart';
@@ -85,14 +86,15 @@ class ApiManager {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
+    print("🔵 LOGIN RAW RESPONSE = ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
-
       final loginResponse = LoginResponse.fromJson(data);
-
+      print("🟡 TOKEN PARSED = ${loginResponse.token}");
+      print("🟠 TOKEN BEFORE SAVE = ${loginResponse.token}");
       await TokenUtils.saveLoginTokens(loginResponse);
-
+      print("TOKEN AFTER LOGIN = ${await TokenUtils.getToken()}"); // 👈 هنا
       return loginResponse;
     } else {
       final errorJson = jsonDecode(response.body);
@@ -280,7 +282,7 @@ class ApiManager {
       ApiConstants.baseUrl + ApiEndpoints.updateProfile,
     );
 
-    String? token = TokenUtils.getToken();
+    String? token = await TokenUtils.getToken();
 
     final body = {
       "email": email,
@@ -319,4 +321,84 @@ class ApiManager {
       "Failed to update profile: ${response.statusCode}",
     );
   }
+  static Future<LogAttemptResponse?> logAttemptStatus({
+    required String phaseId,
+    required bool userHint,
+  }) async {
+    Uri url = Uri.parse(ApiConstants.baseUrl + ApiEndpoints.logAttemptStatus);
+
+    final token = await TokenUtils.getToken();
+
+    print("🔥 TOKEN INSIDE API: $token");
+
+    if (token == null || token.isEmpty) {
+      print("❌ No token found");
+      return null;
+    }
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "PhaseId": phaseId,
+          "UserHint": userHint,
+        }),
+      );
+
+      print("🔵 status: ${response.statusCode}");
+      print("🔵 body: ${response.body}");
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (response.body.isEmpty) return null;
+
+        return LogAttemptResponse.fromJson(jsonDecode(response.body));
+      }
+
+      // ❗ هنا أهم تعديل: اطبع الخطأ بدل ما تخبيه
+      print("❌ API ERROR: ${response.statusCode} - ${response.body}");
+
+      return null;
+    } catch (e) {
+      print("❌ Exception in logAttemptStatus: $e");
+      return null;
+    }
+  }
+  static Future<ProgressSummaryResponse?> getProgressSummary() async {
+    final token = await TokenUtils.getToken();
+
+    final response = await http.get(
+      Uri.parse(ApiConstants.baseUrl + ApiEndpoints.progressSummary),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    // 👇 هنا تحط 401 handler
+    if (response.statusCode == 401) {
+      print("🔁 Token expired");
+
+      final refreshed = await TokenUtils.refreshAccessToken();
+
+      if (refreshed) {
+        return getProgressSummary(); // 🔥 أعد الطلب
+      } else {
+        await TokenUtils.clearTokens();
+        return null;
+      }
+    }
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return ProgressSummaryResponse.fromJson(data);
+    }
+
+    return null;
+  }
+
 }
