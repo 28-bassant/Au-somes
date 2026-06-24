@@ -41,7 +41,7 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
   bool _allImagesLoaded = false;
   int _totalImages = 0;
   int _loadedImagesCount = 0;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -116,6 +116,23 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
       _playSound(lastInstructionAudio!);
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
 
   void onActorTap(ActivityElement actor) async {
     if (!_allImagesLoaded) return;
@@ -123,34 +140,41 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
     final correctActor = orderedActors[currentStep];
 
     if (actor.id == correctActor.id) {
-      final shadow = shadows.firstWhere((s) => s.id == actor.targetedZoneId);
+      final shadow = shadows.firstWhere(
+            (s) => s.id == actor.targetedZoneId,
+      );
+
       setState(() {
         placed[shadow.id!] = actor.imageUrl!;
         currentStep++;
       });
 
-      // ✅ لو مش اخر خطوة → TrueAnswerSound
+      //  لو مش آخر خطوة
       if (currentStep < actors.length) {
-        TrueAnswerSound.play(); // تشغيل صوت الإجابة الصحيحة
+        TrueAnswerSound.play();
 
-        // ✅ انتظار 300 مللي ثانية فقط بدل 500
         await Future.delayed(const Duration(milliseconds: 800));
 
-        // صوت النجاح
-        if (currentStep - 1 < stepSuccess.length && _allImagesLoaded) {
+        if (currentStep - 1 < stepSuccess.length &&
+            _allImagesLoaded) {
           await _playSound(stepSuccess[currentStep - 1]);
         }
       } else {
-        // اخر خطوة → WellDoneOverlay
+        //  آخر خطوة: سجل الـ Progress ثم اعرض Well Done
+        await _logProgress();
+
         WellDoneOverlay.show(context);
       }
 
-      if (currentStep < actors.length) _resetActorTry();
+      if (currentStep < actors.length) {
+        _resetActorTry();
+      }
 
-      // الصوت الجديد (Instruction)
+      // تشغيل التعليمات التالية
       if (currentStep < actors.length &&
           stepInstructions.length > currentStep - 1) {
         lastInstructionAudio = stepInstructions[currentStep - 1];
+
         if (_allImagesLoaded) {
           await _playSound(lastInstructionAudio!);
         }
@@ -158,7 +182,9 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
 
       if (currentStep == actors.length) {
         Future.delayed(const Duration(milliseconds: 700), () {
-          widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
       }
     } else {
@@ -166,7 +192,11 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
         if (_allImagesLoaded) {
           TryAgainSound.play();
         }
+
         actorCanTry[actor.id ?? ''] = false;
+
+        //  المستخدم استخدم Hint / أخطأ
+        _usedHint = true;
       }
     }
   }

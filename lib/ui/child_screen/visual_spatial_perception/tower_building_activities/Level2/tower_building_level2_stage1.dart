@@ -39,7 +39,7 @@ class TowerBuildingLevel2Stage1State extends State<TowerBuildingLevel2Stage1> {
   final GlobalKey _firstShadowKey = GlobalKey();   // Shadow الأول (index 1)
   final GlobalKey _secondShadowKey = GlobalKey();  // Shadow الثاني (index 0)
   final GlobalKey _thirdShadowKey = GlobalKey();   // Shadow الثالث (index 4)
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -196,10 +196,10 @@ class TowerBuildingLevel2Stage1State extends State<TowerBuildingLevel2Stage1> {
   }
 
   // دالة لمعالجة سحب Actor الثالث (index 5) إلى Shadow الثالث (index 4)
-  void _handleThirdActorDragEnd(
+  Future<void> _handleThirdActorDragEnd(
       DraggableDetails details,
       double actorSize,
-      ) {
+      ) async {
     if (_thirdShadowReplaced) return;
     if (!_thirdActorDraggable) return;
 
@@ -208,7 +208,8 @@ class TowerBuildingLevel2Stage1State extends State<TowerBuildingLevel2Stage1> {
       details.offset.dy + actorSize / 2,
     );
 
-    final shadowBox = _thirdShadowKey.currentContext?.findRenderObject() as RenderBox?;
+    final shadowBox =
+    _thirdShadowKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (shadowBox != null) {
       final shadowPosition = shadowBox.localToGlobal(Offset.zero);
@@ -225,13 +226,39 @@ class TowerBuildingLevel2Stage1State extends State<TowerBuildingLevel2Stage1> {
         });
 
         // التحقق من اكتمال جميع Shadows
-        if (_firstShadowReplaced && _secondShadowReplaced && _thirdShadowReplaced) {
+        if (_firstShadowReplaced &&
+            _secondShadowReplaced &&
+            _thirdShadowReplaced) {
+
+          await _logProgress();
+
           WellDoneOverlay.show(context);
+
           Future.delayed(const Duration(seconds: 2), () {
-            widget.onNextStage?.call();
+            if (mounted) {
+              widget.onNextStage?.call();
+            }
           });
         }
       }
+    }
+  }
+
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -396,8 +423,8 @@ class TowerBuildingLevel2Stage1State extends State<TowerBuildingLevel2Stage1> {
                   width: actorSize,
                   height: actorSize,
                 ),
-                onDragEnd: (details) {
-                  _handleThirdActorDragEnd(details, actorSize);
+                onDragEnd: (details) async {
+                  await _handleThirdActorDragEnd(details, actorSize);
                 },
               )
                   : Image.network(

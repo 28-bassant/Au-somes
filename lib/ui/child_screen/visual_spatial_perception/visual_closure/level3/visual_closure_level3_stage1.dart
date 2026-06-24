@@ -52,6 +52,8 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
 
   // ✅ متغير لمنع تشغيل الصوت الأولي أكثر من مرة
   bool _initialSoundPlayed = false;
+  bool _usedHint = false;
+  ActivityResponse? _activity;
 
   @override
   void initState() {
@@ -141,7 +143,7 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
     );
 
     _audioUrl = response.audioUrl;
-
+    _activity = response;
     anchor = response.elements!.firstWhere((e) => e.role == 'Anchor');
     shadows = response.elements!.where((e) => e.role == 'Shadow').toList();
     actors = response.elements!.where((e) => e.role == 'Actor').toList();
@@ -205,7 +207,6 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
   }
 
   void onActorDragEnd(ActivityElement actor, ActivityElement shadow) async {
-    // ✅ منع التفاعل قبل تحميل كل الصور
     if (!_allImagesLoaded) return;
 
     var correctActor = stepCorrect[currentStep]['actor'];
@@ -218,27 +219,28 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
         _resetActorTry();
       });
 
-      // ✅ التحقق: لو مش اخر خطوة → TrueAnswerSound
-      // ✅ لو اخر خطوة → WellDoneOverlay
       if (currentStep < stepCorrect.length) {
-        // مش اخر خطوة
         TrueAnswerSound.play();
 
-        // ✅ انتظار 300 مللي ثانية عشان صوت TrueAnswerSound يخلص
-        await Future.delayed(const Duration(milliseconds: 800));
+        await Future.delayed(
+          const Duration(milliseconds: 800),
+        );
 
-        // ⭐ success sound
         if (stepSuccess.length >= currentStep) {
           await _playSound(stepSuccess[currentStep - 1]);
         }
       } else {
-        // اخر خطوة
+        // ✅ سجل الـ Progress قبل Well Done
+        await _logProgress();
+
         WellDoneOverlay.show(context);
       }
 
       if (currentStep == stepCorrect.length) {
         Future.delayed(const Duration(milliseconds: 700), () {
-          widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
       }
     } else {
@@ -246,8 +248,29 @@ class VisualClosureLevel3Stage1State extends State<VisualClosureLevel3Stage1> {
         if (_allImagesLoaded) {
           TryAgainSound.play();
         }
+
         actorCanTry[actor.id ?? ''] = false;
+
+        // ✅ المستخدم أخطأ
+        _usedHint = true;
       }
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 

@@ -48,7 +48,9 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
   final List<GlobalKey> _pointKeys = List.generate(9, (index) => GlobalKey());
 
   final double _lineOffset = -75;
-
+  bool _usedHint = false;
+  bool _progressSent = false;
+  bool _progressLogged = false;
   @override
   void initState() {
     super.initState();
@@ -143,6 +145,7 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
 
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     TryAgainSound.play();
@@ -178,8 +181,10 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     _handleWrongAnswer();
   }
 
-  void _handleCorrectContainerTap() {
+
+  void _handleCorrectContainerTap() async {
     if (_isCompleted) return;
+    if (_progressLogged) return; //  يمنع التكرار
 
     if (_isFirstCorrectClick) {
       setState(() {
@@ -189,24 +194,35 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
       });
 
       TrueAnswerSound.play();
-    } else {
-      setState(() {
-        _isCompleted = true;
-        _showLine1to2 = true;
-        _showLine4to1 = true;
-        _showLine2to4 = false;
-        _wrongAttempts = 0;
-      });
-
-      TrueAnswerSound.play();
-      WellDoneOverlay.show(context);
-
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          widget.onNextStage?.call();
-        }
-      });
+      return;
     }
+
+    setState(() {
+      _isCompleted = true;
+      _progressLogged = true; //  يتقفل هنا فورًا
+      _showLine1to2 = true;
+      _showLine4to1 = true;
+      _showLine2to4 = false;
+      _wrongAttempts = 0;
+      _isAnimatingAnswer = false;
+    });
+
+    _animationController?.stop();
+    _animationController?.value = 0;
+
+    TrueAnswerSound.play();
+    WellDoneOverlay.show(context);
+
+    // مهم: تأخير بسيط قبل تسجيل الـ progress
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    await _logProgress(); // 👈 مرة واحدة فقط
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        widget.onNextStage?.call();
+      }
+    });
   }
 
   Offset? _getPointTopPositionWithOffset(int index) {
@@ -304,6 +320,27 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
       _isDragging = false;
       _hasMoved = false;
     });
+  }
+  Future<void> _logProgress() async {
+    if (_progressSent) return;
+
+    _progressSent = true;
+
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override
