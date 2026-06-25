@@ -533,7 +533,7 @@ abstract class AppLocalizations {
   /// No description provided for @well_done.
   ///
   /// In en, this message translates to:
-  /// **'Well Done'**
+  /// **'Well done! 🌟'**
   String get well_done;
 
   /// No description provided for @thinking.
@@ -707,7 +707,7 @@ abstract class AppLocalizations {
   /// No description provided for @between.
   ///
   /// In en, this message translates to:
-  /// **'Between Activities'**
+  /// **'Between'**
   String get between;
 
   /// No description provided for @current_progress.
@@ -1411,6 +1411,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Centers Found'**
   String get no_centers_found;
+
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Food Delivery'**
+  String get title;
+
+  /// No description provided for @subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivering the hot pizza to Grandma\'s house 🧓'**
+  String get subtitle;
+
+  /// No description provided for @above.
+  ///
+  /// In en, this message translates to:
+  /// **'Above'**
+  String get above;
+
+  /// No description provided for @under.
+  ///
+  /// In en, this message translates to:
+  /// **'Under'**
+  String get under;
+
+  /// No description provided for @near.
+  ///
+  /// In en, this message translates to:
+  /// **'Near'**
+  String get near;
+
+  /// No description provided for @far.
+  ///
+  /// In en, this message translates to:
+  /// **'Far'**
+  String get far;
+
+  /// No description provided for @inside.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside'**
+  String get inside;
+
+  /// No description provided for @outside.
+  ///
+  /// In en, this message translates to:
+  /// **'Outside'**
+  String get outside;
+
+  /// No description provided for @left.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get left;
+
+  /// No description provided for @right.
+  ///
+  /// In en, this message translates to:
+  /// **'Right'**
+  String get right;
+
+  /// No description provided for @front.
+  ///
+  /// In en, this message translates to:
+  /// **'Front'**
+  String get front;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @visual_perception.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual Perception'**
+  String get visual_perception;
+
+  /// No description provided for @interactive_story.
+  ///
+  /// In en, this message translates to:
+  /// **'Interactive Story'**
+  String get interactive_story;
+
+  /// No description provided for @story_time_header.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Story + Spatial Training + Visual Perception'**
+  String get story_time_header;
+
+  /// No description provided for @enter_child_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Child Name'**
+  String get enter_child_name;
+
+  /// No description provided for @story_theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Theme'**
+  String get story_theme;
+
+  /// No description provided for @spatial_visual_for_training.
+  ///
+  /// In en, this message translates to:
+  /// **'Spatial and Visual Concepts for Training'**
+  String get spatial_visual_for_training;
+
+  /// No description provided for @start_interactive_story.
+  ///
+  /// In en, this message translates to:
+  /// **'✨ Start the Interactive Story ✨'**
+  String get start_interactive_story;
+
+  /// No description provided for @day_at_kindergarten.
+  ///
+  /// In en, this message translates to:
+  /// **'A Day at Kindergarten🏠'**
+  String get day_at_kindergarten;
+
+  /// No description provided for @park_outing.
+  ///
+  /// In en, this message translates to:
+  /// **'Park Outing🌴'**
+  String get park_outing;
+
+  /// No description provided for @space_adventure.
+  ///
+  /// In en, this message translates to:
+  /// **'Space Adventure🚀'**
+  String get space_adventure;
+
+  /// No description provided for @underwater_world.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwater World🐠'**
+  String get underwater_world;
+
+  /// No description provided for @supermarket_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Supermarket Trip🛒'**
+  String get supermarket_trip;
+
+  /// No description provided for @generating_interactive_story.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Interactive Story'**
+  String get generating_interactive_story;
+
+  /// No description provided for @excellent_you_answered.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent! You answered all correctly!'**
+  String get excellent_you_answered;
+
+  /// No description provided for @well_done_keep_practicing.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done! Keep practicing!'**
+  String get well_done_keep_practicing;
+
+  /// No description provided for @keep_trying_you_will_improve.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep trying, you\'ll improve'**
+  String get keep_trying_you_will_improve;
+
+  /// No description provided for @story_complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Complete! 🎊'**
+  String get story_complete;
+
+  /// No description provided for @your_score.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Score'**
+  String get your_score;
+
+  /// No description provided for @new_story.
+  ///
+  /// In en, this message translates to:
+  /// **'New Story ✨'**
+  String get new_story;
+
+  /// No description provided for @hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hint'**
+  String get hint;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @previous.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previous;
+
+  /// No description provided for @where_is_pizza.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is the pizza?'**
+  String get where_is_pizza;
+
+  /// No description provided for @inside_box.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside the box'**
+  String get inside_box;
+
+  /// No description provided for @outside_box.
+  ///
+  /// In en, this message translates to:
+  /// **'Outside the box'**
+  String get outside_box;
+
+  /// No description provided for @where_is_bag.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is the delivery bag?'**
+  String get where_is_bag;
+
+  /// No description provided for @at_back.
+  ///
+  /// In en, this message translates to:
+  /// **'At the back'**
+  String get at_back;
+
+  /// No description provided for @at_front.
+  ///
+  /// In en, this message translates to:
+  /// **'At the front'**
+  String get at_front;
+
+  /// No description provided for @where_is_grandma.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is Grandma standing?'**
+  String get where_is_grandma;
+
+  /// No description provided for @in_front_of_door.
+  ///
+  /// In en, this message translates to:
+  /// **'In front of the door'**
+  String get in_front_of_door;
+
+  /// No description provided for @behind_door.
+  ///
+  /// In en, this message translates to:
+  /// **'Behind the door'**
+  String get behind_door;
+
+  /// No description provided for @pizza_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'The pizza is inside the cardboard box.'**
+  String get pizza_hint;
+
+  /// No description provided for @bag_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'The bag is placed at the back of the bicycle.'**
+  String get bag_hint;
+
+  /// No description provided for @grandma_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandma is standing in front of the house door.'**
+  String get grandma_hint;
+
+  /// No description provided for @keep_going.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going like this'**
+  String get keep_going;
+
+  /// No description provided for @wonderful.
+  ///
+  /// In en, this message translates to:
+  /// **'Wonderful! 🎉'**
+  String get wonderful;
+
+  /// No description provided for @lets_try_again.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s try again together'**
+  String get lets_try_again;
 }
 
 class _AppLocalizationsDelegate

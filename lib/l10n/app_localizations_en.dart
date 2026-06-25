@@ -233,7 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Update your child\'s info for a better personalized experience.';
 
   @override
-  String get well_done => 'Well Done';
+  String get well_done => 'Well done! 🌟';
 
   @override
   String get thinking => '...Thinking';
@@ -323,7 +323,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inside_outside => 'Inside & Outside Activities';
 
   @override
-  String get between => 'Between Activities';
+  String get between => 'Between';
 
   @override
   String get current_progress => 'Current Progress';
@@ -722,4 +722,153 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_centers_found => 'No Centers Found';
+
+  @override
+  String get title => 'Food Delivery';
+
+  @override
+  String get subtitle => 'Delivering the hot pizza to Grandma\'s house 🧓';
+
+  @override
+  String get above => 'Above';
+
+  @override
+  String get under => 'Under';
+
+  @override
+  String get near => 'Near';
+
+  @override
+  String get far => 'Far';
+
+  @override
+  String get inside => 'Inside';
+
+  @override
+  String get outside => 'Outside';
+
+  @override
+  String get left => 'Left';
+
+  @override
+  String get right => 'Right';
+
+  @override
+  String get front => 'Front';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get visual_perception => 'Visual Perception';
+
+  @override
+  String get interactive_story => 'Interactive Story';
+
+  @override
+  String get story_time_header =>
+      'Custom Story + Spatial Training + Visual Perception';
+
+  @override
+  String get enter_child_name => 'Enter Child Name';
+
+  @override
+  String get story_theme => 'Story Theme';
+
+  @override
+  String get spatial_visual_for_training =>
+      'Spatial and Visual Concepts for Training';
+
+  @override
+  String get start_interactive_story => '✨ Start the Interactive Story ✨';
+
+  @override
+  String get day_at_kindergarten => 'A Day at Kindergarten🏠';
+
+  @override
+  String get park_outing => 'Park Outing🌴';
+
+  @override
+  String get space_adventure => 'Space Adventure🚀';
+
+  @override
+  String get underwater_world => 'Underwater World🐠';
+
+  @override
+  String get supermarket_trip => 'Supermarket Trip🛒';
+
+  @override
+  String get generating_interactive_story => 'Generating Interactive Story';
+
+  @override
+  String get excellent_you_answered => 'Excellent! You answered all correctly!';
+
+  @override
+  String get well_done_keep_practicing => 'Well done! Keep practicing!';
+
+  @override
+  String get keep_trying_you_will_improve => 'Keep trying, you\'ll improve';
+
+  @override
+  String get story_complete => 'Story Complete! 🎊';
+
+  @override
+  String get your_score => 'Your Score';
+
+  @override
+  String get new_story => 'New Story ✨';
+
+  @override
+  String get hint => 'Hint';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get previous => 'Previous';
+
+  @override
+  String get where_is_pizza => 'Where is the pizza?';
+
+  @override
+  String get inside_box => 'Inside the box';
+
+  @override
+  String get outside_box => 'Outside the box';
+
+  @override
+  String get where_is_bag => 'Where is the delivery bag?';
+
+  @override
+  String get at_back => 'At the back';
+
+  @override
+  String get at_front => 'At the front';
+
+  @override
+  String get where_is_grandma => 'Where is Grandma standing?';
+
+  @override
+  String get in_front_of_door => 'In front of the door';
+
+  @override
+  String get behind_door => 'Behind the door';
+
+  @override
+  String get pizza_hint => 'The pizza is inside the cardboard box.';
+
+  @override
+  String get bag_hint => 'The bag is placed at the back of the bicycle.';
+
+  @override
+  String get grandma_hint => 'Grandma is standing in front of the house door.';
+
+  @override
+  String get keep_going => 'Keep going like this';
+
+  @override
+  String get wonderful => 'Wonderful! 🎉';
+
+  @override
+  String get lets_try_again => 'Let\'s try again together';
 }

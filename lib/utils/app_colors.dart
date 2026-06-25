@@ -15,4 +15,10 @@ class AppColors{
   static const Color blackColor = Colors.black;
   static const Color blackColorWithOpacity60 = Color(0x99000000);
   static const Color greyColor = Color(0xFF9D9999);
+  static const starGold = Color(0xFFFFC107);
+  static const starEmpty = Color(0xFFD0D0D0);
+  static const progressBg = Color(0xFFE0E0E0);
+  static const popupOverlay = Color(0x99000000);
+
+
 }
