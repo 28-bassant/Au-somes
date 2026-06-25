@@ -25,6 +25,7 @@ import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_routine/daily_routine_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/daily_tips_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/progress_level/progress_level_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/stories_time/stories_time_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/edit_profile/edit_profile_screen.dart';
 import 'package:au_somes/ui/select_screen/select_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
@@ -38,15 +39,22 @@ import 'core/cache/shared_prefs_utils.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
 RouteObserver<ModalRoute<void>>();
-void main()async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SharedPrefsUtils.init();
-  runApp( MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AppLanguageProvider(),),
-      ],
 
-      child: MyApp()));
+  await SharedPrefsUtils.init();
+
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AppLanguageProvider(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 class MyApp extends StatelessWidget{
   @override
@@ -79,6 +87,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.spatialConceptsScreenRouteName:(context)=>SpatialConceptsScreen(),
         AppRoutes.dailyRoutineScreenRouteName:(context)=>DailyRoutineScreen(),
         AppRoutes.dailyTipsScreenRouteName:(context)=>DailyTipsScreen(),
+        AppRoutes.storiesTimeScreenRouteName:(context)=>StoryTimeScreen(),
         AppRoutes.frontBackBaseActivityScreenRouteName:(context)=>FrontBackBaseActivityScreen(),
         AppRoutes.upBaseActivityScreenRouteName:(context)=>UpBaseActivityScreen(),
         AppRoutes.downBaseActivityScreenRouteName:(context)=>DownBaseActivityScreen(),

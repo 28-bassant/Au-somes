@@ -232,7 +232,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'حدّث معلومات طفلك للحصول على تجربة مخصصة بشكل أفضل.';
 
   @override
-  String get well_done => 'أحسنت';
+  String get well_done => 'أحسنتِ 🌟';
 
   @override
   String get thinking => 'جاري التفكير...';
@@ -320,7 +320,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get inside_outside => 'أنشطة داخل و خارج';
 
   @override
-  String get between => 'أنشطة بين';
+  String get between => 'بين';
 
   @override
   String get current_progress => 'التقدم الحالي';
@@ -723,4 +723,152 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get no_centers_found => 'لا توجد مراكز';
+
+  @override
+  String get title => 'توصيل الطعام';
+
+  @override
+  String get subtitle => 'توصيل البيتزا الساخنة لمنزل الجدة 🧓';
+
+  @override
+  String get above => 'فوق';
+
+  @override
+  String get under => 'تحت';
+
+  @override
+  String get near => 'قريب';
+
+  @override
+  String get far => 'بعيد';
+
+  @override
+  String get inside => 'داخل';
+
+  @override
+  String get outside => 'خارج';
+
+  @override
+  String get left => 'يسار';
+
+  @override
+  String get right => 'يمين';
+
+  @override
+  String get front => 'أمام';
+
+  @override
+  String get back => 'خلف';
+
+  @override
+  String get visual_perception => 'إدراك بصري';
+
+  @override
+  String get interactive_story => 'قصة تفاعلية';
+
+  @override
+  String get story_time_header => 'قصة مخصصة + تدريب مكاني + إدراك بصري';
+
+  @override
+  String get enter_child_name => 'أدخل اسم الطفل';
+
+  @override
+  String get story_theme => 'موضوع القصة';
+
+  @override
+  String get spatial_visual_for_training =>
+      'المفاهيم المكانية والبصرية للتدريب';
+
+  @override
+  String get start_interactive_story => '✨ ابدأ القصة التفاعلية ✨';
+
+  @override
+  String get day_at_kindergarten => 'يوم في الروضة🏠';
+
+  @override
+  String get park_outing => 'نزهة في الحديقة🌴';
+
+  @override
+  String get space_adventure => 'مغامرة فضائية🚀';
+
+  @override
+  String get underwater_world => 'عالم البحر🐠';
+
+  @override
+  String get supermarket_trip => 'رحلة السوبر ماركت🛒';
+
+  @override
+  String get generating_interactive_story => 'جار إنشاء القصة التفاعلية';
+
+  @override
+  String get excellent_you_answered => 'ممتازة! أجبتِ على كل الأسئلة!';
+
+  @override
+  String get well_done_keep_practicing => 'أحسنتِ! استمري في التدريب!';
+
+  @override
+  String get keep_trying_you_will_improve => 'تدربي أكثر وستتحسنين!';
+
+  @override
+  String get story_complete => 'انتهت القصة! 🎊';
+
+  @override
+  String get your_score => 'نتيجتك';
+
+  @override
+  String get new_story => 'قصة جديدة ✨';
+
+  @override
+  String get hint => 'تلميح';
+
+  @override
+  String get next => 'التالي';
+
+  @override
+  String get previous => 'السابق';
+
+  @override
+  String get where_is_pizza => 'أين توجد البيتزا؟';
+
+  @override
+  String get inside_box => 'داخل العلبة';
+
+  @override
+  String get outside_box => 'خارج العلبة';
+
+  @override
+  String get where_is_bag => 'أين تقع حقيبة التوصيل؟';
+
+  @override
+  String get at_back => 'في الخلف';
+
+  @override
+  String get at_front => 'في الأمام';
+
+  @override
+  String get where_is_grandma => 'أين تقف الجدة؟';
+
+  @override
+  String get in_front_of_door => 'أمام الباب';
+
+  @override
+  String get behind_door => 'خلف الباب';
+
+  @override
+  String get pizza_hint => 'البيتزا توجد داخل العلبة الكرتونية';
+
+  @override
+  String get bag_hint => 'الحقيبة موضوعة في خلف الدراجة';
+
+  @override
+  String get grandma_hint => 'الجدة تقف أمام باب البيت';
+
+  @override
+  String get keep_going => 'استمري هكذا';
+
+  @override
+  String get wonderful => 'رائعة جداً 🎉';
+
+  @override
+  String get lets_try_again => 'لنحاول معاً مرة أخرى';
 }
