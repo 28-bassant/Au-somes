@@ -30,7 +30,7 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
 
   bool isCorrectPlaced = false;
   bool isCorrectSelected = false;
-
+  bool _usedHint = false;
   // متغيرات لتخزين العناصر
   late Map<String, dynamic> elements;
 
@@ -137,7 +137,9 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
+
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
@@ -177,7 +179,23 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
       });
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   @override
   void dispose() {
     _player.dispose();
@@ -314,12 +332,15 @@ class Activity3Level1Stage1State extends State<Activity3Level1Stage1>
                     onWillAccept: (data) {
                       return data == 'correct' && isCorrectSelected && !isCorrectPlaced;
                     },
-                    onAccept: (data) {
+                    onAccept: (data) async {
                       setState(() {
                         isCorrectPlaced = true;
                       });
 
+                      await _logProgress();
+
                       WellDoneOverlay.show(context);
+
                       Future.delayed(const Duration(seconds: 3), () {
                         if (mounted) widget.onNextStage?.call();
                       });

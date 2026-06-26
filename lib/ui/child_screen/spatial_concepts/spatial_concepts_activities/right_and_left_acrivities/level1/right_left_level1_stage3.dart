@@ -3,8 +3,10 @@ import 'package:au_somes/api/api_manager.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math';
 import '../../../../../../models/activities/activity_response.dart';
+import '../../../../../../providers/app_language_provider.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
 
 class RightLeftLevel1Stage3 extends StatefulWidget {
@@ -28,6 +30,7 @@ class RightLeftLevel1Stage3State extends State<RightLeftLevel1Stage3>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -94,9 +97,13 @@ class RightLeftLevel1Stage3State extends State<RightLeftLevel1Stage3>
   }
 
   Future<void> playSound() async {
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
+
     await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
 
   void repeatSound() => playSound();
@@ -105,13 +112,12 @@ class RightLeftLevel1Stage3State extends State<RightLeftLevel1Stage3>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
@@ -170,11 +176,10 @@ class RightLeftLevel1Stage3State extends State<RightLeftLevel1Stage3>
       body: SingleChildScrollView(
         child: Container(
           width: screenSize.width,
-          height: screenSize.height*.8,
+          height: screenSize.height * 0.8,
           child: Stack(
-            alignment: Alignment.center,
             children: [
-              // Anchor في الخلف
+              // Anchor في النص
               Center(
                 child: Image.network(
                   anchorElement.imageUrl ?? '',
@@ -183,105 +188,87 @@ class RightLeftLevel1Stage3State extends State<RightLeftLevel1Stage3>
                 ),
               ),
 
-              // الصور فوق الـ Anchor
-              Positioned.fill(
-                child: Padding(
-                  padding: EdgeInsets.all(20 * scale),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // الصورة الغلط (اليسار)
-                      GestureDetector(
-                        onTap: () {
-                          _handleWrongAnswer();
-                        },
-                        child: Container(
-                          width: 180 * scale,
-                          height: 180 * scale,
-                          decoration:  BoxDecoration(
-                            border: Border.all(
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          child: Image.network(
-                            leftElement.imageUrl ?? '',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
+              // leftElement في أقصى اليسار (الغلط)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 30,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      _handleWrongAnswer();
+                    },
+                    child: Image.network(
+                      width: 180 * scale,
+                      height: 180 * scale,
+                      leftElement.imageUrl ?? '',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
 
-                      // الصورة الصحيحة (اليمين) مع الحركة
-                      AnimatedBuilder(
-                        animation: _animationController!,
-                        builder: (context, child) {
-                          double shakeValue = 0;
-                          if (_isAnimatingAnswer) {
-                            shakeValue = screenSize.width * 0.03 *
-                                sin(_animationController!.value *  pi );
+              // rightElement في أقصى اليمين (الصحيح) مع الحركة
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 30,
+                child: Center(
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = screenSize.width * 0.03 *
+                            sin(_animationController!.value * pi);
+                      }
+
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTapDown: (details) async {
+                        print(" RIGHT ANSWER CLICKED");
+                        setState(() {
+                          _wrongAttempts = 0;
+                          _isAnimatingAnswer = false;
+                        });
+
+                        _animationController?.stop();
+                        _animationController?.value = 0;
+
+                        // 1. تسجيل المحاولة
+                        final result = await ApiManager.logAttemptStatus(
+                          phaseId: _activity!.phaseId!,
+                          userHint: _usedHint,
+                        );
+
+                        print(" RESULT: ${result?.isPassed}");
+
+                        // 2. لو الإجابة صحيحة → حدّث التقدم
+                        if (result?.isPassed == true) {
+                          await ApiManager.getProgressSummary();
+                        }
+
+                        // 3. عرض النجاح
+                        WellDoneOverlay.show(context);
+
+                        // 4. الانتقال للمرحلة التالية
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (mounted) {
+                            widget.onNextStage?.call();
                           }
-
-                          return Transform.translate(
-                            offset: Offset(shakeValue, 0),
-                            child: child,
-                          );
-                        },
-                        child: GestureDetector(
-                          onTapDown: (details) {
-                            final local = details.localPosition;
-                            final double imageWidth = 180 * scale;
-                            final double imageHeight = 180 * scale;
-
-                            // تحديد المنطقة الصحيحة: النصف الأيمن بالكامل من الصورة
-                            final correctArea = Rect.fromLTWH(
-                              imageWidth * 0.4,   // تبدأ من 40% من العرض
-                              0,                   // من أعلى الصورة
-                              imageWidth * 0.6,   // تمتد 60% من العرض (الجزء الأيمن)
-                              imageHeight,        // كامل الارتفاع
-                            );
-
-                            if (correctArea.contains(local)) {
-                              // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
-                              setState(() {
-                                _wrongAttempts = 0;
-                                _isAnimatingAnswer = false;
-                              });
-                              _animationController?.stop();
-                              _animationController?.value = 0;
-
-                              WellDoneOverlay.show(context);
-                              Future.delayed(const Duration(seconds: 3), () {
-                                if (mounted) {
-                                  widget.onNextStage?.call();
-                                }
-                              });
-                            } else {
-                              // نقر خارج المنطقة الصحيحة يعتبر إجابة خاطئة
-                              _handleWrongAnswer();
-                            }
-                          },
-                          child: Container(
-                            width: 180 * scale,
-                            height: 180 * scale,
-                            child: Stack(
-                              children: [
-                                Image.network(
-                                  rightElement.imageUrl ?? '',
-                                  fit: BoxFit.cover,
-                                ),
-                                // منطقة مرئية للمساعدة في التصميم (يمكن إزالتها لاحقًا)
-                                Positioned(
-                                  left: 180 * scale * 0.4,
-                                  child: Container(
-                                    width: 180 * scale * 0.6,
-                                    height: 180 * scale,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        });
+                      },
+                      child: Image.network(
+                        width: 180 * scale,
+                        height: 180 * scale,
+                        rightElement.imageUrl ?? '',
+                        fit: BoxFit.cover,
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

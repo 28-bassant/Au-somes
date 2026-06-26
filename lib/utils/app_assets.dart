@@ -99,5 +99,7 @@ class AppAssets{
   static const String dress_outside= 'assets/images/dress_outside.png';
   static const String star= 'assets/images/star.jpg';
   static const String geo= 'assets/images/geo.jpg';
+  static const String facebook_icon= 'assets/images/facebook_icon.png';
+  static const String stories_time_image= 'assets/images/stories_time_image.png';
 
 }

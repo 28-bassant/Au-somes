@@ -5,8 +5,10 @@ import 'package:au_somes/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
+import '../../../../../utils/app_styles.dart';
 import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/near_far_level1_stage2.dart';
 import 'level1/near_far_level1_stage3.dart';
@@ -173,10 +175,7 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -189,7 +188,26 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
         currentActivityIndex--;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.first_activity,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
         );
       }
     });
@@ -208,8 +226,8 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
         actions: [
           GestureDetector(
             onTap: () =>
-                Navigator.pushReplacementNamed(context, AppRoutes.spatialConceptsScreenRouteName),
-            child: Container(
+        Navigator.pop(context),
+    child: Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
@@ -239,7 +257,7 @@ class _NearFarBaseActivityScreenState extends State<NearFarBaseActivityScreen> {
                   border: Border.all(color: AppColors.blackColorWithOpacity60, width: 1),
                 ),
                 child: Icon(
-                  languageProvider.isArabic() ? Icons.arrow_forward : Icons.arrow_back,
+                  Icons.arrow_back,
                   color: AppColors.blackColorWithOpacity60,
                   size: 25,
                 ),

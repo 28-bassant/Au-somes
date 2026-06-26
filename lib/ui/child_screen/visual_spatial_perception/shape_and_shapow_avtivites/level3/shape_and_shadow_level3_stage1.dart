@@ -7,6 +7,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 import 'package:flutter/material.dart';
@@ -60,12 +61,25 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
   late ActivityElement actorSquareBlue;
   late ActivityElement actorTriangleRed;
   late ActivityElement actorTriangleBlue;
+  late AudioPlayer _player;
+  bool hasPlayedSound = false;
+  String? audioUrl;
+  Map<String, bool> wrongPlayed = {};
+  bool _isCompleted = false;
+  String audioAsset = 'sounds/sound.mp3';
 
   @override
   void initState() {
     super.initState();
+    _player = AudioPlayer();
+
     _loadActivity();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      playSound();
+    });
   }
+
 
   void _loadActivity() {
     // Shadows
@@ -131,21 +145,45 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
 
   Widget _buildShadow(ActivityElement shadow, double w, double h) {
     return DragTarget<ActivityElement>(
-      onWillAccept: (actor) => true,
+      onWillAccept: (_) => !_isCompleted,
       onAccept: (actor) {
-        if (actor!.targetedZoneId == shadow.id) {
+        if (_isCompleted) return;
+
+        final isCorrect = actor.targetedZoneId == shadow.id;
+
+        if (isCorrect) {
           setState(() {
             placed[shadow.id!] = actor.imageUrl!;
           });
 
-          WellDoneOverlay.show(context); // ✅ يظهر عند كل إجابة صحيحة
+          // reset wrong attempts for better UX
+          wrongPlayed.clear();
 
-          // لو كل الشادو اتملأوا
-          if (placed.length == 4) {
-            Future.delayed(const Duration(milliseconds: 700), () {
-              widget.onNextStage?.call();
-            });
+          final isLast = placed.length == 4;
+
+          if (isLast) {
+            if (!_isCompleted) {
+              _isCompleted = true;
+
+              WellDoneOverlay.show(context);
+
+              Future.delayed(const Duration(seconds: 2), () {
+                widget.onNextStage?.call();
+              });
+            }
+          } else {
+            TrueAnswerSound.play();
           }
+
+          return;
+        }
+
+        // ❌ Wrong answer
+        final actorId = actor.id ?? '';
+
+        if (wrongPlayed[actorId] != true) {
+          TryAgainSound.play();
+          wrongPlayed[actorId] = true;
         }
       },
       builder: (context, candidateData, rejectedData) {
@@ -153,7 +191,9 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
           width: w,
           height: h,
           child: buildActorImage(
-            placed.containsKey(shadow.id) ? placed[shadow.id]! : shadow.imageUrl!,
+            placed.containsKey(shadow.id)
+                ? placed[shadow.id]!
+                : shadow.imageUrl!,
             width: w,
             height: h,
           ),
@@ -171,6 +211,27 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
           ? const SizedBox()
           : SizedBox(width: width, height: height, child: buildActorImage(actor.imageUrl!, width: width, height: height)),
     );
+  }
+
+  Future playSound() async {
+    try {
+      debugPrint("PLAY SOUND START");
+
+      await _player.stop();
+      await _player.play(AssetSource(audioAsset));
+
+      debugPrint("PLAY SOUND DONE");
+    } catch (e) {
+      debugPrint("AUDIO ERROR: $e");
+    }
+  }
+
+  void repeatSound() => playSound();
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
   }
   Widget build(BuildContext context) {
     final w = MediaQuery
@@ -243,11 +304,3 @@ class ShapeAndShadowLevel3Stage1State extends State<ShapeAndShadowLevel3Stage1> 
     );
   }}
 
-// Dummy classes
-class ActivityElement {
-  final String? id;
-  final String? imageUrl;
-  final String? role;
-  final String? targetedZoneId;
-  ActivityElement({this.id, this.imageUrl, this.role, this.targetedZoneId});
-}

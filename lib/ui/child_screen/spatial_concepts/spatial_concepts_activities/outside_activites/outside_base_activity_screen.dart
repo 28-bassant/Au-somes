@@ -108,11 +108,11 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
+            Navigator.pushNamedAndRemoveUntil(
               context,
               AppRoutes.spatialConceptsScreenRouteName,
-            );
-          }
+                  (route) => false,
+            );          }
         });
       }
     });
@@ -123,7 +123,7 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
       if (currentActivityIndex > 0) {
         currentActivityIndex--;
       } else {
-       Navigator.pop(context);
+       Navigator.pushNamedAndRemoveUntil(context, AppRoutes.spatialConceptsScreenRouteName, (route) => false,);
       }
     });
   }
@@ -140,8 +140,8 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
             centerTitle: true,
             actions: [
             GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-        context, AppRoutes.spatialConceptsScreenRouteName),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.spatialConceptsScreenRouteName,(route) => false,),
+
     child: Container(
     width: 40,
     height: 40,
@@ -174,9 +174,7 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
                         color: AppColors.blackColorWithOpacity60, width: 1),
                   ),
                   child: Icon(
-                    languageProvider.isArabic()
-                        ? Icons.arrow_forward
-                        : Icons.arrow_back,
+                   Icons.arrow_back,
                     color: AppColors.blackColorWithOpacity60,
                     size: 25,
                   ),
@@ -194,7 +192,7 @@ class _OutsideBaseActivityScreenState extends State<OutsideBaseActivityScreen> {
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
+          SizedBox(height: height * .04),
 
 
           // InkWell(

@@ -45,7 +45,7 @@ class TowerBuildingLevel3Stage2State extends State<TowerBuildingLevel3Stage2> {
   final GlobalKey _thirdShadowKey = GlobalKey();
   final GlobalKey _fourthShadowKey = GlobalKey();
   final GlobalKey _fifthShadowKey = GlobalKey();
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -228,7 +228,10 @@ class TowerBuildingLevel3Stage2State extends State<TowerBuildingLevel3Stage2> {
   }
 
   // معالجة Actor الخامس (index 4) - يذهب إلى Shadow الخامس
-  void _handleFifthActorDragEnd(DraggableDetails details, double actorSize) {
+  Future<void> _handleFifthActorDragEnd(
+      DraggableDetails details,
+      double actorSize,
+      ) async {
     if (_fifthShadowReplaced) return;
 
     if (_isActorOverShadow(details, actorSize, _fifthShadowKey)) {
@@ -242,13 +245,40 @@ class TowerBuildingLevel3Stage2State extends State<TowerBuildingLevel3Stage2> {
         TrueAnswerSound.play();
       }
 
-      if (_firstShadowReplaced && _secondShadowReplaced &&
-          _thirdShadowReplaced && _fourthShadowReplaced && _fifthShadowReplaced) {
+      if (_firstShadowReplaced &&
+          _secondShadowReplaced &&
+          _thirdShadowReplaced &&
+          _fourthShadowReplaced &&
+          _fifthShadowReplaced) {
+
+        await _logProgress();
+
         WellDoneOverlay.show(context);
+
         Future.delayed(const Duration(seconds: 2), () {
-          widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
       }
+    }
+  }
+
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -512,8 +542,8 @@ class TowerBuildingLevel3Stage2State extends State<TowerBuildingLevel3Stage2> {
                   width: actorSize,
                   height: actorSize,
                 ),
-                onDragEnd: (details) {
-                  _handleFifthActorDragEnd(details, actorSize);
+                onDragEnd: (details) async {
+                  await _handleFifthActorDragEnd(details, actorSize);
                 },
               ),
             ),

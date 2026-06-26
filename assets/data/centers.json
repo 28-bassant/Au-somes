@@ -1,0 +1,184 @@
+[
+  {
+    "name": "Bloom ABA",
+    "phone": "+201224113761",
+
+    "address": "253 North 90 Street, Cairo",
+    "locationName": "Bloom ABA Location",
+    "latitude": 30.0370247,
+    "longitude": 31.1824484,
+
+    "facebookName": "Bloom ABA ",
+    "facebookLink": "https://www.facebook.com/profile.php?id=100087282496134",
+
+    "websiteName": "Bloom",
+    "websiteLink": "https://www.bloom-aba.com",
+
+    "image": "assets/images/bloom.png"
+  },
+  {
+    "name": "Progressive Behaviour Services",
+    "phone": "+201222175725",
+
+    "address": "Mohandeseen Sheikh Zayed Tagam’o - Cairo",
+    "locationName": "Progressive Location",
+    "latitude": 30.420338,
+    "longitude": 31.730619,
+
+    "facebookName": "Progressive Behaviour Services ",
+    "facebookLink": "https://www.facebook.com/PBSEGYPT",
+
+    "websiteName": "Progressive",
+    "websiteLink": "https://www.pbsegypt.com/?utm_source=chatgpt.com",
+
+    "image": "assets/images/progressive.png"
+  },
+  {
+    "name": "Simplify",
+    "phone": "+201222419129",
+
+    "address": "End of Ahmed Ismail El-Moshir St., Sheraton, Heliopolis, Cairo",
+    "locationName": "ٍSimplify Location",
+    "latitude": 30.164757,
+    "longitude": 31.456373,
+
+    "facebookName": "Simplifyegypt",
+    "facebookLink": "https://www.facebook.com/simplifyegypt",
+
+    "websiteName": "Simplify",
+    "websiteLink": "https://simplifyegypt.com/?utm_source=chatgpt.com",
+
+    "image": "assets/images/simplify.png"
+  },
+  {
+    "name": "ACE Behaviour Center",
+    "phone": "+201551054297",
+
+    "address": "GF1,Nakhil Mall inside Nakhil Resort,\nnew cairo - Cairo",
+    "locationName": "ACE Location",
+    "latitude": 30.00123,
+    "longitude": 31.432434,
+
+    "facebookName": "ACE Behaviour Center",
+    "facebookLink": "https://www.facebook.com/Ace.behaviorcenter",
+
+    "websiteName": "ACE",
+    "websiteLink": "https://acebehavioreg.com/?utm_source=chatgpt.com",
+
+    "image": "assets/images/ACE.png"
+  },
+  {
+    "name": "Chance ",
+    "phone": "+201113879992",
+
+    "address": "Inside Ramage Resort, El-moshir Tantawy Axis - Cairo",
+    "locationName": "Chance Location",
+    "latitude": 30.021235,
+    "longitude": 31.364199,
+    "facebookName": "Chance.ABA",
+    "facebookLink": "https://www.facebook.com/Chance.Foundation.eg",
+
+    "websiteName": "Chance",
+    "websiteLink": "https://www.chanceeg.com/iq/?utm_source=chatgpt.com",
+
+    "image": "assets/images/chance.png"
+  },
+  {
+    "name": "Momentum for Behavioral Services ",
+    "phone": "+201204410555",
+
+    "address": "Al Yasmine Mall - 6 October City",
+    "locationName": "Momentum Location",
+    "latitude": 30.038921,
+    "longitude": 31.014297,
+    "facebookName": "Momentum for Behavioral Services",
+    "facebookLink": "https://www.facebook.com/Momentumegypt.ABA/",
+
+    "websiteName": "Momentum",
+    "websiteLink": "https://momentum-eg.com/?utm_source=chatgpt.com",
+
+    "image": "assets/images/momentum.png"
+  },
+  {
+    "name": "A B C",
+    "phone": "+201110069722",
+
+    "address": "18 Al Thawra street 5th Floor Heliopolis\n - Cairo",
+    "locationName": "ABC Location",
+    "latitude": 30.090171215960734,
+    "longitude": 31.328544538278454,
+    "facebookName": "ABC",
+    "facebookLink": "https://www.facebook.com/AbcAdvancedBehavioralClinic",
+
+    "websiteName": "ABC",
+    "websiteLink": "https://www.abcneurohub.com/?utm_source=chatgpt.com",
+
+    "image": "assets/images/ABC.png"
+  },
+  {
+    "name": "KinderBridge",
+    "phone": "+201080228333",
+
+    "address": "Trivium Business Complex - On North 90th Street, New Cairo",
+    "locationName": "KinderBridge Location",
+    "latitude": 30.0278,
+    "longitude": 31.4861,
+    "facebookName": "KinderBridge Autism Center",
+    "facebookLink": "https://www.facebook.com/profile.php?id=61585371302465",
+
+    "websiteName": "KinderBridge",
+    "websiteLink": "https://kbautism.com/?utm_source=chatgpt.com",
+
+    "image": "assets/images/kinderbridge.png"
+  },
+  {
+    "name": "المركز المصري الدولي للتوحد",
+    "phone": "+201009352251",
+
+    "address": "المجاورة الاولى - \nEl Sheikh Zayed",
+    "locationName": "egyption center Location",
+    "latitude": 30.044876,
+    "longitude": 30.97954,
+    "facebookName": "المركز المصري الدولي للتوحد",
+    "facebookLink": "https://www.facebook.com/EgyptianInternationalAutism",
+
+    "websiteName": "المركز المصري الدولي للتوحد",
+    "websiteLink": "https://sites.google.com/view/egyptian-autism-center/",
+
+    "image": "assets/images/egyption_center.png"
+  },
+  {
+    "name": "Global Autism Center",
+    "phone": "+201009929200",
+
+    "address": "Loran - Alexandria",
+    "locationName": "global autism center Location",
+    "latitude": 31.197741,
+    "longitude": 29.892525,
+    "facebookName": "Global Autism Center & Special Needs",
+    "facebookLink": "https://www.facebook.com/globalautismcenter",
+
+    "websiteName": "",
+    "websiteLink": "",
+
+    "image": "assets/images/global_center.png"
+  },
+  {
+    "name": "Advance Society for Autism and other Disabilities ",
+    "phone": "",
+
+    "address": "Block 14 Marshal Ahmed Ismail St - New Cairo",
+    "locationName": "advance society Location",
+    "latitude": 30.00123,
+    "longitude": 31.432434,
+    "facebookName": "Advance Society for Autism and other Disabilies",
+    "facebookLink": "https://www.facebook.com/profile.php?id=100057401741478",
+
+    "websiteName": "Advance Society",
+    "websiteLink": "https://fritill.com/AdvanceWebsite/",
+
+    "image": "assets/images/advance_society.png"
+  }
+
+
+]

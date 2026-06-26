@@ -114,7 +114,24 @@ class FrontBackLevel3Stage1ActivityState
 
     print('All images preloaded successfully');
   }
+  Future<void> _logProgress() async {
+    print("🔥 INSIDE LOG PROGRESS");
 
+    try {
+      print("🔥 phaseId = ${_activity!.phaseId}");
+
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _wrongAttempts > 0,
+      );
+
+      print("📡 API RESPONSE = $result");
+      print("📡 isPassed = ${result?.isPassed}");
+
+    } catch (e) {
+      print("❌ PROGRESS ERROR = $e");
+    }
+  }
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
@@ -199,7 +216,9 @@ class FrontBackLevel3Stage1ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
+                    print("🔥 CORRECT ANSWER CLICKED");
+
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -208,13 +227,27 @@ class FrontBackLevel3Stage1ActivityState
                     _animationController?.stop();
                     _animationController?.value = 0;
 
+                    // 1️⃣ سجل البروجريس
+                    final result = await ApiManager.logAttemptStatus(
+                      phaseId: _activity!.phaseId!,
+                      userHint: _wrongAttempts > 0,
+                    );
+
+                    print("📡 isPassed = ${result?.isPassed}");
+
+                    // 2️⃣ مهم جدًا: تحديث البروجريس
+                    if (result?.isPassed == true) {
+                      await ApiManager.getProgressSummary();
+                    }
+
+                    // 3️⃣ بعد التأكيد
+                    if (!mounted) return;
+
                     WellDoneOverlay.show(context);
 
-                    Future.delayed(const Duration(seconds: 3), () {
-                      if (mounted) {
-                        widget.onNextStage?.call();
-                      }
-                    });
+                    await Future.delayed(const Duration(seconds: 3));
+
+                    widget.onNextStage?.call();
                   },
                   child: Image.network(
                     lastElement.imageUrl ?? '',

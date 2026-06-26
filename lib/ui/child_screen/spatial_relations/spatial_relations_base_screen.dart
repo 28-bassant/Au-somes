@@ -33,6 +33,8 @@ import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../utils/app_styles.dart';
 import '../reinforcement_widgets/confetti_overlay.dart';
 
 
@@ -97,14 +99,14 @@ class _SpatialRelationsBaseScreenState extends State<SpatialRelationsBaseScreen>
         key: stage122Key,
         onNextStage: goToNextActivity,
       ),
-      Activity1Level3Stage1(
-        key: stage131Key,
-        onNextStage: goToNextActivity,
-      ),
-     Activity1Level3Stage2(
-        key: stage132Key,
-        onNextStage: goToNextActivity,
-      ),
+     //  Activity1Level3Stage1(
+     //    key: stage131Key,
+     //    onNextStage: goToNextActivity,
+     //  ),
+     // Activity1Level3Stage2(
+     //    key: stage132Key,
+     //    onNextStage: goToNextActivity,
+     //  ),
  Activity1Level4Stage1(
         key: stage141Key,
         onNextStage: goToNextActivity,
@@ -200,71 +202,72 @@ Activity5Level1Stage5(
      stage121Key.currentState?.repeatSound();
     }
     else if (currentActivityIndex == 3) {
-     stage122Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 4) {
-     stage131Key.currentState?.repeatSound();
+      stage122Key.currentState?.repeatSound();
     }
-   else if (currentActivityIndex == 5) {
-     stage132Key.currentState?.repeatSound();
-    }
-else if (currentActivityIndex == 6) {
+   //  }else if (currentActivityIndex == 4) {
+   //   stage131Key.currentState?.repeatSound();
+   //  }
+   // else if (currentActivityIndex == 5) {
+   //   stage132Key.currentState?.repeatSound();
+   //  }
+else if (currentActivityIndex == 4) {
      stage141Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 7) {
+else if (currentActivityIndex == 5) {
      stage142Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 8) {
+else if (currentActivityIndex == 6) {
      stage151Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 9) {
+else if (currentActivityIndex == 7) {
      stage211Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 10) {
+else if (currentActivityIndex == 8) {
      stage212Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 11) {
+else if (currentActivityIndex == 9) {
      stage311Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 12) {
+else if (currentActivityIndex == 10) {
      stage411Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 13) {
+else if (currentActivityIndex == 11) {
      stage412Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 14) {
+else if (currentActivityIndex == 12) {
      stage413Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 15) {
+else if (currentActivityIndex == 13) {
      stage511Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 16) {
+else if (currentActivityIndex == 14) {
      stage512Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 17) {
+else if (currentActivityIndex == 15) {
      stage513Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 18) {
+else if (currentActivityIndex == 16) {
      stage514Key.currentState?.repeatSound();
     }
-else if (currentActivityIndex == 19) {
+else if (currentActivityIndex == 17) {
      stage515Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 20) {
+    }else if (currentActivityIndex == 18) {
       stage611Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 21) {
+    }else if (currentActivityIndex == 19) {
       stage612Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 20) {
+      stage613Key.currentState?.repeatSound();
+    }else if (currentActivityIndex == 21) {
+      stage613Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 22) {
-      stage613Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 23) {
-      stage613Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 24) {
       stage614Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 25) {
+    }else if (currentActivityIndex == 23) {
       stage615Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 26) {
+    }else if (currentActivityIndex == 24) {
       stage616Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 27) {
+    }else if (currentActivityIndex == 25) {
       stage711Key.currentState?.repeatSound();
-    }else if (currentActivityIndex == 28) {
+    }else if (currentActivityIndex == 26) {
       stage712Key.currentState?.repeatSound();
     }
 
@@ -279,10 +282,7 @@ else if (currentActivityIndex == 19) {
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -295,7 +295,26 @@ else if (currentActivityIndex == 19) {
         currentActivityIndex--;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.first_activity,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
         );
       }
     });
@@ -313,8 +332,7 @@ else if (currentActivityIndex == 19) {
         centerTitle: true,
         actions: [
           GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-                context, AppRoutes.childScreenRouteName),
+            onTap: () => Navigator.pop(context),
             child: Container(
               width: 40,
               height: 40,
@@ -347,9 +365,7 @@ else if (currentActivityIndex == 19) {
                       color: AppColors.blackColorWithOpacity60, width: 1),
                 ),
                 child: Icon(
-                  languageProvider.isArabic()
-                      ? Icons.arrow_forward
-                      : Icons.arrow_back,
+                  Icons.arrow_back,
                   color: AppColors.blackColorWithOpacity60,
                   size: 25,
                 ),
@@ -368,6 +384,7 @@ else if (currentActivityIndex == 19) {
             ),
           ),
           SizedBox(height: height * .04),
+
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

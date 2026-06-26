@@ -7,14 +7,7 @@ import '../../../../../models/activities/activity_element.dart';
 import '../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
-
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:collection/collection.dart'; // لازم للـ firstWhereOrNull
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 
 class VisualClosureLevel2Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
@@ -31,16 +24,26 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
   List<ActivityElement> actors = [];
   ActivityElement? anchor;
 
-  Map<String, String> placed = {}; // targetId -> actorImage
-  Map<String, bool> actorCanTry = {}; // actorId -> true لو ممكن TryAgain
+  Map<String, String> placed = {};
+  Map<String, bool> actorCanTry = {};
 
-  late List<String> targetIds; // id لكل مربع (فوق، يمين، شمال أسفل)
-  late List<ActivityElement> orderedActors; // ترتيب Actors بالنسبة للمربعات
+  late List<String> targetIds;
+  late List<ActivityElement> orderedActors;
 
-  // أصوات لكل خطوة
   List<String> stepInstructions = [];
   List<String> stepSuccess = [];
   int currentStep = 0;
+
+  // ✅ تخزين آخر instruction
+  String? lastInstructionAudio;
+
+  // ✅ متغيرات تتبع تحميل الصور
+  Map<String, bool> _imagesLoaded = {};
+  bool _allImagesLoaded = false;
+  int _totalImages = 0;
+  int _loadedImagesCount = 0;
+  bool _usedHint = false;
+  ActivityResponse? _activity;
 
   @override
   void initState() {
@@ -56,10 +59,34 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
     }
   }
 
+  void _checkAllImagesLoaded() {
+    _loadedImagesCount++;
+    if (_loadedImagesCount >= _totalImages && !_allImagesLoaded) {
+      _allImagesLoaded = true;
+      _playInitialSoundIfReady();
+    }
+  }
+
+  Future<void> _playInitialSoundIfReady() async {
+    if (_allImagesLoaded && lastInstructionAudio != null) {
+      await _playSound(lastInstructionAudio!);
+    }
+  }
+
   Future<void> _playSound(String url) async {
     if (url.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(url));
+    // ✅ فقط شغل الصوت لو كل الصور تحملت
+    if (_allImagesLoaded) {
+      await _player.stop();
+      await _player.play(UrlSource(url));
+    }
+  }
+
+  // ✅ repeat
+  void repeatSound() {
+    if (lastInstructionAudio != null && _allImagesLoaded) {
+      _playSound(lastInstructionAudio!);
+    }
   }
 
   Future<void> _loadActivity() async {
@@ -68,27 +95,41 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
       2,
       1,
     );
-
+    _activity = response;
     actors = response.elements!.where((e) => e.role == 'Actor').toList();
     anchor = response.elements!.firstWhere((e) => e.role == 'Anchor');
 
     targetIds = ['top', 'right', 'bottomLeft'];
 
     orderedActors = [
-      actors[0], // Actor 1 → top
-      actors[1], // Actor 2 → right
-      actors[2], // Actor 3 → bottomLeft
+      actors[0],
+      actors[1],
+      actors[2],
     ];
 
     _resetActorTry();
 
-    // أصوات لكل خطوة
     stepInstructions = response.deceptionInstructions ?? [];
     stepSuccess = response.deceptionInstructions ?? [];
 
-    // 🔹 شغّل أول صوت عند فتح النشاط (زي Stage1)
+    // ✅ تخزين أول instruction بدون تشغيله حالياً
     if (response.audioUrl != null && response.audioUrl!.isNotEmpty) {
-      await _playSound(response.audioUrl!);
+      lastInstructionAudio = response.audioUrl!;
+    }
+
+    // ✅ حساب العدد الإجمالي للصور
+    _totalImages = 1 + actors.length; // Anchor + Actors
+
+    // ✅ تحميل صورة الـ Anchor
+    if (anchor?.imageUrl != null) {
+      _preloadImage(anchor!.imageUrl!, 'anchor');
+    }
+
+    // ✅ تحميل صور Actors
+    for (var actor in actors) {
+      if (actor.imageUrl != null) {
+        _preloadImage(actor.imageUrl!, 'actor_${actor.id}');
+      }
     }
 
     setState(() {
@@ -96,23 +137,40 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
     });
   }
 
+  void _preloadImage(String url, String key) {
+    if (_imagesLoaded.containsKey(key)) return;
+
+    _imagesLoaded[key] = false;
+
+    Image.network(
+      url,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          _checkAllImagesLoaded();
+        }
+        return child;
+      },
+      errorBuilder: (context, error, stackTrace) {
+        _checkAllImagesLoaded(); // Count as loaded even if error
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
   void onActorDragEnd(ActivityElement actor, String targetId) async {
+    if (!_allImagesLoaded) return;
+
     bool isCorrect = false;
 
-    // Step 0 → Actor 1 → top
     if (currentStep == 0) {
       if (actor == actors[0] && targetId == targetIds[0]) {
         isCorrect = true;
       }
-    }
-    // Step 1 → Actor 2 → bottomLeft
-    else if (currentStep == 1) {
+    } else if (currentStep == 1) {
       if (actor == actors[1] && targetId == targetIds[1]) {
         isCorrect = true;
       }
-    }
-    // Step 2 → Actor 3 → right
-    else if (currentStep == 2) {
+    } else if (currentStep == 2) {
       if (actor == actors[2] && targetId == targetIds[2]) {
         isCorrect = true;
       }
@@ -124,143 +182,179 @@ class VisualClosureLevel2Stage1State extends State<VisualClosureLevel2Stage1> {
         currentStep++;
       });
 
-      WellDoneOverlay.show(context);
+      if (currentStep < actors.length) {
+        TrueAnswerSound.play();
 
-      // تشغيل صوت Success
-      if (currentStep - 1 < stepSuccess.length) {
-        await _playSound(stepSuccess[currentStep - 1]);
+        await Future.delayed(const Duration(milliseconds: 800));
+
+        if (currentStep - 1 < stepSuccess.length) {
+          await _playSound(stepSuccess[currentStep - 1]);
+        }
+      } else {
+        // ✅ تسجيل الـ Progress قبل إنهاء المرحلة
+        await _logProgress();
+
+        WellDoneOverlay.show(context);
       }
 
-      // إعادة تهيئة TryAgain للخطوة التالية
-      if (currentStep < actors.length) _resetActorTry();
-
-      // تشغيل صوت Instruction للخطوة التالية
-      if (currentStep < actors.length && stepInstructions.length > currentStep - 1) {
-        await _playSound(stepInstructions[currentStep - 1]);
+      if (currentStep < actors.length) {
+        _resetActorTry();
       }
 
-      // لو خلصنا كل الخطوات
+      if (currentStep < actors.length &&
+          stepInstructions.length > currentStep - 1) {
+        lastInstructionAudio = stepInstructions[currentStep - 1];
+        await _playSound(lastInstructionAudio!);
+      }
+
       if (currentStep == actors.length) {
         Future.delayed(const Duration(milliseconds: 700), () {
-          widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
       }
     } else {
-      // ❌ إجابة غلط → TryAgain مرة واحدة لكل Actor في الخطوة الحالية
       if (actorCanTry[actor.id ?? ''] == true) {
-        TryAgainSound.play();
+        if (_allImagesLoaded) {
+          TryAgainSound.play();
+        }
+
         actorCanTry[actor.id ?? ''] = false;
+
+        // ✅ تسجيل أن المستخدم أخطأ
+        _usedHint = true;
       }
+    }
+  }
+
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading ||anchor==null|| actors.isEmpty) {
-      return const Center(child: SizedBox()); // أو CircularProgressIndicator
+    if (isLoading || anchor == null || actors.isEmpty) {
+      return const Center(child: SizedBox());
     }
+
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
 
     return Stack(
-        children: [
+      children: [
         /// ⭐ Anchor
-        if (anchor != null)
-    Positioned(
-      top: h * 0.15,
-      left: w * 0.05,
-      child: Image.network(
-        anchor!.imageUrl ?? '',
-        width: w * 0.9,
-        height: h * 0.36,
-      ),
-    ),/// 🟦 المربعات الثابتة
-          /// 🟦 المربع الأعلى
-          Positioned(
-            top: h * 0.182,
-            left: w * 0.256,
-            width: w * 0.234,
-            height: w * 0.239,
-            child: DragTarget<ActivityElement>(
-              onWillAccept: (_) => true,
-              onAccept: (actor) => onActorDragEnd(actor, targetIds[0]),
-              builder: (context, candidateData, rejectedData) {
-                bool isPlaced = placed.containsKey(targetIds[0]);
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.transparent), // border شفاف
-                    color: Colors.transparent, // خلفية شفاف
-                  ),
-                  child: isPlaced ? Image.network(placed[targetIds[0]]!) : null,
-                );
-              },
-            ),
+        Positioned(
+          top: h * 0.15,
+          left: w * 0.05,
+          child: Image.network(
+            anchor!.imageUrl ?? '',
+            width: w * 0.9,
+            height: h * 0.36,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) {
+                _checkAllImagesLoaded();
+              }
+              return child;
+            },
           ),
+        ),
 
-          /// 🟦 المربع يمين
-          Positioned(
-            top: h * 0.2193,
-            left: w * 0.735,
-            width: w * 0.234,
-            height: w * 0.239,
-            child: DragTarget<ActivityElement>(
-              onWillAccept: (_) => true,
-              onAccept: (actor) => onActorDragEnd(actor, targetIds[1]),
-              builder: (context, candidateData, rejectedData) {
-                bool isPlaced = placed.containsKey(targetIds[1]);
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.transparent),
-                    color: Colors.transparent,
-                  ),
-                  child: isPlaced ? Image.network(placed[targetIds[1]]!) : null,
-                );
-              },
-            ),
+        /// 🟦 المربعات
+        Positioned(
+          top: h * 0.182,
+          left: w * 0.256,
+          width: w * 0.234,
+          height: w * 0.239,
+          child: DragTarget<ActivityElement>(
+            onWillAccept: (_) => _allImagesLoaded,
+            onAccept: (actor) => onActorDragEnd(actor, targetIds[0]),
+            builder: (context, _, __) {
+              return placed.containsKey(targetIds[0])
+                  ? Image.network(placed[targetIds[0]]!)
+                  : const SizedBox();
+            },
           ),
+        ),
 
-          /// 🟦 المربع أسفل شمال
-          Positioned(
-            top: h * 0.358,
-            left: w * 0.135,
-            width: w * 0.234,
-            height: w * 0.239,
-            child: DragTarget<ActivityElement>(
-              onWillAccept: (_) => true,
-              onAccept: (actor) => onActorDragEnd(actor, targetIds[2]),
-              builder: (context, candidateData, rejectedData) {
-                bool isPlaced = placed.containsKey(targetIds[2]);
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.transparent),
-                    color: Colors.transparent,
-                  ),
-                  child: isPlaced ? Image.network(placed[targetIds[2]]!) : null,
-                );
-              },
-            ),
+        Positioned(
+          top: h * 0.2193,
+          left: w * 0.735,
+          width: w * 0.234,
+          height: w * 0.239,
+          child: DragTarget<ActivityElement>(
+            onWillAccept: (_) => _allImagesLoaded,
+            onAccept: (actor) => onActorDragEnd(actor, targetIds[1]),
+            builder: (context, _, __) {
+              return placed.containsKey(targetIds[1])
+                  ? Image.network(placed[targetIds[1]]!)
+                  : const SizedBox();
+            },
           ),
+        ),
 
-          /// 🟠 Actors draggable
-          for (int i = 0; i < actors.length; i++)
-            if (!placed.values.contains(actors[i].imageUrl))
-              Positioned(
-                bottom: h * 0.1,
-                left: w * (0.1 + i * 0.25),
-                child: Draggable<ActivityElement>(
-                  data: actors[i],
-                  feedback: Image.network(
-                    actors[i].imageUrl ?? '',
-                    width: w * 0.2,
-                  ),
-                  childWhenDragging: const SizedBox(),
-                  child: Image.network(
-                    actors[i].imageUrl ?? '',
-                    width: w * 0.2,
-                  ),
+        Positioned(
+          top: h * 0.358,
+          left: w * 0.135,
+          width: w * 0.234,
+          height: w * 0.239,
+          child: DragTarget<ActivityElement>(
+            onWillAccept: (_) => _allImagesLoaded,
+            onAccept: (actor) => onActorDragEnd(actor, targetIds[2]),
+            builder: (context, _, __) {
+              return placed.containsKey(targetIds[2])
+                  ? Image.network(placed[targetIds[2]]!)
+                  : const SizedBox();
+            },
+          ),
+        ),
+
+        /// 🟠 Actors
+        for (int i = 0; i < actors.length; i++)
+          if (!placed.values.contains(actors[i].imageUrl))
+            Positioned(
+              bottom: h * 0.1,
+              left: w * (0.1 + i * 0.25),
+              child: Draggable<ActivityElement>(
+                data: actors[i],
+                feedback: Image.network(
+                  actors[i].imageUrl ?? '',
+                  width: w * 0.2,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      _checkAllImagesLoaded();
+                    }
+                    return child;
+                  },
+                ),
+                childWhenDragging: const SizedBox(),
+                child: Image.network(
+                  actors[i].imageUrl ?? '',
+                  width: w * 0.2,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      _checkAllImagesLoaded();
+                    }
+                    return child;
+                  },
                 ),
               ),
-        ],
+            ),
+      ],
     );
   }
 

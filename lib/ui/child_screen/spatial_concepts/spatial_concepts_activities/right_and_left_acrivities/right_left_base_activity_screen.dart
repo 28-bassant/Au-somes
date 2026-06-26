@@ -4,8 +4,10 @@ import 'package:au_somes/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_colors.dart';
+import '../../../../../utils/app_styles.dart';
 import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/right_left_level1_stage2.dart';
 import 'level1/right_left_level1_stage3.dart';
@@ -170,10 +172,7 @@ RightLeftLevel4Stage4(
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.spatialConceptsScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -187,7 +186,26 @@ RightLeftLevel4Stage4(
         currentActivityIndex--;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.first_activity,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
         );
       }
     });
@@ -206,7 +224,7 @@ RightLeftLevel4Stage4(
         actions: [
           GestureDetector(
             onTap: () =>
-                Navigator.pushReplacementNamed(context, AppRoutes.spatialConceptsScreenRouteName),
+            Navigator.pop(context)  ,
             child: Container(
               width: 40,
               height: 40,
@@ -237,7 +255,7 @@ RightLeftLevel4Stage4(
                   border: Border.all(color: AppColors.blackColorWithOpacity60, width: 1),
                 ),
                 child: Icon(
-                  languageProvider.isArabic() ? Icons.arrow_forward : Icons.arrow_back,
+                 Icons.arrow_back,
                   color: AppColors.blackColorWithOpacity60,
                   size: 25,
                 ),
@@ -255,7 +273,7 @@ RightLeftLevel4Stage4(
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
+          SizedBox(height: height * .04),
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

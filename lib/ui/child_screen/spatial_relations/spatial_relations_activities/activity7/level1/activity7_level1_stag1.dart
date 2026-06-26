@@ -35,6 +35,8 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
   bool _isAnimatingBasket = false;
   AnimationController? _basketAnimationController;
   Animation<Offset>? _basketOffsetAnimation;
+  bool _usedHint = false;
+  bool _progressSent = false;
 
   @override
   void initState() {
@@ -113,6 +115,27 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
       _basketAnimationController?.value = 0;
       setState(() => _isAnimatingBasket = false);
     });
+  }
+  Future<void> _logProgress() async {
+    if (_progressSent) return;
+
+    try {
+      _progressSent = true;
+
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _loadedActivity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_loadedActivity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override
@@ -196,15 +219,19 @@ class Activity7Level1Stage1State extends State<Activity7Level1Stage1>
                 child: !isPlacedCorrectly
                     ? DragTarget<String>(
                   onWillAccept: (data) => true,
-                  onAccept: (data) {
+                  onAccept: (data) async {
                     if (data == actor.targetedZoneId) {
                       setState(() {
                         isPlacedCorrectly = true;
                       });
+
+                      await _logProgress();
+
                       WellDoneOverlay.show(
                         context,
                         duration: const Duration(seconds: 2),
                       );
+
                       Future.delayed(const Duration(seconds: 2), () {
                         widget.onNextStage?.call();
                       });

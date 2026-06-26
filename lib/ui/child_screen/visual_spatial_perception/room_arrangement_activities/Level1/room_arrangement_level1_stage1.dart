@@ -34,6 +34,7 @@ class RoomArrangementLevel1Stage1State
 
   // لتتبع عدد الإجابات الصحيحة لمنع تشغيل الصوت أكثر من مرة لنفس العنصر
   Map<int, bool> _soundPlayed = {};
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -69,7 +70,23 @@ class RoomArrangementLevel1Stage1State
   }
 
   void repeatSound() => playSound();
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity.phaseId!,
+        userHint: _usedHint,
+      );
 
+      print("PhaseId = ${_activity.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   @override
   void dispose() {
     _player.dispose();
@@ -150,21 +167,26 @@ class RoomArrangementLevel1Stage1State
                         onWillAccept: (data) {
                           return data == i && placed[i] == false;
                         },
-                        onAccept: (data) {
+                        onAccept: (data) async {
                           setState(() {
                             placed[i] = true;
                           });
 
-                          // تشغيل صوت الإجابة الصحيحة إذا لم يتم تشغيله من قبل
                           if (!_soundPlayed[i]!) {
                             _soundPlayed[i] = true;
                             TrueAnswerSound.play();
                           }
 
                           if (placed.values.every((e) => e)) {
+
+                            await _logProgress();
+
                             WellDoneOverlay.show(context);
+
                             Future.delayed(const Duration(seconds: 2), () {
-                              widget.onNextStage?.call();
+                              if (mounted) {
+                                widget.onNextStage?.call();
+                              }
                             });
                           }
                         },

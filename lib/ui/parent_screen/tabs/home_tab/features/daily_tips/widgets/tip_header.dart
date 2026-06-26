@@ -1,6 +1,8 @@
 import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../../../l10n/app_localizations.dart';
+
 class TipHeader extends StatelessWidget {
   final String title;
   final VoidCallback onViewAll;
@@ -23,7 +25,7 @@ class TipHeader extends StatelessWidget {
         GestureDetector(
           onTap: onViewAll,
           child:Text(
-            'View all',
+              AppLocalizations.of(context)!.view_all,
             style: AppStyles.medium16SoftBlue
           ),
         ),

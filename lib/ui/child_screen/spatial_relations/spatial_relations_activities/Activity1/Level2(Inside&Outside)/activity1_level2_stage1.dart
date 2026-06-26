@@ -29,6 +29,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -134,6 +135,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -169,7 +171,7 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
   }
 
   // دالة للتعامل مع الإجابة الصحيحة
-  void _handleCorrectAnswer() {
+  Future<void> _handleCorrectAnswer() async {
     setState(() {
       _wrongAttempts = 0;
       _isAnimatingAnswer = false;
@@ -178,12 +180,32 @@ class Activity1Level2Stage1State extends State<Activity1Level2Stage1>
     _animationController?.stop();
     _animationController?.value = 0;
 
+    await _logProgress();
+
     WellDoneOverlay.show(context);
+
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         widget.onNextStage?.call();
       }
     });
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override

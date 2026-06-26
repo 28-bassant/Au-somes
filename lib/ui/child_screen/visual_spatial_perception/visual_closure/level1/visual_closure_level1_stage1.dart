@@ -8,6 +8,8 @@ import '../../../../../models/activities/activity_element.dart';
 import '../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
+
 class VisualClosureLevel1Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
   const VisualClosureLevel1Stage1({Key? key, this.onNextStage}) : super(key: key);
@@ -25,19 +27,21 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
   List<ActivityElement> actors = [];
   ActivityElement? anchor;
 
-  Map<String, String> placed = {}; // ShadowId -> Actor Image
-  int currentStep = 0; // ترتيب الضغط
+  Map<String, String> placed = {};
+  int currentStep = 0;
 
-  // أصوات لكل خطوة
   List<String> stepInstructions = [];
   List<String> stepSuccess = [];
 
-  // لكل Actor: هل ممكن يشغل TryAgain في الخطوة الحالية
   Map<String, bool> actorCanTry = {};
-
-  // ترتيب الضغط الصحيح (بعد تحميل actors)
   late List<ActivityElement> orderedActors;
 
+  String? lastInstructionAudio;
+
+  bool _allImagesLoaded = false;
+  int _totalImages = 0;
+  int _loadedImagesCount = 0;
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -49,6 +53,21 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
     actorCanTry.clear();
     for (var actor in actors) {
       actorCanTry[actor.id ?? ''] = true;
+    }
+  }
+
+  void _checkAllImagesLoaded() {
+    _loadedImagesCount++;
+    if (_loadedImagesCount >= _totalImages && !_allImagesLoaded) {
+      _allImagesLoaded = true;
+      _playInitialSoundIfReady();
+    }
+  }
+
+  Future<void> _playInitialSoundIfReady() async {
+    if (_allImagesLoaded && _activity?.audioUrl != null && _activity!.audioUrl!.isNotEmpty) {
+      lastInstructionAudio = _activity!.audioUrl!;
+      await _playSound(lastInstructionAudio!);
     }
   }
 
@@ -64,71 +83,120 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
     actors = _activity!.elements!.where((e) => e.role == 'Actor').toList();
     anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-    // ترتيب Actors حسب الإجابة الصحيحة: 1→2→0
     orderedActors = [
-      actors[1], // أول إجابة صحيحة
-      actors[2], // ثاني إجابة صحيحة
-      actors[0], // ثالث إجابة صحيحة
+      actors[1],
+      actors[2],
+      actors[0],
     ];
 
-    // ⚡ إعادة تهيئة TryAgain لكل Actor
     _resetActorTry();
 
-    // أصوات الـ instruction لكل خطوة
     stepInstructions = _activity?.deceptionInstructions ?? [];
     stepSuccess = _activity?.deceptionInstructions ?? [];
 
-    // 🔹 شغّل أول صوت عند فتح النشاط (المثلث)
-    if (_activity?.audioUrl != null && _activity!.audioUrl!.isNotEmpty) {
-      await _playSound(_activity!.audioUrl!);
-    }
+    _totalImages = shadows.length + actors.length;
 
     setState(() => _isLoading = false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
   }
 
   Future<void> _playSound(String url) async {
     if (url.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(url));
+    if (_allImagesLoaded) {
+      await _player.stop();
+      await _player.play(UrlSource(url));
+    }
+  }
+
+  void repeatSound() {
+    if (lastInstructionAudio != null && _allImagesLoaded) {
+      _playSound(lastInstructionAudio!);
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   void onActorTap(ActivityElement actor) async {
+    if (!_allImagesLoaded) return;
+
     final correctActor = orderedActors[currentStep];
 
     if (actor.id == correctActor.id) {
-      // ✅ إجابة صحيحة
-      final shadow = shadows.firstWhere((s) => s.id == actor.targetedZoneId);
+      final shadow = shadows.firstWhere(
+            (s) => s.id == actor.targetedZoneId,
+      );
+
       setState(() {
         placed[shadow.id!] = actor.imageUrl!;
         currentStep++;
       });
 
-      WellDoneOverlay.show(context);
+      //  لو مش آخر خطوة
+      if (currentStep < actors.length) {
+        TrueAnswerSound.play();
 
-      // 🔹 تشغيل صوت النجاح للخطوة
-      if (currentStep - 1 < stepSuccess.length) {
-        await _playSound(stepSuccess[currentStep - 1]);
+        await Future.delayed(const Duration(milliseconds: 800));
+
+        if (currentStep - 1 < stepSuccess.length &&
+            _allImagesLoaded) {
+          await _playSound(stepSuccess[currentStep - 1]);
+        }
+      } else {
+        //  آخر خطوة: سجل الـ Progress ثم اعرض Well Done
+        await _logProgress();
+
+        WellDoneOverlay.show(context);
       }
 
-      // 🔹 إعادة تهيئة TryAgain للخطوة التالية
-      if (currentStep < actors.length) _resetActorTry();
-
-      // 🔹 تشغيل صوت Instruction للخطوة التالية
-      if (currentStep < actors.length && stepInstructions.length > currentStep - 1) {
-        await _playSound(stepInstructions[currentStep - 1]);
+      if (currentStep < actors.length) {
+        _resetActorTry();
       }
 
-      // 🔹 إذا خلصنا كل الخطوات
+      // تشغيل التعليمات التالية
+      if (currentStep < actors.length &&
+          stepInstructions.length > currentStep - 1) {
+        lastInstructionAudio = stepInstructions[currentStep - 1];
+
+        if (_allImagesLoaded) {
+          await _playSound(lastInstructionAudio!);
+        }
+      }
+
       if (currentStep == actors.length) {
         Future.delayed(const Duration(milliseconds: 700), () {
-          widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
       }
     } else {
-      // ❌ إجابة غلط → TryAgain مرة واحدة لكل Actor في الخطوة الحالية
       if (actorCanTry[actor.id ?? ''] == true) {
-        TryAgainSound.play();
+        if (_allImagesLoaded) {
+          TryAgainSound.play();
+        }
+
         actorCanTry[actor.id ?? ''] = false;
+
+        //  المستخدم استخدم Hint / أخطأ
+        _usedHint = true;
       }
     }
   }
@@ -136,11 +204,12 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
+
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
+
     return Stack(
       children: [
-        /// ⭐ Anchor (نجمة بخلفية فوشيا)
         Positioned(
           top: h * 0.15,
           left: w * 0.05,
@@ -148,35 +217,31 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
             color: Colors.transparent,
             width: w * 0.9,
             child: Image.asset(
-              AppAssets.star?? '',
+              AppAssets.star ?? '',
               width: w * 0.3,
               height: h * 0.36,
             ),
           ),
         ),
 
-        /// 🔺 Shadow فوق
         Positioned(
           top: h * 0.197,
           left: w * 0.51,
           child: _buildShadow(shadows[1], w),
         ),
 
-        /// ⬜ Shadow تحت
         Positioned(
           top: h * 0.34,
           left: w * 0.45,
           child: _buildShadow(shadows[2], w),
         ),
 
-        /// ⚪ Shadow شمال
         Positioned(
           top: h * 0.33,
           left: w * 0.16,
           child: _buildShadow(shadows[0], w),
         ),
 
-        /// 🟠 Actors تحت
         for (int i = 0; i < actors.length; i++)
           if (!placed.values.contains(actors[i].imageUrl))
             Positioned(
@@ -187,6 +252,12 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
                 child: Image.network(
                   actors[i].imageUrl ?? '',
                   width: w * 0.2,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      _checkAllImagesLoaded();
+                    }
+                    return child;
+                  },
                 ),
               ),
             ),
@@ -199,8 +270,16 @@ class VisualClosureLevel1Stage1State extends State<VisualClosureLevel1Stage1> {
       width: w * 0.2,
       height: w * 0.2,
       child: Image.network(
-        placed.containsKey(shadow.id) ? placed[shadow.id]! : shadow.imageUrl ?? '',
+        placed.containsKey(shadow.id)
+            ? placed[shadow.id]!
+            : shadow.imageUrl ?? '',
         fit: BoxFit.contain,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            _checkAllImagesLoaded();
+          }
+          return child;
+        },
       ),
     );
   }

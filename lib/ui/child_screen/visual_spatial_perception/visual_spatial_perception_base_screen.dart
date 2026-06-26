@@ -1,4 +1,5 @@
 
+import 'package:au_somes/l10n/app_localizations.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/geoboard_activities/Level1/geoboard_level1_stage1.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/mental_cutting_activities/Level1/mental_cutting_level1_stage1.dart';
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/room_arrangement_activities/Level1/room_arrangement_level1_stage1.dart';
@@ -25,6 +26,7 @@ import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
+import '../../../utils/app_styles.dart';
 import '../reinforcement_widgets/confetti_overlay.dart';
 import 'geoboard_activities/Level1/geoboard_level1_stage2.dart';
 import 'geoboard_activities/Level2/geoboard_level2_stage1.dart';
@@ -37,11 +39,11 @@ import 'mental_cutting_activities/Level3/mental_cutting_level3_stage3.dart';
 
 class VisualSpatialPerceptionBaseScreen extends StatefulWidget {
   @override
-  _VisualSpatialPerceptionBaseScreenState createState() =>
-      _VisualSpatialPerceptionBaseScreenState();
+  VisualSpatialPerceptionBaseScreenState createState() =>
+      VisualSpatialPerceptionBaseScreenState();
 }
 
-class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPerceptionBaseScreen> {
+class VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPerceptionBaseScreen> {
   final room_arrangement11Key = GlobalKey<RoomArrangementLevel1Stage1State>();
   final room_arrangement12Key = GlobalKey<RoomArrangementLevel1Stage2State>();
   final room_arrangement21Key = GlobalKey<RoomArrangementLevel2Stage1State>();
@@ -72,6 +74,11 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
   late final List<Widget> activities;
   int currentActivityIndex = 0;
 
+  void goToActivity(int index) {
+    setState(() {
+      currentActivityIndex = index;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -184,23 +191,23 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
 
   void repeatCurrentSound() {
     if (currentActivityIndex == 0) {
-      // shape_and_shadow_12Key.currentState?.repeatSound();
+       shape_and_shadow_12Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 1) {
-      // shape_and_shadow_13Key.currentState?.repeatSound();
+       shape_and_shadow_13Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 2) {
-      // shape_and_shadow_14Key.currentState?.repeatSound();
+       shape_and_shadow_14Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 3) {
-      // shape_and_shadow_15Key.currentState?.repeatSound();
+       shape_and_shadow_15Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 4) {
-      //shape_and_shadow_16Key.currentState?.repeatSound();
+      shape_and_shadow_16Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 5) {
-      // shape_and_shadow_17Key.currentState?.repeatSound();
+       shape_and_shadow_17Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 6) {
-      // visual_closure_18Key.currentState?.repeatSound();
+       visual_closure_18Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 7) {
-      // visual_closure_19Key.currentState?.repeatSound();
+       visual_closure_19Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 8) {
-      // visual_closure_20Key.currentState?.repeatSound();
+       visual_closure_20Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 9) {
       tower_building11Key.currentState?.repeatSound();
     }else if (currentActivityIndex == 10) {
@@ -250,10 +257,7 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
 
         Future.delayed(const Duration(seconds: 5), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.childScreenRouteName,
-            );
+            Navigator.pop(context);
           }
         });
       }
@@ -266,7 +270,26 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
         currentActivityIndex--;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.first_activity,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+              horizontal: 34,
+              vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
         );
       }
     });
@@ -284,8 +307,7 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
         centerTitle: true,
         actions: [
           GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-                context, AppRoutes.childScreenRouteName),
+            onTap: () => Navigator.pop(context),
             child: Container(
               width: 40,
               height: 40,
@@ -318,9 +340,8 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
                       color: AppColors.blackColorWithOpacity60, width: 1),
                 ),
                 child: Icon(
-                  languageProvider.isArabic()
-                      ? Icons.arrow_forward
-                      : Icons.arrow_back,
+                       Icons.arrow_back
+                      ,
                   color: AppColors.blackColorWithOpacity60,
                   size: 25,
                 ),
@@ -339,12 +360,13 @@ class _VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercept
             ),
           ),
           SizedBox(height: height * .04),
-          InkWell(
-            onTap: goToNextActivity,
-            child: Center(
-              child: Icon(Icons.add),
-            ),
-          ),
+
+          // InkWell(
+          //   onTap: goToNextActivity,
+          //   child: Center(
+          //     child: Icon(Icons.add),
+          //   ),
+          // ),
         ],
       ),
     );

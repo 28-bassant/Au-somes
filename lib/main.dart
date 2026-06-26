@@ -16,6 +16,8 @@ import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activ
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/right_and_left_acrivities/right_left_base_activity_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_screen.dart';
 import 'package:au_somes/ui/child_screen/spatial_relations/spatial_relations_base_screen.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/mental_cutting_activities/Level3/mental_cutting_level3_stage1.dart';
+import 'package:au_somes/ui/child_screen/visual_spatial_perception/mental_cutting_activities/Level3/mental_cutting_level3_stage2.dart';
 
 import 'package:au_somes/ui/child_screen/visual_spatial_perception/visual_spatial_perception_base_screen.dart';
 import 'package:au_somes/ui/parent_screen/parent_screen.dart';
@@ -23,6 +25,7 @@ import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/chatbot/chatbot
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_routine/daily_routine_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/daily_tips_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/progress_level/progress_level_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/stories_time/stories_time_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/edit_profile/edit_profile_screen.dart';
 import 'package:au_somes/ui/select_screen/select_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
@@ -36,15 +39,22 @@ import 'core/cache/shared_prefs_utils.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
 RouteObserver<ModalRoute<void>>();
-void main()async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SharedPrefsUtils.init();
-  runApp( MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AppLanguageProvider(),),
-      ],
 
-      child: MyApp()));
+  await SharedPrefsUtils.init();
+
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AppLanguageProvider(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 class MyApp extends StatelessWidget{
   @override
@@ -60,7 +70,7 @@ class MyApp extends StatelessWidget{
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       navigatorObservers: [routeObserver],
-      initialRoute: AppRoutes.selectScreenRouteName,
+      initialRoute: AppRoutes.loginScreenRouteName,
       routes:  {
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),
@@ -77,6 +87,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.spatialConceptsScreenRouteName:(context)=>SpatialConceptsScreen(),
         AppRoutes.dailyRoutineScreenRouteName:(context)=>DailyRoutineScreen(),
         AppRoutes.dailyTipsScreenRouteName:(context)=>DailyTipsScreen(),
+        AppRoutes.storiesTimeScreenRouteName:(context)=>StoryTimeScreen(),
         AppRoutes.frontBackBaseActivityScreenRouteName:(context)=>FrontBackBaseActivityScreen(),
         AppRoutes.upBaseActivityScreenRouteName:(context)=>UpBaseActivityScreen(),
         AppRoutes.downBaseActivityScreenRouteName:(context)=>DownBaseActivityScreen(),
@@ -87,6 +98,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.spatialRelationsActivitiesBaseScreenRouteName:(context)=>SpatialRelationsBaseScreen(),
         AppRoutes.outsideBaseActivityScreenRouteName:(context)=>OutsideBaseActivityScreen(),
         AppRoutes.visualSpatialPerceptionScreenRouteName:(context)=>VisualSpatialPerceptionBaseScreen(),
+        AppRoutes.mentalCutting32ActivityScreenRouteName:(context)=>MentalCuttingLevel3Stage2(),
 
       },
       theme: AppTheme.lightTheme,

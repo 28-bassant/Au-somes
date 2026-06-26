@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import '../core/cache/shared_prefs_utils.dart';
 import '../core/cache/token_utils.dart';
 import '../models/activities/activity_response.dart';
 import '../models/login_response.dart';
+import '../models/progress/log_attempt_response.dart';
+import '../models/progress/progress_summary_response.dart';
 import '../models/register_response.dart';
 import '../utils/app_routes.dart';
 import 'api_constants.dart';
@@ -84,14 +86,15 @@ class ApiManager {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
+    print("🔵 LOGIN RAW RESPONSE = ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
-
       final loginResponse = LoginResponse.fromJson(data);
-
+      print("🟡 TOKEN PARSED = ${loginResponse.token}");
+      print("🟠 TOKEN BEFORE SAVE = ${loginResponse.token}");
       await TokenUtils.saveLoginTokens(loginResponse);
-
+      print("TOKEN AFTER LOGIN = ${await TokenUtils.getToken()}"); // 👈 هنا
       return loginResponse;
     } else {
       final errorJson = jsonDecode(response.body);
@@ -223,25 +226,56 @@ class ApiManager {
   }
 
   static Future<String> askChatbot(String prompt) async {
-    Uri url = Uri.parse("http://au-somes.runasp.net/api/Chat/ask");
-
-    var response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"Prompt": prompt}),
+    Uri url = Uri.parse(
+      "http://au-somes.runasp.net/api/Chat/ask",
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data["answer"];
-    } else {
-      final errorBody = response.body.toLowerCase();
+    try {
+      var response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"Prompt": prompt}),
+      );
 
-      if (errorBody.contains("quota") || errorBody.contains("quotafailure")) {
+      print("STATUS CODE: ${response.statusCode}");
+      print("BODY: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        return data["response"]?["result"]?.toString() ??
+            "Empty response from server";
+      }
+
+      if (response.statusCode == 400) {
+        throw Exception("Invalid request");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Unauthorized");
+      }
+
+      if (response.statusCode == 403) {
+        throw Exception("Access denied");
+      }
+
+      if (response.statusCode == 404) {
+        throw Exception("Chat service not found");
+      }
+
+      if (response.statusCode == 429) {
         throw Exception("QuotaExceeded");
       }
 
-      throw Exception("Failed to get response");
+      if (response.statusCode >= 500) {
+        throw Exception("Server error");
+      }
+
+      throw Exception(
+        "Status ${response.statusCode}: ${response.body}",
+      );
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -267,6 +301,133 @@ class ApiManager {
       throw Exception(
           "Failed to fetch activity: ${response.statusCode} - ${response.body}");
     }
+  }
+
+
+  static Future<void> updateProfile({
+    required String email,
+    required String childName,
+    required int childAge,
+  }) async {
+    Uri url = Uri.parse(
+      ApiConstants.baseUrl + ApiEndpoints.updateProfile,
+    );
+
+    String? token = await TokenUtils.getToken();
+
+    final body = {
+      "email": email,
+      "childName": childName,
+      "childAge": childAge,
+    };
+
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer ${token?.trim()}",
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 204) {
+
+      // تحديث البيانات المحلية
+      await TokenUtils.saveChildInfo(
+        childName,
+        childAge,
+      );
+
+      await SharedPrefsUtils.saveData(
+        key: "email",
+        value: email,
+      );
+
+      return;
+    }
+
+    throw Exception(
+      "Failed to update profile: ${response.statusCode}",
+    );
+  }
+  static Future<LogAttemptResponse?> logAttemptStatus({
+    required String phaseId,
+    required bool userHint,
+  }) async {
+    Uri url = Uri.parse(ApiConstants.baseUrl + ApiEndpoints.logAttemptStatus);
+
+    final token = await TokenUtils.getToken();
+
+    print(" TOKEN INSIDE API: $token");
+
+    if (token == null || token.isEmpty) {
+      print(" No token found");
+      return null;
+    }
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "PhaseId": phaseId,
+          "UserHint": userHint,
+        }),
+      );
+
+      print("🔵 status: ${response.statusCode}");
+      print("🔵 body: ${response.body}");
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (response.body.isEmpty) return null;
+
+        return LogAttemptResponse.fromJson(jsonDecode(response.body));
+      }
+
+      print("API ERROR: ${response.statusCode} - ${response.body}");
+
+      return null;
+    } catch (e) {
+      print("Exception in logAttemptStatus: $e");
+      return null;
+    }
+  }
+  static Future<ProgressSummaryResponse?> getProgressSummary() async {
+    final token = await TokenUtils.getToken();
+
+    final response = await http.get(
+      Uri.parse(ApiConstants.baseUrl + ApiEndpoints.progressSummary),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 401) {
+      print(" Token expired");
+
+      final refreshed = await TokenUtils.refreshAccessToken();
+
+      if (refreshed) {
+        return getProgressSummary();
+      } else {
+        await TokenUtils.clearTokens();
+        return null;
+      }
+    }
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return ProgressSummaryResponse.fromJson(data);
+    }
+
+    return null;
   }
 
 }

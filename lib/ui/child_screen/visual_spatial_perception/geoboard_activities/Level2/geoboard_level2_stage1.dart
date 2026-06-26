@@ -1,14 +1,4 @@
-import 'dart:math';
-
-import 'package:au_somes/api/api_constants.dart';
-import 'package:au_somes/api/api_manager.dart';
-import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
-import 'package:au_somes/ui/child_screen/reinforcement_widgets/true_answer_sound.dart';
-import 'package:au_somes/utils/app_colors.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import '../../../../../../models/activities/activity_response.dart';
-import '../../../reinforcement_widgets/well_done_overlay.dart';
+import 'dart:math';  import 'package:au_somes/api/api_constants.dart'; import 'package:au_somes/api/api_manager.dart'; import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart'; import 'package:au_somes/ui/child_screen/reinforcement_widgets/true_answer_sound.dart'; import 'package:au_somes/utils/app_colors.dart'; import 'package:audioplayers/audioplayers.dart'; import 'package:flutter/material.dart'; import '../../../../../../models/activities/activity_response.dart'; import '../../../reinforcement_widgets/well_done_overlay.dart';
 
 class GeoboardLevel2Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
@@ -28,8 +18,8 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
   bool _imagesLoaded = false;
   bool _dataLoaded = false;
 
-  // متغيرات للتوصيل (5 نقاط)
-  List<bool> _connectedPoints = List.filled(5, false);
+  // متغيرات للتوصيل (نقطة واحدة صحيحة + 8 نقاط خاطئة)
+  List<bool> _connectedPoints = List.filled(9, false);
   Map<int, bool> _soundPlayed = {};
 
   // متغيرات للسحب
@@ -37,26 +27,30 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
   Offset? _dragStartPosition;
   Offset? _dragCurrentPosition;
   bool _isDragging = false;
+  bool _hasMoved = false;
 
-  // متغيرات للخطوط (كلها ثابتة ولا تتغير)
-  bool _showLine4to1 = false;        // خط بين 4 و 1 (يظهر بعد أول ضغطة)
-  bool _showLine1to2 = false;// خط بين 1 و 2 (يظهر بعد الضغطة الثانية)
+  // متغيرات للخطوط
+  bool _showLine4to1 = false;
+  bool _showLine1to2 = false;
   bool _showLine2to4 = true;
-  bool _isFirstCorrectClick = true;  // هل هذه أول ضغطة على الـ Container الصحيح
-  bool _isCompleted = false;         // هل اكتملت المهمة
+  bool _isFirstCorrectClick = true;
+  bool _isCompleted = false;
 
-  // لتتبع عدد مرات الضغط على كل Container خاطئ
-  Map<int, int> _wrongPressCount = {};
+  // لتتبع عدد مرات الخطأ
+  int _wrongAttempts = 0;
+  bool _isAnimatingAnswer = false;
 
-  // Animation للـ Container الصحيح
+  // Animation
   AnimationController? _animationController;
-  bool _isAnimatingCorrect = false;
 
-  // GlobalKeys
+  // GlobalKeys للنقاط (9 نقاط)
   final GlobalKey _anchorKey = GlobalKey();
-  final List<GlobalKey> _pointKeys = List.generate(5, (index) => GlobalKey());
+  final List<GlobalKey> _pointKeys = List.generate(9, (index) => GlobalKey());
 
   final double _lineOffset = -75;
+  bool _usedHint = false;
+  bool _progressSent = false;
+  bool _progressLogged = false;
   @override
   void initState() {
     super.initState();
@@ -82,9 +76,8 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
           _activity = activity;
           _dataLoaded = true;
 
-          for (int i = 0; i < 5; i++) {
+          for (int i = 0; i < 9; i++) {
             _soundPlayed[i] = false;
-            _wrongPressCount[i] = 0;
           }
         });
 
@@ -147,33 +140,33 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     }
   }
 
-  void _handleWrongContainerTap(int index) {
+  void _handleWrongAnswer() {
     if (_isCompleted) return;
-    if (index == 1) return;
 
-    int currentCount = _wrongPressCount[index] ?? 0;
-    currentCount++;
-    _wrongPressCount[index] = currentCount;
+    setState(() {
+      _wrongAttempts++;
+      _usedHint = true;
+    });
 
-    if (currentCount == 1) {
-      TryAgainSound.play();
-    } else if (currentCount >= 2) {
-      _startCorrectContainerAnimation();
+    TryAgainSound.play();
+
+    if (_wrongAttempts >= 2) {
+      _startCorrectPointAnimation();
     }
   }
 
-  void _startCorrectContainerAnimation() {
-    if (!_isAnimatingCorrect && _animationController != null) {
+  void _startCorrectPointAnimation() {
+    if (!_isAnimatingAnswer && _animationController != null && !_connectedPoints[1]) {
       setState(() {
-        _isAnimatingCorrect = true;
+        _isAnimatingAnswer = true;
       });
 
       _animationController!.repeat(reverse: true);
 
       Future.delayed(const Duration(seconds: 3), () {
-        if (mounted && _isAnimatingCorrect) {
+        if (mounted && _isAnimatingAnswer) {
           setState(() {
-            _isAnimatingCorrect = false;
+            _isAnimatingAnswer = false;
           });
           _animationController!.stop();
           _animationController!.value = 0;
@@ -182,50 +175,58 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     }
   }
 
-  void _handleCorrectContainerTap() {
+  void _handleWrongContainerTap(int index) {
     if (_isCompleted) return;
+    if (index == 1) return;
+    _handleWrongAnswer();
+  }
+
+
+  void _handleCorrectContainerTap() async {
+    if (_isCompleted) return;
+    if (_progressLogged) return; //  يمنع التكرار
 
     if (_isFirstCorrectClick) {
       setState(() {
         _isFirstCorrectClick = false;
         _showLine4to1 = true;
-      });
-
-      TrueAnswerSound.play(); // ✅ أول ضغطة
-    } else {
-      setState(() {
-        _isCompleted = true;
-        _showLine1to2 = true;
-        _showLine4to1 = true;
-        _showLine2to4 = false; // ✅ هنا بنشيله
+        _wrongAttempts = 0;
       });
 
       TrueAnswerSound.play();
-      WellDoneOverlay.show(context);
-
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          widget.onNextStage?.call();
-        }
-      });
-
-      Future.delayed(const Duration(milliseconds: 100), () {
-        TrueAnswerSound.play(); // ✅ نخليه بعد setState بشوية
-      });
-
-      Future.delayed(const Duration(milliseconds: 300), () {
-        WellDoneOverlay.show(context);
-      });
-
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          widget.onNextStage?.call();
-        }
-      });
+      return;
     }
+
+    setState(() {
+      _isCompleted = true;
+      _progressLogged = true; //  يتقفل هنا فورًا
+      _showLine1to2 = true;
+      _showLine4to1 = true;
+      _showLine2to4 = false;
+      _wrongAttempts = 0;
+      _isAnimatingAnswer = false;
+    });
+
+    _animationController?.stop();
+    _animationController?.value = 0;
+
+    TrueAnswerSound.play();
+    WellDoneOverlay.show(context);
+
+    // مهم: تأخير بسيط قبل تسجيل الـ progress
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    await _logProgress(); // 👈 مرة واحدة فقط
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        widget.onNextStage?.call();
+      }
+    });
   }
 
   Offset? _getPointTopPositionWithOffset(int index) {
+    if (index >= _pointKeys.length) return null;
     final renderBox = _pointKeys[index].currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return null;
     final position = renderBox.localToGlobal(Offset.zero);
@@ -250,6 +251,7 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
 
   void _onDragStart(int index, Offset position) {
     if (_connectedPoints[index] || _isCompleted) return;
+    if (index >= _pointKeys.length) return;
 
     final startPos = _getPointTopPositionWithOffset(index);
     if (startPos == null) return;
@@ -259,6 +261,7 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
       _dragStartPosition = startPos;
       _dragCurrentPosition = startPos;
       _isDragging = true;
+      _hasMoved = false;
     });
   }
 
@@ -266,12 +269,25 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     if (_isDragging) {
       setState(() {
         _dragCurrentPosition = position;
+        _hasMoved = true;
       });
     }
   }
 
   void _onDragEnd(Offset position) {
     if (!_isDragging || _draggingPointIndex == null) {
+      _resetDrag();
+      return;
+    }
+
+    if (!_hasMoved) {
+      _resetDrag();
+      return;
+    }
+
+    final dragDistance = (_dragStartPosition! - position).distance;
+
+    if (dragDistance < 10) {
       _resetDrag();
       return;
     }
@@ -285,8 +301,12 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
         _soundPlayed[_draggingPointIndex!] = true;
         TrueAnswerSound.play();
       }
+
+      setState(() {
+        _wrongAttempts = 0;
+      });
     } else {
-      TryAgainSound.play();
+      _handleWrongAnswer();
     }
 
     _resetDrag();
@@ -298,7 +318,29 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
       _dragStartPosition = null;
       _dragCurrentPosition = null;
       _isDragging = false;
+      _hasMoved = false;
     });
+  }
+  Future<void> _logProgress() async {
+    if (_progressSent) return;
+
+    _progressSent = true;
+
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override
@@ -319,25 +361,37 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
     }
 
     final elements = _activity!.elements!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+
+    // 🔥 احسب الـ SafeArea padding عشان تتطابق النقاط على كل الأجهزة
+    final topPadding = mediaQuery.padding.top;
+    final bottomPadding = mediaQuery.padding.bottom;
+    final safeHeight = screenHeight - topPadding - bottomPadding;
 
     final anchorElement = elements[1];
     final double pointSize = screenWidth * 0.12;
 
+    // جميع النقاط (9 نقاط) - كلها خاطئة ما عدا النقطة 1
     final List<Offset> pointPositions = [
-      Offset(screenWidth * 0.17, screenHeight * 0.53),   // 0
-      Offset(screenWidth * 0.7, screenHeight * 0.53),    // 1: الزاوية السفلى اليمنى (الصحيح)
-      Offset(screenWidth * 0.45, screenHeight * 0.37),   // 2
-      Offset(screenWidth * 0.72, screenHeight * 0.37),   // 3
-      Offset(screenWidth * 0.45, screenHeight * 0.53),   // 4
+      Offset(screenWidth * 0.17, topPadding + safeHeight * 0.53),  // 0 - خاطئة
+      Offset(screenWidth * 0.7,  topPadding + safeHeight * 0.53),  // 1 - الصحيحة الوحيدة
+      Offset(screenWidth * 0.45, topPadding + safeHeight * 0.37),  // 2 - خاطئة
+      Offset(screenWidth * 0.72, topPadding + safeHeight * 0.37),  // 3 - خاطئة
+      Offset(screenWidth * 0.45, topPadding + safeHeight * 0.53),  // 4 - خاطئة
+      Offset(screenWidth * 0.17, topPadding + safeHeight * 0.18),  // 5 - خاطئة
+      Offset(screenWidth * 0.45, topPadding + safeHeight * 0.18),  // 6 - خاطئة
+      Offset(screenWidth * 0.72, topPadding + safeHeight * 0.18),  // 7 - خاطئة
+      Offset(screenWidth * 0.17, topPadding + safeHeight * 0.37),  // 8 - خاطئة
     ];
 
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
-            Center(
+            Align(
+              alignment: Alignment(0, -0.09), // غير الـ -0.3 حسب اللي يناسبك (من -1.0 لفوق لـ 1.0 لتحت)
               child: Container(
                 key: _anchorKey,
                 width: screenWidth * 0.9,
@@ -365,15 +419,15 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
                 )
                     : null,
                 lineOffset: _lineOffset,
-                showFixedLine2to0: true,      // خط ثابت بين 2 و 0 (يظهر دائماً)
-                showFixedLine0to4: true,      // خط ثابت بين 0 و 4 (يظهر دائماً)
+                showFixedLine2to0: true,
+                showFixedLine0to4: true,
                 showFixedLine2to4: _showLine2to4,
-                showLine4to1: _showLine4to1,  // خط بين 4 و 1 (يظهر بعد أول ضغطة)
-                showLine1to2: _showLine1to2,  // خط بين 1 و 2 (يظهر بعد الضغطة الثانية)
+                showLine4to1: _showLine4to1,
+                showLine1to2: _showLine1to2,
               ),
             ),
 
-            // الـ Container الصحيح (index 1) مع Animation
+            // النقطة الصحيحة (index 1) مع Animation
             if (!_connectedPoints[1])
               Positioned(
                 left: pointPositions[1].dx,
@@ -382,7 +436,7 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
                   animation: _animationController!,
                   builder: (context, child) {
                     double shakeValue = 0;
-                    if (_isAnimatingCorrect) {
+                    if (_isAnimatingAnswer) {
                       shakeValue = 20 * sin(_animationController!.value * 3.14159);
                     }
                     return Transform.translate(
@@ -407,14 +461,17 @@ class GeoboardLevel2Stage1State extends State<GeoboardLevel2Stage1>
                 ),
               ),
 
-            // باقي الـ Containers (غير الصحيح)
-            for (int i = 0; i < 5; i++)
+            // جميع النقاط الأخرى (0,2,3,4,5,6,7,8) - كلها خاطئة وقابلة للسحب والضغط
+            for (int i = 0; i < 9; i++)
               if (i != 1 && !_connectedPoints[i])
                 Positioned(
                   left: pointPositions[i].dx,
                   top: pointPositions[i].dy,
                   child: GestureDetector(
                     onTap: () => _handleWrongContainerTap(i),
+                    onPanStart: (details) => _onDragStart(i, details.localPosition),
+                    onPanUpdate: (details) => _onDragUpdate(details.globalPosition),
+                    onPanEnd: (details) => _onDragEnd(_dragCurrentPosition ?? Offset.zero),
                     child: Container(
                       key: _pointKeys[i],
                       width: pointSize,
@@ -468,6 +525,7 @@ class ConnectionPainter extends CustomPainter {
   });
 
   Offset? _getPointTopPositionWithOffset(int index) {
+    if (index >= pointKeys.length) return null;
     final renderBox = pointKeys[index].currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return null;
     final position = renderBox.localToGlobal(Offset.zero);
@@ -490,78 +548,46 @@ class ConnectionPainter extends CustomPainter {
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
 
-    // الخط الثابت بين 2 و 0 (يظهر دائماً)
     if (showFixedLine2to0) {
       Offset? point2Top = _getPointTopPositionWithOffset(2);
       Offset? point0Top = _getPointTopPositionWithOffset(0);
       if (point2Top != null && point0Top != null) {
         canvas.drawLine(point2Top, point0Top, fixedLinePaint);
-        final circlePaint = Paint()
-          ..color = AppColors.lightPastelBlue
-          ..style = PaintingStyle.fill;
-        canvas.drawCircle(point2Top, 4, circlePaint);
-        canvas.drawCircle(point0Top, 4, circlePaint);
       }
     }
 
-    // الخط الثابت بين 0 و 4 (يظهر دائماً)
     if (showFixedLine0to4) {
       Offset? point0Top = _getPointTopPositionWithOffset(0);
       Offset? point4Top = _getPointTopPositionWithOffset(4);
       if (point0Top != null && point4Top != null) {
         canvas.drawLine(point0Top, point4Top, fixedLinePaint);
-        final circlePaint = Paint()
-          ..color = AppColors.lightPastelBlue
-          ..style = PaintingStyle.fill;
-        canvas.drawCircle(point0Top, 4, circlePaint);
-        canvas.drawCircle(point4Top, 4, circlePaint);
       }
     }
 
-    // الخط الثابت بين 2 و 4 (يظهر دائماً)
     if (showFixedLine2to4) {
       Offset? point2Top = _getPointTopPositionWithOffset(2);
       Offset? point4Top = _getPointTopPositionWithOffset(4);
       if (point2Top != null && point4Top != null) {
         canvas.drawLine(point2Top, point4Top, fixedLinePaint);
-        final circlePaint = Paint()
-          ..color = AppColors.lightPastelBlue
-          ..style = PaintingStyle.fill;
-        canvas.drawCircle(point2Top, 4, circlePaint);
-        canvas.drawCircle(point4Top, 4, circlePaint);
       }
     }
 
-    // خط بين 4 و 1 (يظهر بعد أول ضغطة)
-    // خط بين 4 و 1 (يظهر بعد أول ضغطة)
     if (showLine4to1) {
       Offset? point4Top = _getPointTopPositionWithOffset(4);
       Offset? point1Top = _getPointTopPositionWithOffset(1);
       if (point4Top != null && point1Top != null) {
         canvas.drawLine(point4Top, point1Top, fixedLinePaint);
-        final circlePaint = Paint()
-          ..color = AppColors.lightPastelBlue
-          ..style = PaintingStyle.fill;
-        canvas.drawCircle(point4Top, 4, circlePaint);
-        canvas.drawCircle(point1Top, 4, circlePaint);
       }
     }
 
-    // خط بين 1 و 2 (يظهر بعد الضغطة الثانية)
     if (showLine1to2) {
       Offset? point1Top = _getPointTopPositionWithOffset(1);
       Offset? point2Top = _getPointTopPositionWithOffset(2);
       if (point1Top != null && point2Top != null) {
         canvas.drawLine(point1Top, point2Top, fixedLinePaint);
-        final circlePaint = Paint()
-          ..color = AppColors.lightPastelBlue
-          ..style = PaintingStyle.fill;
-        canvas.drawCircle(point1Top, 4, circlePaint);
-        canvas.drawCircle(point2Top, 4, circlePaint);
       }
     }
 
-    // خطوط التوصيل الديناميكية
     final paint = Paint()
       ..color = Colors.green
       ..strokeWidth = 4
@@ -573,11 +599,6 @@ class ConnectionPainter extends CustomPainter {
         final anchorTop = _getAnchorTopPositionWithOffset();
         if (pointTop != null && anchorTop != null) {
           canvas.drawLine(pointTop, anchorTop, paint);
-          final greenCirclePaint = Paint()
-            ..color = Colors.green
-            ..style = PaintingStyle.fill;
-          canvas.drawCircle(pointTop, 6, greenCirclePaint);
-          canvas.drawCircle(anchorTop, 6, greenCirclePaint);
         }
       }
     }
@@ -588,10 +609,6 @@ class ConnectionPainter extends CustomPainter {
         ..strokeWidth = 4
         ..style = PaintingStyle.stroke;
       canvas.drawLine(draggingLine!.start, draggingLine!.end, draggingPaint);
-      final orangeCirclePaint = Paint()
-        ..color = Colors.orange
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(draggingLine!.start, 6, orangeCirclePaint);
     }
   }
 
@@ -600,4 +617,3 @@ class ConnectionPainter extends CustomPainter {
     return true;
   }
 }
-

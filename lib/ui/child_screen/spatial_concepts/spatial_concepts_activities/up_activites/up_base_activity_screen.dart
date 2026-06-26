@@ -1,11 +1,13 @@
 import 'package:au_somes/ui/child_screen/spatial_concepts/spatial_concepts_activities/up_activites/level1/up_level1_stage1_activity.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../main.dart';
 import '../../../../../providers/app_language_provider.dart';
 import '../../../../../utils/app_assets.dart';
 import '../../../../../utils/app_colors.dart';
 import '../../../../../utils/app_routes.dart';
+import '../../../../../utils/app_styles.dart';
 import '../../../reinforcement_widgets/confetti_overlay.dart';
 import 'level1/up_level1_stage2_activity.dart';
 import 'level1/up_level1_stage3_activity.dart';
@@ -125,7 +127,26 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
         currentActivityIndex--;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ده أول نشاط بالفعل!")),
+          SnackBar(
+            content: Text(
+              textAlign: TextAlign.center,
+              AppLocalizations.of(context)!.first_activity,
+              style: AppStyles.regular16White,
+            ),
+            backgroundColor: AppColors.redColor,
+
+            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+
+            margin: EdgeInsets.symmetric(
+                horizontal: 34,
+                vertical: 16
+            ), // مسافة من كل الجهات
+
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+            ),
+          ),
+
         );
       }
     });
@@ -170,8 +191,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
             centerTitle: true,
             actions: [
             GestureDetector(
-            onTap: () => Navigator.pushReplacementNamed(
-        context, AppRoutes.spatialConceptsScreenRouteName),
+            onTap: () =>Navigator.pop(context),
     child: Container(
     width: 40,
     height: 40,
@@ -204,9 +224,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
                         color: AppColors.blackColorWithOpacity60, width: 1),
                   ),
                   child: Icon(
-                    languageProvider.isArabic()
-                        ? Icons.arrow_forward
-                        : Icons.arrow_back,
+                     Icons.arrow_back,
                     color: AppColors.blackColorWithOpacity60,
                     size: 25,
                   ),
@@ -224,8 +242,7 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
               child: Image(image: AssetImage(AppAssets.soundIcon)),
             ),
           ),
-          SizedBox(height: height * .04)
-
+          SizedBox(height: height * .04),
 
           // InkWell(
           //   onTap: goToNextActivity,

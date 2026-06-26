@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../../api/api_manager.dart';
 import '../../../../../../core/cache/shared_prefs_utils.dart';
+import '../../../../../../core/cache/token_utils.dart';
 import '../../../../../../providers/app_language_provider.dart';
 import '../../../../../../utils/app_assets.dart';
 import '../../../../../../utils/app_colors.dart';
@@ -30,19 +31,28 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   bool isLoading = false;
   bool isTyping = false;
   ScrollController scrollController=ScrollController();
-
+  late String chatMessagesKey;
+  late String chatStartedKey;
   @override
   void initState() {
     super.initState();
+
+    final userId = TokenUtils.getUserId() ?? "guest";
+
+    chatMessagesKey =
+    '${ChatConstants.chatMessagesKey}_$userId';
+
+    chatStartedKey =
+    '${ChatConstants.chatStartedKey}_$userId';
+
     loadChat();
   }
-
   void loadChat() {
     final storedMessages =
-    SharedPrefsUtils.getData(key: ChatConstants.chatMessagesKey) as List<String>?;
+    SharedPrefsUtils.getData(key: chatMessagesKey) as List<String>?;
 
     final started =
-    SharedPrefsUtils.getData(key: ChatConstants.chatStartedKey) as bool?;
+    SharedPrefsUtils.getData(key: chatStartedKey) as bool?;
 
     if (storedMessages != null) {
       messages = storedMessages
@@ -213,53 +223,135 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   }
   Future<void> sendMessage(String text) async {
     if (text.trim().isEmpty) return;
+
+    final localizations = AppLocalizations.of(context)!;
+
+    final Map<String, String> predefinedAnswers = {
+      localizations.what_is_visual_spatial_perception:
+      localizations.visual_spatial_perception_definition,
+
+      localizations.how_is_visual_spatial_perception_related_to_autism:
+      localizations.visual_spatial_autism_info,
+
+      localizations.game_improve:
+      localizations.visual_spatial_games,
+
+      localizations.confusion:
+      localizations.visual_spatial_training_tips,
+    };
+
+    final bool isPredefinedQuestion =
+    predefinedAnswers.containsKey(text);
+
     setState(() {
       if (!hasStartedChat) {
         messages.clear();
         hasStartedChat = true;
       }
+
       messages.add(ChatMessage(text: text, isUser: true));
-      isTyping = true;
+
+      isTyping = !isPredefinedQuestion;
     });
+
     controller.clear();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.animateTo(
         scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     });
+
+    // الأسئلة الجاهزة
+    if (isPredefinedQuestion) {
+      setState(() {
+        messages.add(
+          ChatMessage(
+            text: predefinedAnswers[text]!,
+            isUser: false,
+          ),
+        );
+      });
+
+      await saveChat();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+
+      return;
+    }
 
     try {
       final answer = await ApiManager.askChatbot(text);
 
       setState(() {
         isTyping = false;
-        messages.add(ChatMessage(text: answer, isUser: false));
+        messages.add(
+          ChatMessage(
+            text: answer,
+            isUser: false,
+          ),
+        );
       });
 
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
     } catch (e, s) {
       print("Error from API: $e");
       print("Stacktrace: $s");
 
-      String errorMessage =AppLocalizations.of(context)!.error_try_again ;
+      String errorMessage;
 
-      if (e.toString().toLowerCase().contains("quota") ||
-          e.toString().toLowerCase().contains("quotafailure")) {
-        errorMessage =
-        AppLocalizations.of(context)!.exceeded_api;
+      if (e.toString().contains("SocketException")) {
+        errorMessage = "No internet connection";
+      } else if (e.toString().contains("TimeoutException")) {
+        errorMessage = "Request timeout";
+      } else if (e.toString().contains("Unauthorized")) {
+        errorMessage = "Unauthorized access";
+      } else if (e.toString().contains("Access denied")) {
+        errorMessage = "Access denied";
+      } else if (e.toString().contains("Chat service not found")) {
+        errorMessage = "Chat service not found";
+      } else if (e.toString().contains("QuotaExceeded")) {
+        errorMessage = "API quota exceeded";
+      } else if (e.toString().contains("Server error")) {
+        errorMessage = "Server error";
+      } else {
+        errorMessage = e.toString();
       }
 
       setState(() {
         isTyping = false;
-        messages.add(ChatMessage(
-          text: errorMessage,
-          isUser: false,
-        ));
+        messages.add(
+          ChatMessage(
+            text: errorMessage,
+            isUser: false,
+          ),
+        );
       });
     }
 
     await saveChat();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   Future<void> saveChat() async {
@@ -267,11 +359,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     messages.map((m) => jsonEncode(m.toJson())).toList();
 
     await SharedPrefsUtils.saveData(
-      key: ChatConstants.chatMessagesKey,
+      key: chatMessagesKey,
       value: encodedMessages,
     );
+
     await SharedPrefsUtils.saveData(
-      key: ChatConstants.chatStartedKey,
+      key: chatStartedKey,
       value: hasStartedChat,
     );
   }

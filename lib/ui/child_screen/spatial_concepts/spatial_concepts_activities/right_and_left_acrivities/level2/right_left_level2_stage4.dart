@@ -40,6 +40,7 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -122,22 +123,14 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
   }
 
   Future<void> playSound() async {
-    if (!_dataLoaded || !_imagesLoaded) {
-      print('Waiting for data and images to load before playing sound');
-      return;
-    }
+    if (_activity?.deceptionInstructions == null ||
+        _activity!.deceptionInstructions!.isEmpty) return;
 
-    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-
-    try {
-      await _player.stop();
-      await _player.play(UrlSource(_activity!.audioUrl!));
-      print('Sound played successfully after data and images loaded');
-    } catch (e) {
-      print('Error playing sound: $e');
-    }
+    await _player.stop();
+    await _player.play(
+      UrlSource(_activity!.deceptionInstructions![0]!),
+    );
   }
-
   void repeatSound() {
     if (_dataLoaded && _imagesLoaded) {
       playSound();
@@ -148,13 +141,12 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الـ Shadow الصحيح
       _startShadowAnimation();
     }
   }
@@ -183,7 +175,7 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
   }
 
   // دالة التعامل مع نهاية السحب
-  void _handleDragEnd(DraggableDetails details, BuildContext context) {
+  Future<void> _handleDragEnd(DraggableDetails details, BuildContext context) async {
     if (isPlacedCorrectly) return;
 
     final double scale = MediaQuery.of(context).size.width / 400.0;
@@ -204,22 +196,37 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
       );
 
       if (shadow1Rect.contains(actorCenter)) {
-        // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
         setState(() {
           isPlacedCorrectly = true;
-          _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
 
         _animationController?.stop();
         _animationController?.value = 0;
 
+        final result = await ApiManager.logAttemptStatus(
+          phaseId: _activity!.phaseId!,
+          userHint: _wrongAttempts > 0,
+        );
+
+        print("RESULT: ${result?.isPassed}");
+
+        if (result?.isPassed == true) {
+          await ApiManager.getProgressSummary();
+        }
+
+        setState(() {
+          _wrongAttempts = 0;
+        });
+
         WellDoneOverlay.show(context);
+
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) {
             widget.onNextStage?.call();
           }
         });
+
         return;
       }
     }
@@ -341,18 +348,34 @@ class RightLeftLevel2Stage4State extends State<RightLeftLevel2Stage4>
                   height: shadowWidth,
                   child: DragTarget<String>(
                     onWillAccept: (data) => data == actor.id,
-                    onAccept: (_) {
-                      // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
-                      setState(() {
-                        isPlacedCorrectly = true;
-                        _wrongAttempts = 0;
-                        _isAnimatingShadow = false;
-                      });
+                    onAccept: (_) async {
+                      print("👉 RIGHT ANSWER CLICKED");
 
                       _animationController?.stop();
                       _animationController?.value = 0;
 
+                      setState(() {
+                        isPlacedCorrectly = true;
+                        _isAnimatingShadow = false;
+                      });
+
+                      final result = await ApiManager.logAttemptStatus(
+                        phaseId: _activity!.phaseId!,
+                        userHint: _usedHint,
+                      );
+
+                      print("RESULT: ${result?.isPassed}");
+
+                      if (result?.isPassed == true) {
+                        await ApiManager.getProgressSummary();
+                      }
+
+                      setState(() {
+                        _wrongAttempts = 0;
+                      });
+
                       WellDoneOverlay.show(context);
+
                       Future.delayed(const Duration(seconds: 3), () {
                         if (mounted) {
                           widget.onNextStage?.call();

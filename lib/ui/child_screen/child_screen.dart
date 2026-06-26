@@ -1,37 +1,50 @@
 import 'package:au_somes/l10n/app_localizations.dart';
+import 'package:au_somes/providers/app_language_provider.dart';
 import 'package:au_somes/ui/child_screen/widget/acticites_widget.dart';
 import 'package:au_somes/utils/app_assets.dart';
 import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/cache/token_utils.dart';
+import '../../custom_widgets/custom_language_widget.dart';
 
 class ChildScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    var languageProvider = Provider.of<AppLanguageProvider>(context);
     final name = TokenUtils.getChildName();
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
-          },
-        ),
+         leading: IconButton(
+           icon: const Icon(Icons.arrow_back),
+           onPressed: () {
+             Navigator.pushReplacementNamed(context, AppRoutes.selectScreenRouteName);
+           },
+         ),
       ),
       body: Padding(
         padding:  EdgeInsets.symmetric(horizontal: width * .04),
         child: Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${AppLocalizations.of(context)!.hi} $name !',style: AppStyles.bold24BlackWithOpacity60,),
-                SizedBox(width: width * .02,),
-                Image(image: AssetImage(AppAssets.hi_icon))
+                Row(
+                  children: [
+                    Text(
+                      '${AppLocalizations.of(context)!.hi} $name !',
+                      style: AppStyles.bold24BlackWithOpacity60,
+                    ),
+                    SizedBox(width: width * .02),
+                    Image(image: AssetImage(AppAssets.hi_icon)),
+                  ],
+                ),
+                CustomLanguageWidget(),
               ],
             ),
             SizedBox(height: height * .04,),

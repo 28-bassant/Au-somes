@@ -23,22 +23,19 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
   bool _isLoading = true;
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
-  bool _dataLoaded = false; // متغير جديد للتأكد من تحميل البيانات
+  bool _dataLoaded = false;
 
   // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
-
-    // تهيئة المتحكم في الحركة
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -56,17 +53,15 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
       if (mounted) {
         setState(() {
           _activity = activity;
-          _dataLoaded = true; // تم تحميل البيانات
+          _dataLoaded = true;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
         setState(() {
           _imagesLoaded = true;
         });
 
-        // تشغيل الصوت بعد تحميل الصور والبيانات
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -94,19 +89,15 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
-    // تحميل كل الصور في الخلفية
     final List<Future> precacheFutures = [];
     for (final url in images) {
       precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
-
-    // انتظار تحميل جميع الصور
     await Future.wait(precacheFutures);
     print('All images preloaded successfully');
   }
 
   Future<void> playSound() async {
-    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
     if (!_dataLoaded || !_imagesLoaded) {
       print('Waiting for data and images to load before playing sound');
       return;
@@ -124,38 +115,32 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
   }
 
   void repeatSound() {
-    // التأكد من تحميل كل شيء قبل إعادة تشغيل الصوت
     if (_dataLoaded && _imagesLoaded) {
       playSound();
     }
   }
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
 
-  // دالة لبدء حركة الإجابة الصحيحة
   void _startAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -168,8 +153,7 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
     }
   }
 
-  // دالة للتعامل مع الإجابة الصحيحة
-  void _handleCorrectAnswer() {
+  Future<void> _handleCorrectAnswer() async {
     setState(() {
       _wrongAttempts = 0;
       _isAnimatingAnswer = false;
@@ -178,12 +162,33 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
     _animationController?.stop();
     _animationController?.value = 0;
 
+    await _logProgress();
+
     WellDoneOverlay.show(context);
+
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         widget.onNextStage?.call();
       }
     });
+  }
+
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override
@@ -195,12 +200,10 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
 
   @override
   Widget build(BuildContext context) {
-    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
@@ -220,24 +223,58 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
         height: double.infinity,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // حساب النسب المئوية بناءً على أبعاد الشاشة
-            final double anchorWidthPercent = 180 / 400;    // 45% من العرض المرجعي
-            final double optionWidthPercent = 80 / 400;     // 20% من العرض المرجعي
-            final double topPaddingPercent = 180 / 800;     // 22.5% من الارتفاع المرجعي
+            final double anchorWidthPercent = 180 / 400;
+            final double optionWidthPercent = 80 / 400;
+            final double topPaddingPercent = 180 / 800;
 
-            // حساب الأحجام الفعلية
             final double anchorWidth = constraints.maxWidth * anchorWidthPercent;
             final double optionWidth = constraints.maxWidth * optionWidthPercent;
             final double topPadding = constraints.maxHeight * topPaddingPercent;
 
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            // استخدام Stack بدلاً من Row لضمان مواضيع ثابتة بغض النظر عن RTL/LTR
+            return Stack(
               children: [
+                // Anchor في المنتصف
+                Center(
+                  child: Image.network(
+                    anchorElement.imageUrl ?? '',
+                    width: anchorWidth,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: anchorWidth,
+                        height: anchorWidth,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.error),
+                      );
+                    },
+                  ),
+                ),
 
-                // ✅ الإجابة الصح (الشمال) – نازلة لتحت
-                Padding(
-                  padding: EdgeInsets.only(top: topPadding),
+                // الإجابة الخاطئة (على الجهة اليسرى)
+                Positioned(
+                  left: 25,
+                  top: topPadding+200,
+                  child: GestureDetector(
+                    onTap: _handleWrongAnswer,
+                    child: Image.network(
+                      wrongElement.imageUrl ?? '',
+                      width: optionWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: optionWidth,
+                          height: optionWidth,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                // الإجابة الصحيحة (على الجهة اليمنى) مع الحركة
+                Positioned(
+                  right: 25,
+                  top: topPadding+200,
                   child: AnimatedBuilder(
                     animation: _animationController!,
                     builder: (context, child) {
@@ -245,7 +282,6 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
                       if (_isAnimatingAnswer) {
                         shakeValue = 20 * sin(_animationController!.value * pi);
                       }
-
                       return Transform.translate(
                         offset: Offset(shakeValue, 0),
                         child: child,
@@ -268,40 +304,6 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
                     ),
                   ),
                 ),
-
-                // ⚓ الـ Anchor (ثابت في النص)
-                Image.network(
-                  anchorElement.imageUrl ?? '',
-                  width: anchorWidth,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: anchorWidth,
-                      height: anchorWidth,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.error),
-                    );
-                  },
-                ),
-
-                // ❌ الإجابة الغلط (اليمين) – نازلة لتحت
-                Padding(
-                  padding: EdgeInsets.only(top: topPadding),
-                  child: GestureDetector(
-                    onTap: _handleWrongAnswer,
-                    child: Image.network(
-                      wrongElement.imageUrl ?? '',
-                      width: optionWidth,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: optionWidth,
-                          height: optionWidth,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.error),
-                        );
-                      },
-                    ),
-                  ),
-                ),
               ],
             );
           },
@@ -310,4 +312,3 @@ class Activity1Level1Stage1State extends State<Activity1Level1Stage1>
     );
   }
 }
-

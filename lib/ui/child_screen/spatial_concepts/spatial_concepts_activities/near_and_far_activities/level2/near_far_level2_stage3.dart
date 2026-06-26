@@ -157,8 +157,8 @@ class NearFarLevel2Stage3State extends State<NearFarLevel2Stage3>
     final double scale = screenWidth / 400.0;
 
     final double anchorWidth = 250 * scale;
-    final double shadowLeft = 150 * scale;
-    final double shadowTop = 360 * scale;
+    final double shadowLeft = 170 * scale;
+    final double shadowTop = 365 * scale;
     final double shadowWidth = 80 * scale;
     final double shadowBallWidth = 70 * scale;
     final double actorRight = 165 * scale;

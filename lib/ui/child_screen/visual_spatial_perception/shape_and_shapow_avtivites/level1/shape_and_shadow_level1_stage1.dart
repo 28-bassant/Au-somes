@@ -10,6 +10,7 @@ import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+
 class ShapeAndShadowLevel1Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
   const ShapeAndShadowLevel1Stage1({Key? key, this.onNextStage})
@@ -30,6 +31,7 @@ class ShapeAndShadowLevel1Stage1State extends State<ShapeAndShadowLevel1Stage1>
   late AnimationController _animationController;
   ActivityElement? shadowElement;
   List<ActivityElement>? actors;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -84,34 +86,54 @@ class ShapeAndShadowLevel1Stage1State extends State<ShapeAndShadowLevel1Stage1>
     await _player.play(UrlSource(activity!.audioUrl!));
     hasPlayedSound = true;
   }
+  void repeatSound() => playSound();
 
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
+      print("PhaseId = ${activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   int _wrongAttempts = 0; // عدد مرات الضغط على Actors الغلط
 
-  void onActorTap(ActivityElement actor) {
+  Future<void> onActorTap(ActivityElement actor) async {
     if (isPlacedCorrectly || shadowElement == null) return;
 
-    // -------------------- Actor صح --------------------
-    if (actor.targetedZoneId != null &&
-        actor.targetedZoneId == shadowElement!.id) {
+    final isCorrect = actor.targetedZoneId == shadowElement!.id;
+
+    if (isCorrect) {
       setState(() => isPlacedCorrectly = true);
 
-      // تشغيل حركة بسيطة
       _animationController.forward(from: 0);
 
-      // بعد فترة قصيرة الانتقال للمرحلة التالية
-      Future.delayed(const Duration(milliseconds: 700), () {
-        widget.onNextStage?.call();
+      await _logProgress();
+
+      WellDoneOverlay.show(context);
+
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          widget.onNextStage?.call();
+        }
       });
     } else {
-      // -------------------- Actor غلط --------------------
       if (_wrongAttempts == 0) {
-        TryAgainSound.play(); // شغل الصوت لأول مرة فقط
+        TryAgainSound.play();
       }
 
-      // زيادة العدادات
       setState(() {
         _wrongAttempts++;
+        _usedHint = true;
       });
     }
   }

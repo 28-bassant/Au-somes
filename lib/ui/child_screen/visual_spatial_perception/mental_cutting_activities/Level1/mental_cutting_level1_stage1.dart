@@ -35,6 +35,7 @@ class MentalCuttingLevel1Stage1State extends State<MentalCuttingLevel1Stage1>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -140,14 +141,30 @@ class MentalCuttingLevel1Stage1State extends State<MentalCuttingLevel1Stage1>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
-    // تشغيل صوت Try Again
-    TryAgainSound.play();
-
-    if (_wrongAttempts >= 2) {
-      // تحريك الإجابة الصحيحة بعد المحاولات الخاطئة
+    if (_wrongAttempts == 1) {
+      TryAgainSound.play();
+    } else if (_wrongAttempts >= 2) {
       _startAnswerAnimation();
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -173,7 +190,7 @@ class MentalCuttingLevel1Stage1State extends State<MentalCuttingLevel1Stage1>
   }
 
   // دالة للتعامل مع الإجابة الصحيحة (الضغط على Actor الصحيح)
-  void _handleCorrectActor() {
+  Future<void> _handleCorrectActor() async {
     if (_shadowReplaced) return; // إذا تم استبدال Shadow بالفعل
 
     setState(() {
@@ -186,7 +203,10 @@ class MentalCuttingLevel1Stage1State extends State<MentalCuttingLevel1Stage1>
     _animationController?.value = 0;
 
     // إظهار WellDoneOverlay بعد استبدال Shadow
+    await _logProgress();
+
     WellDoneOverlay.show(context);
+
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         widget.onNextStage?.call();

@@ -29,6 +29,7 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -103,13 +104,12 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: صوت Try Again
       TryAgainSound.play();
-    } else if (_wrongAttempts >= 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
+    } else if (_wrongAttempts == 2) {
       _startAnswerAnimation();
     }
   }
@@ -233,17 +233,34 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
               left: correctRect.left,
               top: correctRect.top,
               child: GestureDetector(
-                onTap: () {
-                  // الإجابة صحيحة
+                onTapDown: (details) async {
+                  print(" RIGHT ANSWER CLICKED");
                   setState(() {
                     _wrongAttempts = 0;
                     _isAnimatingAnswer = false;
                   });
+
                   _animationController?.stop();
                   _animationController?.value = 0;
 
+                  // 1. تسجيل المحاولة
+                  final result = await ApiManager.logAttemptStatus(
+                    phaseId: _activity!.phaseId!,
+                    userHint: _usedHint,
+                  );
+
+                  print(" RESULT: ${result?.isPassed}");
+
+                  // 2. لو الإجابة صحيحة → حدّث التقدم
+                  if (result?.isPassed == true) {
+                    await ApiManager.getProgressSummary();
+                  }
+
+                  // 3. عرض النجاح
                   WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () { // تغيير من 2 إلى 3 ثواني
+
+                  // 4. الانتقال للمرحلة التالية
+                  Future.delayed(const Duration(seconds: 3), () {
                     if (mounted) {
                       widget.onNextStage?.call();
                     }

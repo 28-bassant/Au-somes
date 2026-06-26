@@ -28,21 +28,24 @@ class DialogUtils{
   }
 
   static void showMsg({required BuildContext context,
-    required String msg,String? title,String? posActionName,
+    required String msg,String? title,
+    TextStyle? msgStyle,
+    String? posActionName,
+    TextStyle? postActionStyle,TextStyle? negActionStyle,
     Function? posAction,String? negActionName,Function? negAction,bool barrierDismissible= true }){
     List<Widget>? actions=[];
     if(posActionName != null){
       actions.add(TextButton(onPressed: (){
         Navigator.pop(context);
         posAction?.call();
-      }, child: Text(posActionName,style:AppStyles.bold24SoftBlue,)));
+      }, child: Text(posActionName,style:postActionStyle??AppStyles.bold24SoftBlue,)));
 
     }
     if(negActionName !=null){
       actions.add(TextButton(onPressed: (){
         Navigator.pop(context);
         negAction?.call();
-      }, child: Text(negActionName,style:AppStyles.medium16Red ,)));
+      }, child: Text(negActionName,style:negActionStyle??AppStyles.medium16Red ,)));
     }
     if (actions.isEmpty) {
       actions.add(
@@ -55,7 +58,7 @@ class DialogUtils{
 
     showDialog(barrierDismissible: barrierDismissible,
         context: context, builder: (context) => AlertDialog(
-          content: Text(msg,style: AppStyles.medium20BlackWithOpacity60,),
+          content: Text(msg,style:msgStyle?? AppStyles.medium20BlackWithOpacity60,),
           title: Text(title??'',style: AppStyles.bold20BlackWithOpacity60,),
           actions: actions,
         ));

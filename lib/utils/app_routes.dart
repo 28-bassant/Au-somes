@@ -11,6 +11,7 @@ class AppRoutes {
   static String chatbotScreenRouteName = "chatbot_screen";
   static String progressLevelScreenRouteName = "progress_level_screen";
   static String dailyRoutineScreenRouteName = "daily_routine_screen";
+  static String storiesTimeScreenRouteName = "stories_time_screen";
   static String dailyTipsScreenRouteName = "daily_tips_screen";
   static String editProfileScreenRouteName = "edit_profile_screen";
   static String spatialConceptsScreenRouteName = "spatial_concepts_screen";
@@ -24,4 +25,6 @@ class AppRoutes {
   static String nearFarBaseActivityScreenRouteName = "near_far_base_activity_screen";
   static String spatialRelationsActivitiesBaseScreenRouteName = "spatial_relations_base_activity_screen";
   static String visualSpatialPerceptionScreenRouteName = "visual_spatial_perception_screen";
-  static String shapeAndShadowBaseActivityScreenRouteName = "shape_and_shadow_base_activity_screen";}
+  static String shapeAndShadowBaseActivityScreenRouteName = "shape_and_shadow_base_activity_screen";
+  static String mentalCutting32ActivityScreenRouteName = "mental_cutting32_activity_screen";
+}

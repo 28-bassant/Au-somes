@@ -34,7 +34,7 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -130,9 +130,11 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       playSound();
     }
   }
-
   void _handleWrongAnswer() {
-    setState(() => _wrongAttempts++);
+    setState(() {
+      _wrongAttempts++;
+      _usedHint = true;
+    });
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
@@ -183,10 +185,20 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
         _animationController?.stop();
         _animationController?.value = 0;
 
+        // ✅ تسجيل الـ Progress هنا
+        ApiManager.logAttemptStatus(
+          phaseId: _activity!.phaseId!,
+          userHint: _usedHint,
+        );
+
+        ApiManager.getProgressSummary();
+
         WellDoneOverlay.show(context);
+
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) widget.onNextStage?.call();
         });
+
         return;
       }
     }

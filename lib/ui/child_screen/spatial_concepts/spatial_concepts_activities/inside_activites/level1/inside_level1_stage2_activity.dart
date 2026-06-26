@@ -30,6 +30,7 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -113,6 +114,7 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -197,17 +199,12 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
             Positioned(
               right: wrong1Right,
               top: wrong1Top,
-              child: GestureDetector(
-                onTap: () {
-                  _handleWrongAnswer();
-                },
-                child: Container(
-                  child: Image.network(
-                    anchorElement.imageUrl ?? '',
-                    fit: BoxFit.fill,
-                    width: wrong1Width,
-                    height: wrong1Height,
-                  ),
+              child: Container(
+                child: Image.network(
+                  anchorElement.imageUrl ?? '',
+                  fit: BoxFit.fill,
+                  width: wrong1Width,
+                  height: wrong1Height,
                 ),
               ),
             ),
@@ -254,8 +251,7 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
                   );
                 },
                 child: GestureDetector(
-                  onTap: () {
-                    // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
+                  onTap: () async {
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -264,7 +260,19 @@ class InsideLevel1Stage2ActivityState extends State<InsideLevel1Stage2Activity>
                     _animationController?.stop();
                     _animationController?.value = 0;
 
+                    final result = await ApiManager.logAttemptStatus(
+                      phaseId: _activity!.phaseId!,
+                      userHint: _usedHint,
+                    );
+
+                    print("RESULT: ${result?.isPassed}");
+
+                    if (result?.isPassed == true) {
+                      await ApiManager.getProgressSummary();
+                    }
+
                     WellDoneOverlay.show(context);
+
                     Future.delayed(const Duration(seconds: 3), () {
                       if (mounted) {
                         widget.onNextStage?.call();

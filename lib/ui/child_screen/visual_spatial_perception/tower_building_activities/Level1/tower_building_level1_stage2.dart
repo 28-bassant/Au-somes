@@ -35,7 +35,7 @@ class TowerBuildingLevel1Stage2State extends State<TowerBuildingLevel1Stage2> {
   // GlobalKeys لتحديد مواقع العناصر
   final GlobalKey _firstShadowKey = GlobalKey();
   final GlobalKey _secondShadowKey = GlobalKey();
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -91,20 +91,19 @@ class TowerBuildingLevel1Stage2State extends State<TowerBuildingLevel1Stage2> {
     setState(() => _imagesLoaded = true);
   }
 
-  void _handleFirstActorDragEnd(
+  Future<void> _handleFirstActorDragEnd(
       DraggableDetails details,
       double actorSize,
-      ) {
-    if (_firstShadowReplaced) return; // لو اتم استبداله خلاص
+      ) async {
+    if (_firstShadowReplaced) return;
 
-    // نحسب مركز الأكتور المسحوب
     final actorCenter = Offset(
       details.offset.dx + actorSize / 2,
       details.offset.dy + actorSize / 2,
     );
 
-    // نحصل على موقع Shadow الأول
-    final shadowBox = _firstShadowKey.currentContext?.findRenderObject() as RenderBox?;
+    final shadowBox =
+    _firstShadowKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (shadowBox != null) {
       final shadowPosition = shadowBox.localToGlobal(Offset.zero);
@@ -115,43 +114,44 @@ class TowerBuildingLevel1Stage2State extends State<TowerBuildingLevel1Stage2> {
         shadowBox.size.height,
       );
 
-      // نتحقق إذا كان الأكتور وقع داخل Shadow الأول
       if (shadowRect.contains(actorCenter)) {
         setState(() {
           _firstShadowReplaced = true;
         });
 
-        // تشغيل صوت الإجابة الصحيحة
         if (!_firstSoundPlayed) {
           _firstSoundPlayed = true;
           TrueAnswerSound.play();
         }
 
-        // نتحقق إذا كان كل الشادوز اتم استبدالهم
         if (_firstShadowReplaced && _secondShadowReplaced) {
+          await _logProgress();
+
           WellDoneOverlay.show(context);
+
           Future.delayed(const Duration(seconds: 2), () {
-            widget.onNextStage?.call();
+            if (mounted) {
+              widget.onNextStage?.call();
+            }
           });
         }
       }
     }
   }
 
-  void _handleSecondActorDragEnd(
+  Future<void> _handleSecondActorDragEnd(
       DraggableDetails details,
       double actorSize,
-      ) {
-    if (_secondShadowReplaced) return; // لو اتم استبداله خلاص
+      ) async {
+    if (_secondShadowReplaced) return;
 
-    // نحسب مركز الأكتور المسحوب
     final actorCenter = Offset(
       details.offset.dx + actorSize / 2,
       details.offset.dy + actorSize / 2,
     );
 
-    // نحصل على موقع Shadow الثاني
-    final shadowBox = _secondShadowKey.currentContext?.findRenderObject() as RenderBox?;
+    final shadowBox =
+    _secondShadowKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (shadowBox != null) {
       final shadowPosition = shadowBox.localToGlobal(Offset.zero);
@@ -162,26 +162,45 @@ class TowerBuildingLevel1Stage2State extends State<TowerBuildingLevel1Stage2> {
         shadowBox.size.height,
       );
 
-      // نتحقق إذا كان الأكتور وقع داخل Shadow الثاني
       if (shadowRect.contains(actorCenter)) {
         setState(() {
           _secondShadowReplaced = true;
         });
 
-        // تشغيل صوت الإجابة الصحيحة
         if (!_secondSoundPlayed) {
           _secondSoundPlayed = true;
           TrueAnswerSound.play();
         }
 
-        // نتحقق إذا كان كل الشادوز اتم استبدالهم
         if (_firstShadowReplaced && _secondShadowReplaced) {
+          await _logProgress();
+
           WellDoneOverlay.show(context);
+
           Future.delayed(const Duration(seconds: 2), () {
-            widget.onNextStage?.call();
+            if (mounted) {
+              widget.onNextStage?.call();
+            }
           });
         }
       }
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 

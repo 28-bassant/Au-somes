@@ -24,17 +24,20 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
+  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
 
+    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
+    // تهيئة المتحكم في الحركة
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -54,8 +57,10 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
           _activity = activity;
         });
 
+        // تحميل الصور
         await _preloadImages(activity);
 
+        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -89,20 +94,17 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
   }
 
   Future<void> playSound() async {
-    if (_activity?.deceptionInstructions == null ||
-        _activity!.deceptionInstructions!.isEmpty) return;
-
+    if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
     await _player.stop();
-    await _player.play(
-      UrlSource(_activity!.deceptionInstructions![0]!),
-    );
+    await _player.play(UrlSource(_activity!.audioUrl!));
   }
-
   void repeatSound() => playSound();
 
+  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -112,14 +114,17 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
     }
   }
 
+  // دالة لبدء حركة الإجابة الصحيحة
   void _startAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
+      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
+      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -132,6 +137,39 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
     }
   }
 
+  // دالة للإجابة الصحيحة
+  Future<void> _handleCorrectAnswer() async {
+    setState(() {
+      _isAnimatingAnswer = false;
+    });
+
+    _animationController?.stop();
+    _animationController?.value = 0;
+
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _usedHint,
+    );
+
+    print("RESULT: ${result?.isPassed}");
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
+    }
+
+    setState(() {
+      _wrongAttempts = 0;
+    });
+
+    WellDoneOverlay.show(context);
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        widget.onNextStage?.call();
+      }
+    });
+  }
+
   @override
   void dispose() {
     _player.dispose();
@@ -141,19 +179,21 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
 
   @override
   Widget build(BuildContext context) {
+    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
 
-    final rightElement = _activity!.elements![0];
-    final leftElement = _activity!.elements![1];
-    final anchorElement =
-    _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
+    final wrongElement = _activity!.elements![0];   // الصورة الخطأ (اليمين)
+    final correctElement = _activity!.elements![1]; // الصورة الصحيحة (اليسار)
+    final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
+    // استخدام MediaQuery مع SingleChildScrollView
     final Size screenSize = MediaQuery.of(context).size;
     final double scale = min(screenSize.width / 400, screenSize.height / 800);
 
@@ -161,10 +201,10 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
       body: SingleChildScrollView(
         child: Container(
           width: screenSize.width,
-          height: screenSize.height * .8,
+          height: screenSize.height * 0.8,
           child: Stack(
-            alignment: Alignment.center,
             children: [
+              // Anchor في النص مع قلب (scaleX: -1) لـ Level3
               Center(
                 child: Transform.scale(
                   scaleX: -1,
@@ -176,102 +216,57 @@ class RightLeftLevel3Stage3State extends State<RightLeftLevel3Stage3>
                 ),
               ),
 
-              Positioned.fill(
-                child: Padding(
-                  padding: EdgeInsets.all(20 * scale),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      AnimatedBuilder(
-                        animation: _animationController!,
-                        builder: (context, child) {
-                          double shakeValue = 0;
-                          if (_isAnimatingAnswer) {
-                            shakeValue = screenSize.width *
-                                0.03 *
-                                sin(_animationController!.value * pi);
-                          }
+              // leftElement في أقصى اليسار (الصحيح) - كامل الصورة يعتبر إجابة صحيحة
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 30,
+                child: Center(
+                  child: AnimatedBuilder(
+                    animation: _animationController!,
+                    builder: (context, child) {
+                      double shakeValue = 0;
+                      if (_isAnimatingAnswer) {
+                        shakeValue = screenSize.width * 0.03 *
+                            sin(_animationController!.value * pi);
+                      }
 
-                          return Transform.translate(
-                            offset: Offset(shakeValue, 0),
-                            child: child,
-                          );
-                        },
-                        child: GestureDetector(
-                          onTapDown: (details) {
-                            final local = details.localPosition;
-                            final double imageWidth = 180 * scale;
-                            final double imageHeight = 180 * scale;
-
-                            // المنطقة الصحيحة أصبحت في الشمال
-                            final correctArea = Rect.fromLTWH(
-                              0,
-                              0,
-                              imageWidth * 0.6,
-                              imageHeight,
-                            );
-
-                            if (correctArea.contains(local)) {
-                              setState(() {
-                                _wrongAttempts = 0;
-                                _isAnimatingAnswer = false;
-                              });
-
-                              _animationController?.stop();
-                              _animationController?.value = 0;
-
-                              WellDoneOverlay.show(context);
-
-                              Future.delayed(const Duration(seconds: 3), () {
-                                if (mounted) {
-                                  widget.onNextStage?.call();
-                                }
-                              });
-                            }
-                          },
-                          child: SizedBox(
-                            width: 180 * scale,
-                            height: 180 * scale,
-                            child: Stack(
-                              children: [
-                                Image.network(
-                                  leftElement.imageUrl ?? '',
-                                  fit: BoxFit.cover,
-                                ),
-
-                                // منطقة المساعدة أصبحت في الشمال
-                                Positioned(
-                                  left: 0,
-                                  child: Container(
-                                    width: 180 * scale * 0.6,
-                                    height: 180 * scale,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      return Transform.translate(
+                        offset: Offset(shakeValue, 0),
+                        child: child,
+                      );
+                    },
+                    child: GestureDetector(
+                      onTap: () async {
+                        await _handleCorrectAnswer();
+                      },
+                      child: Image.network(
+                        width: 180 * scale,
+                        height: 180 * scale,
+                        correctElement.imageUrl ?? '',
+                        fit: BoxFit.cover,
                       ),
+                    ),
+                  ),
+                ),
+              ),
 
-                      GestureDetector(
-                        onTap: () {
-                          _handleWrongAnswer();
-                        },
-                        child: Container(
-                          width: 180 * scale,
-                          height: 180 * scale,
-                          decoration: const BoxDecoration(
-                            border: Border.fromBorderSide(
-                              BorderSide(color: Colors.transparent),
-                            ),
-                          ),
-                          child: Image.network(
-                            rightElement.imageUrl ?? '',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ],
+              // rightElement في أقصى اليمين (الخطأ)
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 30,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      _handleWrongAnswer();
+                    },
+                    child: Image.network(
+                      width: 180 * scale,
+                      height: 180 * scale,
+                      wrongElement.imageUrl ?? '',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),

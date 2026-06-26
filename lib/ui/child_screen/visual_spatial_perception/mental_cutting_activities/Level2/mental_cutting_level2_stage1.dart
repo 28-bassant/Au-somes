@@ -38,7 +38,7 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
 
   // GlobalKey للـ Container
   final GlobalKey _containerKey = GlobalKey();
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -140,13 +140,12 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
-    // تشغيل صوت Try Again
-    TryAgainSound.play();
-
-    if (_wrongAttempts >= 2) {
-      // تحريك الإجابة الصحيحة بعد المحاولات الخاطئة
+    if (_wrongAttempts == 1) {
+      TryAgainSound.play();
+    } else if (_wrongAttempts >= 2) {
       _startAnswerAnimation();
     }
   }
@@ -196,7 +195,10 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
   }
 
   // دالة للتعامل مع الإجابة الصحيحة (سحب Actor الصحيح إلى الـ Container)
-  void _handleCorrectActor(DraggableDetails details, double actorSize) {
+  Future<void> _handleCorrectActor(
+      DraggableDetails details,
+      double actorSize,
+      ) async {
     if (_containerFilled) return;
 
     // نتحقق إذا كان الـ Actor قد وقع داخل الـ Container
@@ -210,8 +212,10 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
       _animationController?.stop();
       _animationController?.value = 0;
 
-      // إظهار WellDoneOverlay بعد ملء الـ Container
+      await _logProgress();
+
       WellDoneOverlay.show(context);
+
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) {
           widget.onNextStage?.call();
@@ -219,7 +223,23 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
       });
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   @override
   void dispose() {
     _player.dispose();
@@ -343,8 +363,8 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
                         },
                       ),
                     ),
-                    onDragEnd: (details) {
-                      _handleCorrectActor(details, actorSize);
+                    onDragEnd: (details) async {
+                      await _handleCorrectActor(details, actorSize);
                     },
                   ),
                 ),

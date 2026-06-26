@@ -31,7 +31,7 @@ class GeoboardLevel1Stage1State extends State<GeoboardLevel1Stage1>
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
   bool _isCompleted = false;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -129,13 +129,12 @@ class GeoboardLevel1Stage1State extends State<GeoboardLevel1Stage1>
 
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
-    // تشغيل صوت Try Again
     TryAgainSound.play();
 
     if (_wrongAttempts >= 2) {
-      // تحريك الإجابة الصحيحة بعد المحاولات الخاطئة
       _startAnswerAnimation();
     }
   }
@@ -162,7 +161,7 @@ class GeoboardLevel1Stage1State extends State<GeoboardLevel1Stage1>
   }
 
   // دالة للتعامل مع الإجابة الصحيحة
-  void _handleCorrectActor() {
+  void _handleCorrectActor() async {
     if (_isCompleted) return;
 
     setState(() {
@@ -174,13 +173,32 @@ class GeoboardLevel1Stage1State extends State<GeoboardLevel1Stage1>
     _animationController?.stop();
     _animationController?.value = 0;
 
-    // إظهار WellDoneOverlay
+    await _logProgress();
+
     WellDoneOverlay.show(context);
+
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         widget.onNextStage?.call();
       }
     });
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:math' as math;
 import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
@@ -7,39 +6,10 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../../models/activities/activity_element.dart';
+import '../../../reinforcement_widgets/true_answer_sound.dart';
 import '../../../reinforcement_widgets/try_again_sound.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'dart:math' as math;
-import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+
 class ShapeAndShadowLevel3Stage2 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
@@ -71,9 +41,11 @@ class ShapeAndShadowLevel3Stage2State
   // rotation لكل actor
   Map<String, double> actorRotation = {};
 
-  // 🔥 لكل actor محاولة واحدة فقط
+  // لكل actor محاولة واحدة فقط
   Map<String, int> actorTryCount = {};
-
+  bool _isCompleted = false;
+  Map<String, bool> wrongPlayed = {};
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -115,21 +87,28 @@ class ShapeAndShadowLevel3Stage2State
       actorTryCount[actor3!.id!] = 0;
 
       await _preloadImages();
+
+      //  تشغيل الصوت بعد تحميل الصور
       await _playSound();
 
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       print("Error: $e");
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _preloadImages() async {
     final images = _activity!.elements!
         .map((e) => e.imageUrl)
-        .where((url) => url != null && url!.isNotEmpty);
+        .where((url) => url != null && url!.isNotEmpty)
+        .toList();
 
     for (final url in images) {
       await precacheImage(NetworkImage(url!), context);
@@ -138,10 +117,27 @@ class ShapeAndShadowLevel3Stage2State
 
   Future<void> _playSound() async {
     if (_activity?.audioUrl == null || _activity!.audioUrl!.isEmpty) return;
-    await _player.stop();
-    await _player.play(UrlSource(_activity!.audioUrl!));
+
+    try {
+      // ✅ الطريقة الأضمن: setSourceUrl ثم play
+      await _player.stop();
+      await _player.setSourceUrl(_activity!.audioUrl!);
+      await _player.resume();
+    } catch (e) {
+      print("خطأ في تشغيل الصوت: $e");
+      // محاولة بديلة
+      try {
+        await _player.stop();
+        await _player.play(UrlSource(_activity!.audioUrl!));
+      } catch (e2) {
+        print("خطأ في المحاولة البديلة: $e2");
+      }
+    }
   }
 
+  void repeatSound() {
+    _playSound();
+  }
 
   @override
   void dispose() {
@@ -196,30 +192,64 @@ class ShapeAndShadowLevel3Stage2State
 
   Widget _buildShadow(ActivityElement? shadow, double w) {
     return DragTarget<ActivityElement>(
-        onWillAccept: (_) => true,
-    onAccept: (actor) {
-    if (actor.targetedZoneId == shadow?.id) {
-    // ✅ صح
-      setState(() {
-        placed[shadow!.id!] = actor;
+      onWillAccept: (_) => !_isCompleted,
+      onAccept: (actor) async {
+        if (_isCompleted) return;
 
-        // 🔥 reset المحاولات لكل actors (دور جديد)
-        actorTryCount.updateAll((key, value) => 0);
-      });
-    WellDoneOverlay.show(context);if (placed.length == 2) {
-      Future.delayed(const Duration(milliseconds: 700), () {
-        widget.onNextStage?.call();
-      });
-    }
-    } else {
-      // ❌ غلط → مرة واحدة بس لكل actor
-      final id = actor.id!;
-      if (actorTryCount[id]! < 1) {
-        TryAgainSound.play();
-        actorTryCount[id] = 1;
-      }
-    }
-    },
+        final isCorrect = actor.targetedZoneId == shadow?.id;
+
+        if (isCorrect) {
+          setState(() {
+            placed[shadow!.id!] = actor;
+          });
+
+          wrongPlayed.clear();
+
+          final isLast = placed.length == 2;
+
+          if (isLast) {
+            if (!_isCompleted) {
+              _isCompleted = true;
+
+              // تسجيل النجاح
+              final result = await ApiManager.logAttemptStatus(
+                phaseId: _activity!.phaseId!,
+                userHint: _usedHint,
+              );
+
+              print("RESULT: ${result?.isPassed}");
+
+              // تحديث الـ Progress
+              if (result?.isPassed == true) {
+                await ApiManager.getProgressSummary();
+              }
+
+              WellDoneOverlay.show(context);
+
+              Future.delayed(const Duration(seconds: 3), () {
+                if (mounted) {
+                  widget.onNextStage?.call();
+                }
+              });
+            }
+          } else {
+            TrueAnswerSound.play();
+          }
+
+          return;
+        }
+
+        final actorId = actor.id ?? '';
+
+        if (wrongPlayed[actorId] != true) {
+          setState(() {
+            _usedHint = true;
+          });
+
+          TryAgainSound.play();
+          wrongPlayed[actorId] = true;
+        }
+      },
       builder: (context, candidateData, rejectedData) {
         return SizedBox(
           width: w * 0.22,
@@ -228,9 +258,7 @@ class ShapeAndShadowLevel3Stage2State
               ? Builder(
             builder: (_) {
               final placedActor = placed[shadow!.id]!;
-
               final isActor2 = placedActor.id == actor2?.id;
-
               return Transform.rotate(
                 angle: actorRotation[placedActor.id!] ?? 0,
                 child: Transform.scale(
@@ -258,17 +286,13 @@ class ShapeAndShadowLevel3Stage2State
         double? height,
       }) {
     final isPlaced = placed.containsValue(actor);
-
     final w = MediaQuery.of(context).size.width;
     final finalWidth = width ?? w * 0.21;
     final finalHeight = height ?? w * 0.20;
-
     final isActor2 = actor?.id == actor2?.id;
 
     return Draggable<ActivityElement>(
       data: actor,
-
-      // ✨ أثناء السحب
       feedback: Transform.rotate(
         angle: actorRotation[actor?.id ?? ''] ?? 0,
         child: Material(
@@ -283,9 +307,7 @@ class ShapeAndShadowLevel3Stage2State
           ),
         ),
       ),
-
       childWhenDragging: const SizedBox(),
-
       child: isPlaced
           ? const SizedBox()
           : SizedBox(

@@ -32,7 +32,7 @@ class RoomArrangementLevel2Stage1State
   late Future<ActivityResponse> _activityFuture;
   Map<int, bool> placed = {};
   Map<int, bool> _soundPlayed = {};
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -67,6 +67,23 @@ class RoomArrangementLevel2Stage1State
   }
 
   void repeatSound() => playSound();
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -182,21 +199,26 @@ class RoomArrangementLevel2Stage1State
                         onWillAccept: (data) {
                           return data == i && placed[i] != true;
                         },
-                        onAccept: (data) {
+                        onAccept: (data) async {
                           setState(() {
                             placed[i] = true;
                           });
 
-                          // تشغيل صوت الإجابة الصحيحة إذا لم يتم تشغيله من قبل
                           if (!_soundPlayed[i]!) {
                             _soundPlayed[i] = true;
                             TrueAnswerSound.play();
                           }
 
                           if (placed.values.every((e) => e == true)) {
+
+                            await _logProgress();
+
                             WellDoneOverlay.show(context);
+
                             Future.delayed(const Duration(seconds: 2), () {
-                              widget.onNextStage?.call();
+                              if (mounted) {
+                                widget.onNextStage?.call();
+                              }
                             });
                           }
                         },

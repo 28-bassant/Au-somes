@@ -4,10 +4,13 @@ import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/true_answer_sound.dart';
+import 'package:au_somes/utils/app_routes.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../reinforcement_widgets/well_done_overlay.dart';
+import '../../visual_spatial_perception_base_screen.dart';
+import '../../widgets/asperger_widget.dart';
 
 class MentalCuttingLevel3Stage1 extends StatefulWidget {
   final VoidCallback? onNextStage;
@@ -45,11 +48,36 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
 
   // GlobalKeys لكل Anchor
   final Map<String, GlobalKey> _anchorKeys = {};
+  bool _usedHint = false;
 
+  void _playAfterDialog() async {
+    _canPlaySound = true;
+    // تأخير بسيط للتأكد من أن كل شيء جاهز
+    await Future.delayed(const Duration(milliseconds: 100));
+    await playSound();
+    _hasPlayedSound = true;
+  }
   @override
   void initState() {
     super.initState();
+
+    // تهيئة AudioPlayer أولاً
     _player = AudioPlayer();
+
+    // استخدام Future.delayed للتأكد من اكتمال التهيئة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AspergerWidget().aspergerFun(
+        context,
+        onSkip: () {
+          final parent = context.findAncestorStateOfType<VisualSpatialPerceptionBaseScreenState>();
+          parent?.goToActivity(23);
+        },
+        onOk: () {
+          _playAfterDialog();
+        },
+      );
+    });
+
     _loadActivity();
 
     _animationController = AnimationController(
@@ -99,10 +127,7 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
           _imagesLoaded = true;
         });
 
-        if (!_hasPlayedSound) {
-          await playSound();
-          _hasPlayedSound = true;
-        }
+
 
         setState(() {
           _isLoading = false;
@@ -134,8 +159,17 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
     await Future.wait(precacheFutures);
     print('All images preloaded successfully');
   }
+  bool _canPlaySound = false;
 
   Future<void> playSound() async {
+    if (!_canPlaySound) return;
+
+    // التأكد من أن player تم تهيئته
+    if (_player == null) {
+      print('AudioPlayer not initialized');
+      return;
+    }
+
     if (!_dataLoaded || !_imagesLoaded) {
       print('Waiting for data and images to load before playing sound');
       return;
@@ -162,18 +196,18 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
   void _handleWrongAnswer(String actorId) {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
-    // تشغيل صوت Try Again فقط في المرة الأولى
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     }
 
-    // عند المحاولة الخاطئة الثانية، نهتز الـ Anchor الصحيح (بدون صوت)
     if (_wrongAttempts >= 2) {
-      // الحصول على الـ Anchor المستهدف لهذا الـ Actor
       final targetAnchorId = _actorTargetAnchor[actorId];
-      if (targetAnchorId != null && !_filledAnchors[targetAnchorId]!) {
+
+      if (targetAnchorId != null &&
+          !_filledAnchors[targetAnchorId]!) {
         _startAnchorAnimation(targetAnchorId);
       }
     }
@@ -232,19 +266,24 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
   }
 
   // دالة للتعامل مع سحب Actor
-  void _handleActorDragEnd(DraggableDetails details, double actorSize, String actorId) {
+  Future<void> _handleActorDragEnd(
+      DraggableDetails details,
+      double actorSize,
+      String actorId,
+      ) async {
     // الحصول على الـ Anchor الذي تم السحب فوقه
     final targetAnchorId = _getAnchorUnderActor(details, actorSize);
 
     if (targetAnchorId == null) {
-      // إذا لم يتم السحب فوق أي Anchor، لا نفعل شيء
       return;
     }
 
     // التحقق مما إذا كان هذا الـ Anchor هو الهدف الصحيح لهذا الـ Actor
     final expectedAnchorId = _actorTargetAnchor[actorId];
 
-    if (expectedAnchorId == targetAnchorId && !_filledAnchors[targetAnchorId]!) {
+    if (expectedAnchorId == targetAnchorId &&
+        !_filledAnchors[targetAnchorId]!) {
+
       // إجابة صحيحة
       setState(() {
         _filledAnchors[targetAnchorId] = true;
@@ -263,9 +302,14 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
       }
 
       // التحقق من اكتمال جميع Anchors
-      bool allFilled = _filledAnchors.values.every((filled) => filled == true);
+      bool allFilled =
+      _filledAnchors.values.every((filled) => filled == true);
+
       if (allFilled) {
+        await _logProgress();
+
         WellDoneOverlay.show(context);
+
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) {
             widget.onNextStage?.call();
@@ -277,6 +321,24 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
       _handleWrongAnswer(actorId);
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
+
 
   @override
   void dispose() {
