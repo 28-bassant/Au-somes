@@ -197,6 +197,7 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
           SizedBox(height: height * .04),
 
 
+
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

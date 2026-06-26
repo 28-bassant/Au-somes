@@ -11,53 +11,81 @@ class TokenUtils {
 
   // ---------------- SAVE REGISTER ----------------
   static Future<void> saveTokens(RegisterResponse res) async {
-    await SharedPrefsUtils.saveData(key: "token", value: res.token ?? "");
-    await SharedPrefsUtils.saveData(key: "refreshToken", value: res.refreshToken ?? "");
-
-    final expiry = getExpiryFromToken(res.token) ??
-        DateTime.now()
-            .add(Duration(seconds: res.expiresIn ?? 1800))
-            .millisecondsSinceEpoch;
-
-    await SharedPrefsUtils.saveData(key: "tokenExpiry", value: expiry);
-
-    await saveChildInfo(res.childName, res.childAge);
-
-    if (res.email != null) {
-      await SharedPrefsUtils.saveData(key: "email", value: res.email!);
-    }
+    await _saveCommonTokens(
+      token: res.token,
+      refreshToken: res.refreshToken,
+      expiresIn: res.expiresIn,
+      childName: res.childName,
+      childAge: res.childAge,
+      email: res.email,
+    );
   }
 
   // ---------------- SAVE LOGIN ----------------
   static Future<void> saveLoginTokens(LoginResponse res) async {
-    await SharedPrefsUtils.saveData(key: "token", value: res.token ?? "");
-    await SharedPrefsUtils.saveData(key: "refreshToken", value: res.refreshToken ?? "");
+    print("🔥 SAVING TOKEN: ${res.token}");
 
-    final expiry = getExpiryFromToken(res.token) ??
+    await _saveCommonTokens(
+      token: res.token,
+      refreshToken: res.refreshToken,
+      expiresIn: res.expiresIn,
+      childName: res.childName,
+      childAge: res.childAge,
+      email: res.email,
+    );
+  }
+
+  // ---------------- COMMON SAVE ----------------
+  static Future<void> _saveCommonTokens({
+    required String? token,
+    required String? refreshToken,
+    required int? expiresIn,
+    required String? childName,
+    required int? childAge,
+    required String? email,
+  }) async {
+    if (token != null && token.isNotEmpty) {
+      await SharedPrefsUtils.saveData(key: "token", value: token);
+    }
+    await SharedPrefsUtils.saveData(key: "refreshToken", value: refreshToken ?? "");
+
+    final expiry = getExpiryFromToken(token) ??
         DateTime.now()
-            .add(Duration(seconds: res.expiresIn ?? 1800))
+            .add(Duration(seconds: expiresIn ?? 1800))
             .millisecondsSinceEpoch;
 
     await SharedPrefsUtils.saveData(key: "tokenExpiry", value: expiry);
 
-    await saveChildInfo(res.childName, res.childAge);
+    await saveChildInfo(childName, childAge);
 
-    if (res.email != null) {
-      await SharedPrefsUtils.saveData(key: "email", value: res.email!);
+    if (email != null) {
+      await SharedPrefsUtils.saveData(key: "email", value: email);
     }
   }
 
-  // ---------------- GET TOKENS ----------------
-  static String? getToken() =>
-      SharedPrefsUtils.getData(key: "token") as String?;
+  // ---------------- GET TOKEN (FIXED) ----------------
+  static Future<String?> getToken() async {
+    final value = await SharedPrefsUtils.getData(key: "token");
 
-  static String? getRefreshToken() =>
-      SharedPrefsUtils.getData(key: "refreshToken") as String?;
+    print("🔥 READ TOKEN: $value");
 
-  static int? getTokenExpiry() =>
-      SharedPrefsUtils.getData(key: "tokenExpiry") as int?;
+    if (value is String && value.isNotEmpty) return value;
+    return null;
+  }
 
-  // ---------------- JWT EXP EXTRA (NEW FIX) ----------------
+  static Future<String?> getRefreshToken() async {
+    final value = SharedPrefsUtils.getData(key: "refreshToken");
+    if (value is String && value.isNotEmpty) return value;
+    return null;
+  }
+
+  static Future<int?> getTokenExpiry() async {
+    final value = SharedPrefsUtils.getData(key: "tokenExpiry");
+    if (value is int) return value;
+    return null;
+  }
+
+  // ---------------- JWT EXP ----------------
   static int? getExpiryFromToken(String? token) {
     if (token == null || token.isEmpty) return null;
 
@@ -73,11 +101,12 @@ class TokenUtils {
 
       if (data['exp'] == null) return null;
 
-      return (data['exp'] as int) * 1000; // seconds → milliseconds
-    } catch (e) {
+      return (data['exp'] as int) * 1000;
+    } catch (_) {
       return null;
     }
   }
+
 
   // 👇 child data
   static String? getChildName() {
@@ -110,7 +139,7 @@ class TokenUtils {
 
   // ---------------- REFRESH TOKEN ----------------
   static Future<bool> refreshAccessToken() async {
-    final refreshToken = getRefreshToken();
+    final refreshToken = await getRefreshToken();
     if (refreshToken == null || refreshToken.isEmpty) return false;
 
     final response = await http.post(
@@ -124,8 +153,10 @@ class TokenUtils {
       await saveLoginTokens(LoginResponse.fromJson(data));
       return true;
     }
+
     return false;
   }
+
 
   // ---------------- CHILD INFO ----------------
   static Future<void> saveChildInfo(String? name, int? age) async {

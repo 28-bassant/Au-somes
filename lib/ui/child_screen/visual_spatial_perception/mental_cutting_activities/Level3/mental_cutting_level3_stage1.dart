@@ -48,7 +48,7 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
 
   // GlobalKeys لكل Anchor
   final Map<String, GlobalKey> _anchorKeys = {};
-
+  bool _usedHint = false;
 
   void _playAfterDialog() async {
     _canPlaySound = true;
@@ -196,18 +196,18 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
   void _handleWrongAnswer(String actorId) {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
-    // تشغيل صوت Try Again فقط في المرة الأولى
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     }
 
-    // عند المحاولة الخاطئة الثانية، نهتز الـ Anchor الصحيح (بدون صوت)
     if (_wrongAttempts >= 2) {
-      // الحصول على الـ Anchor المستهدف لهذا الـ Actor
       final targetAnchorId = _actorTargetAnchor[actorId];
-      if (targetAnchorId != null && !_filledAnchors[targetAnchorId]!) {
+
+      if (targetAnchorId != null &&
+          !_filledAnchors[targetAnchorId]!) {
         _startAnchorAnimation(targetAnchorId);
       }
     }
@@ -266,19 +266,24 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
   }
 
   // دالة للتعامل مع سحب Actor
-  void _handleActorDragEnd(DraggableDetails details, double actorSize, String actorId) {
+  Future<void> _handleActorDragEnd(
+      DraggableDetails details,
+      double actorSize,
+      String actorId,
+      ) async {
     // الحصول على الـ Anchor الذي تم السحب فوقه
     final targetAnchorId = _getAnchorUnderActor(details, actorSize);
 
     if (targetAnchorId == null) {
-      // إذا لم يتم السحب فوق أي Anchor، لا نفعل شيء
       return;
     }
 
     // التحقق مما إذا كان هذا الـ Anchor هو الهدف الصحيح لهذا الـ Actor
     final expectedAnchorId = _actorTargetAnchor[actorId];
 
-    if (expectedAnchorId == targetAnchorId && !_filledAnchors[targetAnchorId]!) {
+    if (expectedAnchorId == targetAnchorId &&
+        !_filledAnchors[targetAnchorId]!) {
+
       // إجابة صحيحة
       setState(() {
         _filledAnchors[targetAnchorId] = true;
@@ -297,9 +302,14 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
       }
 
       // التحقق من اكتمال جميع Anchors
-      bool allFilled = _filledAnchors.values.every((filled) => filled == true);
+      bool allFilled =
+      _filledAnchors.values.every((filled) => filled == true);
+
       if (allFilled) {
+        await _logProgress();
+
         WellDoneOverlay.show(context);
+
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) {
             widget.onNextStage?.call();
@@ -311,6 +321,24 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
       _handleWrongAnswer(actorId);
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
+
 
   @override
   void dispose() {

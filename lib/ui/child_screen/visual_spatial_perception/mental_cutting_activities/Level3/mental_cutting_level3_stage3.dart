@@ -51,7 +51,7 @@ class MentalCuttingLevel3Stage3State extends State<MentalCuttingLevel3Stage3>
   // GlobalKeys للحصول على المواضع
   final Map<String, GlobalKey> _actorKeys = {};
   final Map<String, GlobalKey> _anchorKeys = {};
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -219,7 +219,7 @@ class MentalCuttingLevel3Stage3State extends State<MentalCuttingLevel3Stage3>
   }
 
   // إنهاء السحب
-  void _onDragEnd(Offset position) {
+  Future<void> _onDragEnd(Offset position) async {
     if (!_isDragging || _draggingActorId == null) {
       _resetDrag();
       return;
@@ -248,9 +248,14 @@ class MentalCuttingLevel3Stage3State extends State<MentalCuttingLevel3Stage3>
       }
 
       // التحقق من اكتمال جميع التوصيلات
-      bool allConnected = _connectedAnchors.values.every((connected) => connected == true);
+      bool allConnected =
+      _connectedAnchors.values.every((connected) => connected == true);
+
       if (allConnected) {
+        await _logProgress();
+
         WellDoneOverlay.show(context);
+
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) {
             widget.onNextStage?.call();
@@ -258,7 +263,10 @@ class MentalCuttingLevel3Stage3State extends State<MentalCuttingLevel3Stage3>
         });
       }
     } else if (targetAnchorId != null) {
-      // إجابة خاطئة
+      setState(() {
+        _usedHint = true;
+      });
+
       TryAgainSound.play();
     }
 
@@ -272,6 +280,23 @@ class MentalCuttingLevel3Stage3State extends State<MentalCuttingLevel3Stage3>
       _dragCurrentPosition = null;
       _isDragging = false;
     });
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override

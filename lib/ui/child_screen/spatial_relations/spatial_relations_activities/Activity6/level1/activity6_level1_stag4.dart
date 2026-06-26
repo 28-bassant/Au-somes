@@ -6,6 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
 import '../../../../reinforcement_widgets/well_done_overlay.dart';
+
 class Activity6Level1Stage4 extends StatefulWidget {
   final VoidCallback? onNextStage;
 
@@ -22,6 +23,8 @@ class Activity6Level1Stage4State extends State<Activity6Level1Stage4> {
   bool _imagesLoaded = false;
   bool _hasPlayedSound = false;
   bool isPlacedCorrectly = false;
+  bool _usedHint = false;
+  bool _progressSent = false;
 
   @override
   void initState() {
@@ -53,6 +56,27 @@ class Activity6Level1Stage4State extends State<Activity6Level1Stage4> {
     if (_activity.audioUrl == null || _activity.audioUrl!.isEmpty) return;
     await _player.stop();
     await _player.play(UrlSource(_activity.audioUrl!));
+  }
+  Future<void> _logProgress() async {
+    if (_progressSent) return;
+
+    try {
+      _progressSent = true;
+
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override
@@ -121,9 +145,13 @@ class Activity6Level1Stage4State extends State<Activity6Level1Stage4> {
                     height: containerHeight,
                     child: DragTarget<String>(
                       onWillAccept: (data) => data == actor.targetedZoneId,
-                      onAccept: (data) {
+                      onAccept: (data) async {
                         setState(() => isPlacedCorrectly = true);
+
+                        await _logProgress();
+
                         WellDoneOverlay.show(context);
+
                         Future.delayed(const Duration(seconds: 3), () {
                           widget.onNextStage?.call();
                         });

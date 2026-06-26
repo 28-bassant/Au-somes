@@ -122,6 +122,19 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
     }
   }
 
+  Future<void> _logProgress() async {
+    try {
+      await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _wrongAttempts > 0,
+      );
+
+      await ApiManager.getProgressSummary();
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
+
   void _startShadowAnimation() {
     if (!_isAnimatingShadow && _animationController != null) {
       setState(() {
@@ -143,7 +156,7 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
     }
   }
 
-  void _handleDragEnd(DraggableDetails details, double actorSize) {
+  Future<void> _handleDragEnd(DraggableDetails details, double actorSize) async {
     if (_isPlacedCorrectly) return;
 
     final actorCenter = Offset(
@@ -199,6 +212,8 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
         _animationController?.stop();
         _animationController?.value = 0;
 
+        await _logProgress(); // 👈 ده الجديد
+
         WellDoneOverlay.show(context);
 
         Future.delayed(const Duration(seconds: 3), () {
@@ -206,6 +221,8 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
             widget.onNextStage?.call();
           }
         });
+
+        return;
       }
     }
   }

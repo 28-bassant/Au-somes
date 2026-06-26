@@ -47,6 +47,7 @@ class UpLevel2Stage1ActivityState extends State<UpLevel2Stage1Activity>
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   late AnimationController _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -139,12 +140,14 @@ class UpLevel2Stage1ActivityState extends State<UpLevel2Stage1Activity>
 
   // 🔹 التعامل مع إجابة خاطئة
   void _handleWrongAnswer() {
-    setState(() => _wrongAttempts++);
+    setState(() {
+      _wrongAttempts++;
+      _usedHint = true;
+    });
+
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تشغيل اهتزاز Shadow الصحيح
       _startShadowAnimation();
     }
   }
@@ -167,7 +170,7 @@ class UpLevel2Stage1ActivityState extends State<UpLevel2Stage1Activity>
   }
 
   // 🔹 التعامل مع نهاية سحب القطّة
-  void _handleDragEnd(DraggableDetails details) {
+  Future<void> _handleDragEnd(DraggableDetails details) async {
     if (isPlacedCorrectly) return;
 
     // حساب عامل القياس
@@ -188,23 +191,36 @@ class UpLevel2Stage1ActivityState extends State<UpLevel2Stage1Activity>
           correctBox.size.height);
 
       if (rect.contains(actorCenter)) {
-        // ✅ وضع القطّة في المكان الصحيح
+        print("👉 RIGHT ANSWER CLICKED");
+
         _animationController.stop();
         _animationController.value = 0;
+
         setState(() {
           isPlacedCorrectly = true;
           _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
-        // عرض رسالة "Well Done"
+
+        final result = await ApiManager.logAttemptStatus(
+          phaseId: activity!.phaseId!,
+          userHint: _usedHint,
+        );
+
+        print("RESULT: ${result?.isPassed}");
+
+        if (result?.isPassed == true) {
+          await ApiManager.getProgressSummary();
+        }
+
         WellDoneOverlay.show(context);
 
-        // الانتقال للمرحلة التالية بعد 3 ثواني
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) {
             widget.onNextStage?.call();
           }
         });
+
         return;
       }
     }

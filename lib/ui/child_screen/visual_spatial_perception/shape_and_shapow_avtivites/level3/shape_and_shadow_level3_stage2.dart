@@ -45,7 +45,7 @@ class ShapeAndShadowLevel3Stage2State
   Map<String, int> actorTryCount = {};
   bool _isCompleted = false;
   Map<String, bool> wrongPlayed = {};
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -88,7 +88,7 @@ class ShapeAndShadowLevel3Stage2State
 
       await _preloadImages();
 
-      // ✅ تشغيل الصوت بعد تحميل الصور
+      //  تشغيل الصوت بعد تحميل الصور
       await _playSound();
 
       if (mounted) {
@@ -193,7 +193,7 @@ class ShapeAndShadowLevel3Stage2State
   Widget _buildShadow(ActivityElement? shadow, double w) {
     return DragTarget<ActivityElement>(
       onWillAccept: (_) => !_isCompleted,
-      onAccept: (actor) {
+      onAccept: (actor) async {
         if (_isCompleted) return;
 
         final isCorrect = actor.targetedZoneId == shadow?.id;
@@ -210,20 +210,42 @@ class ShapeAndShadowLevel3Stage2State
           if (isLast) {
             if (!_isCompleted) {
               _isCompleted = true;
+
+              // تسجيل النجاح
+              final result = await ApiManager.logAttemptStatus(
+                phaseId: _activity!.phaseId!,
+                userHint: _usedHint,
+              );
+
+              print("RESULT: ${result?.isPassed}");
+
+              // تحديث الـ Progress
+              if (result?.isPassed == true) {
+                await ApiManager.getProgressSummary();
+              }
+
               WellDoneOverlay.show(context);
-              Future.delayed(const Duration(milliseconds: 700), () {
-                widget.onNextStage?.call();
+
+              Future.delayed(const Duration(seconds: 3), () {
+                if (mounted) {
+                  widget.onNextStage?.call();
+                }
               });
             }
           } else {
             TrueAnswerSound.play();
           }
+
           return;
         }
 
         final actorId = actor.id ?? '';
 
         if (wrongPlayed[actorId] != true) {
+          setState(() {
+            _usedHint = true;
+          });
+
           TryAgainSound.play();
           wrongPlayed[actorId] = true;
         }

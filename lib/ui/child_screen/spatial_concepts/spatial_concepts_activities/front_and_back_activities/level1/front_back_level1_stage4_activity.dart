@@ -252,7 +252,15 @@ class FrontBackLevel1Stage4ActivityState
                       _animationController?.stop();
                       _animationController?.value = 0;
 
+                      ApiManager.logAttemptStatus(
+                        phaseId: _activity!.phaseId!,
+                        userHint: false,
+                      );
+
+                      ApiManager.getProgressSummary();
+
                       WellDoneOverlay.show(context);
+
                       Future.delayed(const Duration(seconds: 3), () {
                         if (mounted) {
                           widget.onNextStage?.call();

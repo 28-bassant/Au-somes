@@ -159,13 +159,12 @@ class TowerBuildingLevel1Stage1State extends State<TowerBuildingLevel1Stage1> {
       }
     }
   }
-
-  void _handleFirstActorDragEnd(
+  Future<void> _handleFirstActorDragEnd(
       DraggableDetails details,
       double actorSize,
-      ) {
-    if (_firstShadowReplaced) return; // لو اتم استبداله خلاص
-    if (!_firstActorEnabled) return; // لو مش مفعّل، ميعملش حاجة
+      ) async {
+    if (_firstShadowReplaced) return;
+    if (!_firstActorEnabled) return;
 
     // نحسب مركز الأكتور المسحوب
     final actorCenter = Offset(
@@ -174,10 +173,12 @@ class TowerBuildingLevel1Stage1State extends State<TowerBuildingLevel1Stage1> {
     );
 
     // نحصل على موقع Shadow الأول
-    final shadowBox = _firstShadowKey.currentContext?.findRenderObject() as RenderBox?;
+    final shadowBox =
+    _firstShadowKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (shadowBox != null) {
       final shadowPosition = shadowBox.localToGlobal(Offset.zero);
+
       final shadowRect = Rect.fromLTWH(
         shadowPosition.dx,
         shadowPosition.dy,
@@ -188,7 +189,7 @@ class TowerBuildingLevel1Stage1State extends State<TowerBuildingLevel1Stage1> {
       // نتحقق إذا كان الأكتور وقع داخل Shadow الأول
       if (shadowRect.contains(actorCenter)) {
         setState(() {
-          _firstShadowReplaced = true; // استبدال Shadow الأول
+          _firstShadowReplaced = true;
         });
 
         // تشغيل صوت الإجابة الصحيحة
@@ -197,14 +198,36 @@ class TowerBuildingLevel1Stage1State extends State<TowerBuildingLevel1Stage1> {
           TrueAnswerSound.play();
         }
 
-        // نتحقق إذا كان كل الشادوز اتم استبدالهم
+        // اكتمل النشاط
         if (_firstShadowReplaced && _secondShadowReplaced) {
+          await _logProgress();
+
           WellDoneOverlay.show(context);
+
           Future.delayed(const Duration(seconds: 2), () {
-            widget.onNextStage?.call();
+            if (mounted) {
+              widget.onNextStage?.call();
+            }
           });
         }
       }
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: false,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 

@@ -27,6 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+
 class ShapeAndShadowLevel2Stage2 extends StatefulWidget {
   final VoidCallback? onNextStage;
   const ShapeAndShadowLevel2Stage2({Key? key, this.onNextStage}) : super(key: key);
@@ -56,6 +57,8 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
 
   Map<String, bool> _actorCanTry = {};
   bool _isCompleted = false;
+  bool _usedHint = false;
+
   @override
   void initState() {
     super.initState();
@@ -123,7 +126,23 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
   void repeatSound() => _playSound();
 
   double safe(num? value) => (value ?? 0).toDouble();
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   @override
   void dispose() {
     _player.dispose();
@@ -192,7 +211,7 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
   Widget _buildShadow(ActivityElement? shadow, ActivityElement? actor, double w) {
     return DragTarget<ActivityElement>(
       onWillAccept: (_) => !_isCompleted,
-      onAccept: (droppedActor) {
+      onAccept: (droppedActor) async {
         if (_isCompleted) return;
 
         final isCorrect = droppedActor.targetedZoneId == shadow?.id;
@@ -211,10 +230,14 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
             if (!_isCompleted) {
               _isCompleted = true;
 
+              await _logProgress();
+
               WellDoneOverlay.show(context);
 
               Future.delayed(const Duration(milliseconds: 700), () {
-                widget.onNextStage?.call();
+                if (mounted) {
+                  widget.onNextStage?.call();
+                }
               });
             }
           } else {
@@ -228,6 +251,10 @@ class ShapeAndShadowLevel2Stage2State extends State<ShapeAndShadowLevel2Stage2> 
         final actorId = droppedActor.id ?? '';
 
         if (_actorCanTry[actorId] == true) {
+          setState(() {
+            _usedHint = true;
+          });
+
           TryAgainSound.play();
           _actorCanTry[actorId] = false;
         }

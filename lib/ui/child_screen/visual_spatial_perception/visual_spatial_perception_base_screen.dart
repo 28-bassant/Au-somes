@@ -360,6 +360,13 @@ class VisualSpatialPerceptionBaseScreenState extends State<VisualSpatialPercepti
             ),
           ),
           SizedBox(height: height * .04),
+          IconButton(
+            onPressed: goToNextActivity,
+            icon: const Icon(
+              Icons.add_circle,
+              size: 20,
+            ),
+          ),
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

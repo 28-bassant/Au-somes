@@ -27,7 +27,7 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   late AnimationController _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -106,6 +106,7 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -236,7 +237,9 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
               left: wrongContainerLeft,
               top: wrongContainerTop,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  print("RIGHT ANSWER CLICKED");
+
                   _animationController.stop();
                   _animationController.value = 0;
 
@@ -244,6 +247,17 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
                     _wrongAttempts = 0;
                     _isAnimatingAnswer = false;
                   });
+
+                  final result = await ApiManager.logAttemptStatus(
+                    phaseId: activity!.phaseId!,
+                    userHint: _usedHint,
+                  );
+
+                  print("RESULT: ${result?.isPassed}");
+
+                  if (result?.isPassed == true) {
+                    await ApiManager.getProgressSummary();
+                  }
 
                   WellDoneOverlay.show(context);
 

@@ -180,8 +180,20 @@ class FrontBackLevel4Stage2ActivityState extends State<FrontBackLevel4Stage2Acti
       });
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _wrongAttempts > 0,
+      );
 
-  void _handleDragEnd(DraggableDetails details, double actorSize) {
+      await ApiManager.getProgressSummary();
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
+
+  Future<void> _handleDragEnd(DraggableDetails details, double actorSize) async {
 
     if (_isPlacedCorrectly) return;
 
@@ -214,6 +226,8 @@ class FrontBackLevel4Stage2ActivityState extends State<FrontBackLevel4Stage2Acti
 
         _animationController?.stop();
         _animationController?.value = 0;
+
+        await _logProgress(); // 👈 المهم هنا
 
         WellDoneOverlay.show(context);
 

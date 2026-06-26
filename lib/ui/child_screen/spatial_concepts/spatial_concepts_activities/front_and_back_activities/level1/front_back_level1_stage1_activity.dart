@@ -136,6 +136,16 @@ class FrontBackLevel1Stage1ActivityState
       });
     }
   }
+  Future<void> _logProgress() async {
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _wrongAttempts > 0,
+    );
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
+    }
+  }
 
   @override
   void dispose() {
@@ -214,7 +224,7 @@ class FrontBackLevel1Stage1ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -222,6 +232,8 @@ class FrontBackLevel1Stage1ActivityState
 
                     _animationController?.stop();
                     _animationController?.value = 0;
+
+                    await _logProgress(); // 🔥 هنا الإضافة المهمة
 
                     WellDoneOverlay.show(context);
 

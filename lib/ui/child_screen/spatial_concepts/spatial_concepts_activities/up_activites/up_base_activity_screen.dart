@@ -244,7 +244,6 @@ class _UpBaseActivityScreenState extends State<UpBaseActivityScreen> with RouteA
           ),
           SizedBox(height: height * .04),
 
-
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

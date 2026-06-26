@@ -45,6 +45,7 @@ class InsideLevel2Stage4ActivityState
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -133,6 +134,7 @@ class InsideLevel2Stage4ActivityState
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -164,6 +166,23 @@ class InsideLevel2Stage4ActivityState
           _animationController!.value = 0;
         }
       });
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -274,8 +293,7 @@ class InsideLevel2Stage4ActivityState
                   width: shadow1Width,
                   child: DragTarget<String>(
                     onWillAccept: (data) => data == actor.id,
-                    onAccept: (_) {
-                      // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
+                    onAccept: (_) async {
                       setState(() {
                         isPlacedCorrectly = true;
                         _wrongAttempts = 0;
@@ -284,6 +302,8 @@ class InsideLevel2Stage4ActivityState
 
                       _animationController?.stop();
                       _animationController?.value = 0;
+
+                      await _logProgress();
 
                       WellDoneOverlay.show(context);
 
@@ -345,7 +365,7 @@ class InsideLevel2Stage4ActivityState
                       width: actorWidth,
                     ),
                   ),
-                  onDragEnd: (details) {
+                  onDragEnd: (details) async {
                     if (isPlacedCorrectly) return;
 
                     final double actorSize = 220 * scale;
@@ -365,7 +385,6 @@ class InsideLevel2Stage4ActivityState
                       );
 
                       if (shadow1Rect.contains(actorCenter)) {
-                        // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
                         setState(() {
                           isPlacedCorrectly = true;
                           _wrongAttempts = 0;
@@ -375,12 +394,16 @@ class InsideLevel2Stage4ActivityState
                         _animationController?.stop();
                         _animationController?.value = 0;
 
+                        await _logProgress();
+
                         WellDoneOverlay.show(context);
+
                         Future.delayed(const Duration(seconds: 3), () {
                           if (mounted) {
                             widget.onNextStage?.call();
                           }
                         });
+
                         return;
                       }
                     }

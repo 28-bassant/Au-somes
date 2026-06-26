@@ -140,6 +140,16 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
       }
     });
   }
+  Future<void> _logProgress() async {
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _wrongAttempts > 0,
+    );
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
+    }
+  }
 
   @override
   void dispose() {
@@ -268,7 +278,7 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
                     width: actorWidth,
                   ),
                 ),
-                onDragEnd: (details) {
+                onDragEnd: (details) async {
 
                   final actorCenter = Offset(
                     details.offset.dx + actorWidth / 2,
@@ -289,11 +299,20 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
                       setState(() {
                         isPlacedCorrectly = true;
                         _wrongAttempts = 0;
+                        _isAnimatingShadow = false;
                       });
+
+                      _animationController.stop();
+                      _animationController.value = 0;
+
+                      await _logProgress(); // 🔥 هنا أهم إضافة
+
                       WellDoneOverlay.show(context);
+
                       Future.delayed(const Duration(seconds: 3), () {
                         if (mounted) widget.onNextStage?.call();
                       });
+
                       return;
                     }
                   }

@@ -78,6 +78,8 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
     {'tap': 1, 'lineTo': 3},
     {'tap': 3, 'lineTo': 4},
   ];
+  bool _usedHint = false;
+  bool _progressLocked = false;
 
   @override
   void initState() {
@@ -164,7 +166,8 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
   }
 
   void _handleCircleTap(int index) {
-    if (_isCompleted || _currentStageIndex >= stages.length) return;
+    if (_isCompleted) return;
+    if (_progressLocked) return;
 
     final stage = stages[_currentStageIndex];
     final correctIndex = stage['tap']!;
@@ -174,6 +177,8 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
       int count = _circleWrongPressCount[index] ?? 0;
       count++;
       _circleWrongPressCount[index] = count;
+
+      _usedHint = true;
 
       if (count == 1) {
         TryAgainSound.play();
@@ -190,12 +195,45 @@ class GeoboardLevel3Stage1State extends State<GeoboardLevel3Stage1>
 
     TrueAnswerSound.play();
 
+    // ⭐ هنا المهم: لما يخلص كل الستيجز
     if (_currentStageIndex >= stages.length) {
+      _completeLevel();
+    }
+  }
+  Future<void> _completeLevel() async {
+    if (_progressLocked) return;
+
+    setState(() {
+      _progressLocked = true;
       _isCompleted = true;
-      WellDoneOverlay.show(context);
-      Future.delayed(const Duration(seconds: 3), () {
+      _isAnimatingCircle = false;
+    });
+
+    _circleAnimationController?.stop();
+    _circleAnimationController?.value = 0;
+
+    await _logProgress();
+
+    WellDoneOverlay.show(context);
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
         widget.onNextStage?.call();
-      });
+      }
+    });
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 

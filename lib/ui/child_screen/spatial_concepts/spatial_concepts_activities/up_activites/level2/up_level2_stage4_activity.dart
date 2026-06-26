@@ -41,6 +41,7 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
 
   // Nullable AnimationController لتجنب LateInitializationError
   AnimationController? _animationController;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -128,7 +129,11 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
 
   // التعامل مع الإجابة الغلط
   void _handleWrongAnswer() {
-    setState(() => _wrongAttempts++);
+    setState(() {
+      _wrongAttempts++;
+      _usedHint = true;
+    });
+
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
@@ -153,7 +158,7 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
   }
 
   // التعامل مع نهاية السحب
-  void _handleDragEnd(DraggableDetails details) {
+  Future<void> _handleDragEnd(DraggableDetails details) async {
     if (isPlacedCorrectly) return;
 
     // حساب عامل القياس
@@ -177,19 +182,36 @@ class UpLevel2Stage4ActivityState extends State<UpLevel2Stage4Activity>
         correctBox.size.height,
       );
       if (rect.contains(actorCenter)) {
+        print("👉 RIGHT ANSWER CLICKED");
+
         _animationController?.stop();
         _animationController?.value = 0;
+
         setState(() {
           isPlacedCorrectly = true;
           _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
+
+        final result = await ApiManager.logAttemptStatus(
+          phaseId: activity!.phaseId!,
+          userHint: _usedHint,
+        );
+
+        print("RESULT: ${result?.isPassed}");
+
+        if (result?.isPassed == true) {
+          await ApiManager.getProgressSummary();
+        }
+
         WellDoneOverlay.show(context);
+
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) {
             widget.onNextStage?.call();
           }
         });
+
         return;
       }
     }

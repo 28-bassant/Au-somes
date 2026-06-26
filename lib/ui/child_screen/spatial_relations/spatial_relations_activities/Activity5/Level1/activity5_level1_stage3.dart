@@ -24,7 +24,8 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
   late ActivityResponse _activity;
   bool _imagesLoaded = false;
   bool _hasPlayedSound = false;
-
+  bool _usedHint = false;
+  bool _progressSent = false;
   @override
   void initState() {
     super.initState();
@@ -60,6 +61,27 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
 
   void repeatSound() => playSound();
 
+  Future<void> _logProgress() async {
+    if (_progressSent) return;
+
+    try {
+      _progressSent = true;
+
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   @override
   void dispose() {
     _player.dispose();
@@ -177,11 +199,15 @@ class Activity5Level1Stage3State extends State<Activity5Level1Stage3> {
                             child: DragTarget<String>(
                               onWillAccept: (data) =>
                               data == actor.targetedZoneId,
-                              onAccept: (data) {
+                              onAccept: (data) async {
                                 setState(() {
                                   isPlacedCorrectly = true;
                                 });
+
+                                await _logProgress();
+
                                 WellDoneOverlay.show(context);
+
                                 Future.delayed(const Duration(seconds: 3), () {
                                   if (mounted) {
                                     widget.onNextStage?.call();

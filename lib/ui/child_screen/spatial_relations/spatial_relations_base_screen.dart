@@ -384,6 +384,7 @@ else if (currentActivityIndex == 17) {
             ),
           ),
           SizedBox(height: height * .04),
+
           // InkWell(
           //   onTap: goToNextActivity,
           //   child: Center(

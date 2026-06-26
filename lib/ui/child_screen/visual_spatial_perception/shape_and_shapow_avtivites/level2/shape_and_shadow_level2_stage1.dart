@@ -48,6 +48,8 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
   int _grapeTryCount = 0; // عدد محاولات Try في الدور الحالي
   bool _firstAnswerDone = false; // هل تم وضع أي Actor صح؟
   bool _isCompleted = false;
+  bool _usedHint = false;
+
   @override
   void initState() {
     super.initState();
@@ -118,6 +120,23 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
 
   double safe(num? value) => (value ?? 0).toDouble();
 
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
   @override
   void dispose() {
     _player.dispose();
@@ -163,7 +182,7 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
                             : w * (0.1 + (1 - i) * 0.34),
                         child: DragTarget<ActivityElement>(
                           onWillAccept: (actor) => true,
-                            onAccept: (actor) {
+                            onAccept: (actor) async {
                               if (_isCompleted) return;
 
                               final isCorrect = actor.targetedZoneId == shadows[i].id;
@@ -181,10 +200,14 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
                                   if (!_isCompleted) {
                                     _isCompleted = true;
 
+                                    await _logProgress();
+
                                     WellDoneOverlay.show(context);
 
                                     Future.delayed(const Duration(milliseconds: 700), () {
-                                      widget.onNextStage?.call();
+                                      if (mounted) {
+                                        widget.onNextStage?.call();
+                                      }
                                     });
                                   }
                                 } else {
@@ -194,14 +217,22 @@ class ShapeAndShadowLevel2Stage1State extends State<ShapeAndShadowLevel2Stage1> 
                                 return;
                               }
 
-                              // ❌ Wrong answer logic (grape special handling)
+                              //  Wrong answer logic (grape special handling)
                               final isGrape = actor == orderedActors[2];
 
                               if (isGrape) {
                                 if (!_firstAnswerDone && _grapeTryCount < 2) {
+                                  setState(() {
+                                    _usedHint = true;
+                                  });
+
                                   TryAgainSound.play();
                                   _grapeTryCount++;
                                 } else if (_firstAnswerDone && _grapeTryCount < 1) {
+                                  setState(() {
+                                    _usedHint = true;
+                                  });
+
                                   TryAgainSound.play();
                                   _grapeTryCount++;
                                 }

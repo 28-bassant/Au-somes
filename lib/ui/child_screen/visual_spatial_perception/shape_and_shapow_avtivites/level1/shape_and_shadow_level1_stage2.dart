@@ -40,12 +40,10 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
 
   List<ActivityElement> shadows = [];
   List<ActivityElement> actors = [];
-
-
   Map<String, String> placed = {};
-
   int _wrongAttempts = 0;
   bool _isCompleted = false;
+  bool _usedHint = false;
 
   @override
   void initState() {
@@ -111,7 +109,7 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
   }
 
 
-  void onActorTap(int index) {
+  Future<void> onActorTap(int index) async {
     if (_isCompleted) return;
 
     final actor = actors[index];
@@ -127,8 +125,15 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
     }
 
     if (correctShadow == null) {
-      if (_wrongAttempts == 0) TryAgainSound.play();
-      setState(() => _wrongAttempts++);
+      if (_wrongAttempts == 0) {
+        TryAgainSound.play();
+      }
+
+      setState(() {
+        _wrongAttempts++;
+        _usedHint = true;
+      });
+
       return;
     }
 
@@ -139,22 +144,42 @@ class ShapeAndShadowLevel1Stage2State extends State<ShapeAndShadowLevel1Stage2>
     final isLast = placed.length == shadows.length;
 
     if (isLast) {
-      // 🟢 آخر إجابة صحيحة
       if (!_isCompleted) {
         _isCompleted = true;
+
+        await _logProgress();
 
         WellDoneOverlay.show(context);
 
         Future.delayed(const Duration(milliseconds: 700), () {
-          widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
       }
     } else {
-      // 🟢 إجابة صحيحة عادية
       TrueAnswerSound.play();
     }
 
     _animationController.forward(from: 0);
+  }
+
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
   }
 
   @override
