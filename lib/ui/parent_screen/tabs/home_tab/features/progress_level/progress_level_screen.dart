@@ -187,6 +187,8 @@ class _ProgressLevelScreenState
                 SizedBox(height: height * .02),
                 PercentCircularIndicator(
                   percent: (summary?.totalPercentage ?? 0) / 100,
+                  progressText:
+                  '${summary?.totalPercentage.toStringAsFixed(0) ?? 0}%',
                 ),
                 /// Spatial Concepts
                 PercentLinearIndicator(
