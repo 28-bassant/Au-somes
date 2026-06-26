@@ -33,9 +33,9 @@ class NotificationTab extends StatelessWidget{
               Text(AppLocalizations.of(context)!.yesterday,style: AppStyles.regular16BlackWithOpacity60,),
               SizedBox(height: height*.02,),
               NotificationItem(image: AppAssets.chatbotIcon, text1: AppLocalizations.of(context)!.ask_chatbot_now, text2:AppLocalizations.of(context)!.days_ago, text3:AppLocalizations.of(context)!.ask_chatbot_message)
-                ,          SizedBox(height: height*.02,),
-               NotificationItem(image: AppAssets.reminderIcon, text1:AppLocalizations.of(context)!.reminder, text2:AppLocalizations.of(context)!.days_ago, text3:AppLocalizations.of(context)!.support_message),
-          
+              ,          SizedBox(height: height*.02,),
+              NotificationItem(image: AppAssets.reminderIcon, text1:AppLocalizations.of(context)!.reminder, text2:AppLocalizations.of(context)!.days_ago, text3:AppLocalizations.of(context)!.support_message),
+
             ],
           ),
         ),

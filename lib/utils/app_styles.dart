@@ -69,6 +69,11 @@ class AppStyles{
       fontWeight: FontWeight.bold,
       color: AppColors.blackColor
   );
+  static TextStyle bold32SoftBlue = GoogleFonts.glory(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: AppColors.softBlue
+  );
   static TextStyle bold16MintGreen = GoogleFonts.glory(
     fontSize: 16,
     fontWeight: FontWeight.bold,
