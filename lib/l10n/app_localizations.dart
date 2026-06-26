@@ -1412,6 +1412,30 @@ abstract class AppLocalizations {
   /// **'No Centers Found'**
   String get no_centers_found;
 
+  /// No description provided for @visual_spatial_perception_definition.
+  ///
+  /// In en, this message translates to:
+  /// **'Spatial visualization is the ability to mentally imagine objects, understand their positions and directions, and manipulate them in space.'**
+  String get visual_spatial_perception_definition;
+
+  /// No description provided for @visual_spatial_autism_info.
+  ///
+  /// In en, this message translates to:
+  /// **'Although some autistic individuals demonstrate strengths in specific visual-spatial tasks, spatial skills vary widely across the autism spectrum. Structured training can help improve spatial orientation, directional awareness, and functional navigation skills.'**
+  String get visual_spatial_autism_info;
+
+  /// No description provided for @visual_spatial_games.
+  ///
+  /// In en, this message translates to:
+  /// **'Jigsaw puzzles, tangrams, LEGO building, maze games, and shape-matching activities can help improve visual–spatial skills.'**
+  String get visual_spatial_games;
+
+  /// No description provided for @visual_spatial_training_tips.
+  ///
+  /// In en, this message translates to:
+  /// **'Help your child learn directions through visual cues, simple navigation games, obstacle courses, and consistent practice with concepts like left/right, up/down, and front/back.'**
+  String get visual_spatial_training_tips;
+
   /// No description provided for @title.
   ///
   /// In en, this message translates to:

@@ -51,7 +51,7 @@ dependencies:
   url_launcher: ^6.3.0
   geolocator: ^14.0.2
 
-  timezone: ^0.10.1
+
 
 
 dev_dependencies:

@@ -226,25 +226,56 @@ class ApiManager {
   }
 
   static Future<String> askChatbot(String prompt) async {
-    Uri url = Uri.parse("http://au-somes.runasp.net/api/Chat/ask");
-
-    var response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"Prompt": prompt}),
+    Uri url = Uri.parse(
+      "http://au-somes.runasp.net/api/Chat/ask",
     );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data["answer"];
-    } else {
-      final errorBody = response.body.toLowerCase();
+    try {
+      var response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"Prompt": prompt}),
+      );
 
-      if (errorBody.contains("quota") || errorBody.contains("quotafailure")) {
+      print("STATUS CODE: ${response.statusCode}");
+      print("BODY: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        return data["response"]?["result"]?.toString() ??
+            "Empty response from server";
+      }
+
+      if (response.statusCode == 400) {
+        throw Exception("Invalid request");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Unauthorized");
+      }
+
+      if (response.statusCode == 403) {
+        throw Exception("Access denied");
+      }
+
+      if (response.statusCode == 404) {
+        throw Exception("Chat service not found");
+      }
+
+      if (response.statusCode == 429) {
         throw Exception("QuotaExceeded");
       }
 
-      throw Exception("Failed to get response");
+      if (response.statusCode >= 500) {
+        throw Exception("Server error");
+      }
+
+      throw Exception(
+        "Status ${response.statusCode}: ${response.body}",
+      );
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -329,10 +360,10 @@ class ApiManager {
 
     final token = await TokenUtils.getToken();
 
-    print("🔥 TOKEN INSIDE API: $token");
+    print(" TOKEN INSIDE API: $token");
 
     if (token == null || token.isEmpty) {
-      print("❌ No token found");
+      print(" No token found");
       return null;
     }
 
@@ -359,12 +390,11 @@ class ApiManager {
         return LogAttemptResponse.fromJson(jsonDecode(response.body));
       }
 
-      // ❗ هنا أهم تعديل: اطبع الخطأ بدل ما تخبيه
-      print("❌ API ERROR: ${response.statusCode} - ${response.body}");
+      print("API ERROR: ${response.statusCode} - ${response.body}");
 
       return null;
     } catch (e) {
-      print("❌ Exception in logAttemptStatus: $e");
+      print("Exception in logAttemptStatus: $e");
       return null;
     }
   }
@@ -379,14 +409,13 @@ class ApiManager {
       },
     );
 
-    // 👇 هنا تحط 401 handler
     if (response.statusCode == 401) {
-      print("🔁 Token expired");
+      print(" Token expired");
 
       final refreshed = await TokenUtils.refreshAccessToken();
 
       if (refreshed) {
-        return getProgressSummary(); // 🔥 أعد الطلب
+        return getProgressSummary();
       } else {
         await TokenUtils.clearTokens();
         return null;
