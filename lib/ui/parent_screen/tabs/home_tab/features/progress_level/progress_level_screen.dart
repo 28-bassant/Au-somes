@@ -136,7 +136,6 @@ class _ProgressLevelScreenState
                 ),
 
                 SizedBox(height: height * .02),
-
                 Row(
                   mainAxisAlignment:
                   MainAxisAlignment.spaceBetween,
@@ -186,7 +185,9 @@ class _ProgressLevelScreenState
                 ),
 
                 SizedBox(height: height * .02),
-
+                PercentCircularIndicator(
+                  percent: (summary?.totalPercentage ?? 0) / 100,
+                ),
                 /// Spatial Concepts
                 PercentLinearIndicator(
                   activityName:

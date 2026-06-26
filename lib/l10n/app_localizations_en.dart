@@ -117,11 +117,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get what_is_visual_spatial_perception =>
-      'What is visual–spatial perception?';
+      'What is spatial visualization?';
 
   @override
   String get how_is_visual_spatial_perception_related_to_autism =>
-      'How is visual–spatial perception related to autism?';
+      'How is spatial visualization related to autism?';
 
   @override
   String get game_improve => 'What games improve visual–spatial skills';
@@ -722,4 +722,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_centers_found => 'No Centers Found';
+
+  @override
+  String get visual_spatial_perception_definition =>
+      'Spatial visualization is the ability to mentally imagine objects, understand their positions and directions, and manipulate them in space.';
+
+  @override
+  String get visual_spatial_autism_info =>
+      'Although some autistic individuals demonstrate strengths in specific visual-spatial tasks, spatial skills vary widely across the autism spectrum. Structured training can help improve spatial orientation, directional awareness, and functional navigation skills.';
+
+  @override
+  String get visual_spatial_games =>
+      'Jigsaw puzzles, tangrams, LEGO building, maze games, and shape-matching activities can help improve visual–spatial skills.';
+
+  @override
+  String get visual_spatial_training_tips =>
+      'Help your child learn directions through visual cues, simple navigation games, obstacle courses, and consistent practice with concepts like left/right, up/down, and front/back.';
 }

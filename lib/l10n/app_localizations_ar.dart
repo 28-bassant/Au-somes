@@ -116,15 +116,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get what_is_visual_spatial_perception =>
-      'ما هو الإدراك البصري-المكاني؟';
+      'ما هو التصور البصري-المكاني؟';
 
   @override
   String get how_is_visual_spatial_perception_related_to_autism =>
-      'ما هي علاقة الإدراك البصري-المكاني بالتوحد؟';
+      'ما هي علاقة التصور البصري المكاني بالتوحد؟';
 
   @override
   String get game_improve =>
-      'ما الألعاب المناسبة لتنمية الإدراك البصري-المكاني؟';
+      'ما الألعاب المناسبة لتنمية التصور البصري المكاني؟';
 
   @override
   String get confusion => 'كيف أقدر أساعد طفلي في مشكلة اللخبطة في الاتجاهات؟';
@@ -723,4 +723,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get no_centers_found => 'لا توجد مراكز';
+
+  @override
+  String get visual_spatial_perception_definition =>
+      'التصور البصري المكاني هو القدرة على تخيل الأشكال والأجسام ومعرفة مواقعها واتجاهاتها وتحريكها ذهنيًا في الفراغ.';
+
+  @override
+  String get visual_spatial_autism_info =>
+      'على الرغم من أن بعض الأفراد ذوي التوحد قد يُظهرون نقاط قوة في بعض المهام البصرية المكانية، فإن المهارات المكانية تختلف بشكل كبير بين الأفراد. ويمكن للتدريب المنظم أن يسهم في تحسين الإدراك المكاني، وفهم الاتجاهات، ومهارات التنقل الوظيفية.';
+
+  @override
+  String get visual_spatial_games =>
+      'البازل، والتانجرام، وألعاب الليجو، والمتاهات، ومطابقة الأشكال من أفضل الألعاب لتنمية مهارات التصور البصري-المكاني.';
+
+  @override
+  String get visual_spatial_training_tips =>
+      'ساعد طفلك على تعلم الاتجاهات باستخدام الإشارات البصرية، والألعاب البسيطة، ومسارات العوائق، والتدريب المستمر على مفاهيم مثل اليمين/اليسار، وفوق/تحت، وأمام/خلف.';
 }

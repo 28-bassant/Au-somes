@@ -31,7 +31,7 @@ class PercentCircularIndicator extends StatelessWidget {
              style: AppStyles.bold32MintGreen
          ),
          footer:  Text(
-           AppLocalizations.of(context)!.today_progress,
+           AppLocalizations.of(context)!.overall_progress,
            style:AppStyles.medium16BlackWithOpacity60,
          ),
          circularStrokeCap: CircularStrokeCap.round,
