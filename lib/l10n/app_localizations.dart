@@ -311,13 +311,13 @@ abstract class AppLocalizations {
   /// No description provided for @what_is_visual_spatial_perception.
   ///
   /// In en, this message translates to:
-  /// **'What is visual–spatial perception?'**
+  /// **'What is spatial visualization?'**
   String get what_is_visual_spatial_perception;
 
   /// No description provided for @how_is_visual_spatial_perception_related_to_autism.
   ///
   /// In en, this message translates to:
-  /// **'How is visual–spatial perception related to autism?'**
+  /// **'How is spatial visualization related to autism?'**
   String get how_is_visual_spatial_perception_related_to_autism;
 
   /// No description provided for @game_improve.

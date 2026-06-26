@@ -9,7 +9,7 @@ class ProgressHelper {
 
     try {
 
-      print("👉 SUBMIT PHASE STARTED");
+      print(" SUBMIT PHASE STARTED");
       print("PhaseId: ${activity.phaseId}");
       print("UsedHint: $usedHint");
 
@@ -18,17 +18,17 @@ class ProgressHelper {
         userHint: usedHint,
       );
 
-      print("🔥 RESULT FROM API: $result");
+      print(" RESULT FROM API: $result");
 
       if (result == null) {
-        print("❌ API RETURNED NULL");
+        print(" API RETURNED NULL");
       } else {
-        print("✅ IS PASSED: ${result.isPassed}");
-        print("🏆 POINTS: ${result.points}");
+        print(" IS PASSED: ${result.isPassed}");
+        print(" POINTS: ${result.points}");
       }
 
     } catch (e) {
-      print("❌ ERROR IN SUBMIT PHASE: $e");
+      print(" ERROR IN SUBMIT PHASE: $e");
     }
   }
 }

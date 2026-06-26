@@ -18,6 +18,7 @@ class TokenUtils {
       childName: res.childName,
       childAge: res.childAge,
       email: res.email,
+      userId: res.id,
     );
   }
 
@@ -32,6 +33,7 @@ class TokenUtils {
       childName: res.childName,
       childAge: res.childAge,
       email: res.email,
+      userId: res.id,
     );
   }
 
@@ -43,6 +45,7 @@ class TokenUtils {
     required String? childName,
     required int? childAge,
     required String? email,
+    required String? userId,
   }) async {
     if (token != null && token.isNotEmpty) {
       await SharedPrefsUtils.saveData(key: "token", value: token);
@@ -60,6 +63,12 @@ class TokenUtils {
 
     if (email != null) {
       await SharedPrefsUtils.saveData(key: "email", value: email);
+    }
+    if (userId != null) {
+      await SharedPrefsUtils.saveData(
+        key: "userId",
+        value: userId,
+      );
     }
   }
 
@@ -126,6 +135,11 @@ class TokenUtils {
     if (value is String) return value;
     return null;
   }
+  static String? getUserId() {
+    final value = SharedPrefsUtils.getData(key: "userId");
+    if (value is String) return value;
+    return null;
+  }
 
   // ---------------- CLEAR ----------------
   static Future<void> clearTokens() async {
@@ -135,6 +149,7 @@ class TokenUtils {
     await SharedPrefsUtils.removeData(key: "childName");
     await SharedPrefsUtils.removeData(key: "childAge");
     await SharedPrefsUtils.removeData(key: "email");
+    await SharedPrefsUtils.removeData(key: "userId");
   }
 
   // ---------------- REFRESH TOKEN ----------------

@@ -117,11 +117,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get what_is_visual_spatial_perception =>
-      'What is visual–spatial perception?';
+      'What is spatial visualization?';
 
   @override
   String get how_is_visual_spatial_perception_related_to_autism =>
-      'How is visual–spatial perception related to autism?';
+      'How is spatial visualization related to autism?';
 
   @override
   String get game_improve => 'What games improve visual–spatial skills';
