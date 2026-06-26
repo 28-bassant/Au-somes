@@ -116,15 +116,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get what_is_visual_spatial_perception =>
-      'ما هو الإدراك البصري-المكاني؟';
+      'ما هو التصولر البصري المكاني؟';
 
   @override
   String get how_is_visual_spatial_perception_related_to_autism =>
-      'ما هي علاقة الإدراك البصري-المكاني بالتوحد؟';
+      'ما هي علاقة التصور البصري المكاني بالتوحد؟';
 
   @override
   String get game_improve =>
-      'ما الألعاب المناسبة لتنمية الإدراك البصري-المكاني؟';
+      'ما الألعاب المناسبة لتنمية التصور البصري المكاني؟';
 
   @override
   String get confusion => 'كيف أقدر أساعد طفلي في مشكلة اللخبطة في الاتجاهات؟';

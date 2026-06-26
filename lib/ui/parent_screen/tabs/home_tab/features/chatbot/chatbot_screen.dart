@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../../api/api_manager.dart';
 import '../../../../../../core/cache/shared_prefs_utils.dart';
+import '../../../../../../core/cache/token_utils.dart';
 import '../../../../../../providers/app_language_provider.dart';
 import '../../../../../../utils/app_assets.dart';
 import '../../../../../../utils/app_colors.dart';
@@ -30,26 +31,28 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   bool isLoading = false;
   bool isTyping = false;
   ScrollController scrollController=ScrollController();
-
+  late String chatMessagesKey;
+  late String chatStartedKey;
   @override
   void initState() {
     super.initState();
-    SharedPrefsUtils.removeData(
-      key: ChatConstants.chatMessagesKey,
-    );
 
-    SharedPrefsUtils.removeData(
-      key: ChatConstants.chatStartedKey,
-    );
+    final userId = TokenUtils.getUserId() ?? "guest";
+
+    chatMessagesKey =
+    '${ChatConstants.chatMessagesKey}_$userId';
+
+    chatStartedKey =
+    '${ChatConstants.chatStartedKey}_$userId';
+
     loadChat();
   }
-
   void loadChat() {
     final storedMessages =
-    SharedPrefsUtils.getData(key: ChatConstants.chatMessagesKey) as List<String>?;
+    SharedPrefsUtils.getData(key: chatMessagesKey) as List<String>?;
 
     final started =
-    SharedPrefsUtils.getData(key: ChatConstants.chatStartedKey) as bool?;
+    SharedPrefsUtils.getData(key: chatStartedKey) as bool?;
 
     if (storedMessages != null) {
       messages = storedMessages
@@ -356,11 +359,12 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
     messages.map((m) => jsonEncode(m.toJson())).toList();
 
     await SharedPrefsUtils.saveData(
-      key: ChatConstants.chatMessagesKey,
+      key: chatMessagesKey,
       value: encodedMessages,
     );
+
     await SharedPrefsUtils.saveData(
-      key: ChatConstants.chatStartedKey,
+      key: chatStartedKey,
       value: hasStartedChat,
     );
   }
