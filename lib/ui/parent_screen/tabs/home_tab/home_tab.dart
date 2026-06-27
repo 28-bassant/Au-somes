@@ -25,7 +25,7 @@ class _HomeTabState extends State<HomeTab> {
       {
         'image':AppAssets.dailyTipsImage,
         'title': AppLocalizations.of(context)!.daily_tips,
-        'route':AppRoutes.dailyRoutineScreenRouteName
+        'route':AppRoutes.dailyTipsScreenRouteName
       },
       {
         'image': AppAssets.progressImage,

@@ -259,6 +259,8 @@
        "space_adventure": "Space Adventure🚀",
        "underwater_world": "Underwater World🐠",
        "supermarket_trip": "Supermarket Trip🛒",
+       "day_at_school": "A Day at School 🏫",
+       "fun_at_kitchen": "Fun in the Kitchen 🍳",
        "generating_interactive_story": "Generating Interactive Story",
        "excellent_you_answered": "Excellent! You answered all correctly!",
        "well_done_keep_practicing": "Well done! Keep practicing!",
@@ -284,9 +286,15 @@
        "keep_going": "Keep going like this",
        "wonderful": "Wonderful! 🎉",
        "well_done": "Well done! 🌟",
-       "lets_try_again": "Let's try again together"
-
-
+       "lets_try_again": "Let's try again together",
+       "please_choose_story_theme": "Please choose story theme",
+       "please_select_exactly_concepts": "Please select exactly 3 concepts",
+       "how_would_you_rate_our_app": "How would you rate our app?",
+       "cancel": "Cancel",
+       "submit": "Submit",
+       "thank_you_for_rating": "Thank you for your feedback",
+       "about_us_title": "Empowering Every Child to Learn, Grow, and Shine",
+       "about_us_content": "AU-Somes is an educational and interactive application designed to support children with Autism Spectrum Disorder (ASD) in developing essential cognitive, communication, and daily living skills through engaging activities and personalized learning experiences.\n\nOur mission is to provide a safe, enjoyable, and accessible environment where children can learn at their own pace while helping parents and therapists monitor their progress. The application includes educational games, storytelling, visual learning activities, and progress tracking to encourage continuous development.\n\nAt AU-Somes, we believe that every child has unique abilities and deserves learning tools that meet their individual needs. Our goal is to make learning more enjoyable, inclusive, and effective for every child."
 
 
 

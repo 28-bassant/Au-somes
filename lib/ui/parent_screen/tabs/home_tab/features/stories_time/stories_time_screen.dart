@@ -25,11 +25,26 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
   List<Map<String, String>> get _topics {
     final l10n = AppLocalizations.of(context)!;
     return [
-      {'key': 'day_at_kindergarten', 'label': l10n.day_at_kindergarten},
-      {'key': 'park_outing', 'label': l10n.park_outing},
-      {'key': 'space_adventure', 'label': l10n.space_adventure},
-      {'key': 'underwater_world', 'label': l10n.underwater_world},
-      {'key': 'supermarket_trip', 'label': l10n.supermarket_trip},
+      {
+        'key': 'day_at_kindergarten',
+        'label': l10n.day_at_kindergarten,
+      },
+      {
+        'key': 'school_day',
+        'label': l10n.day_at_school,
+      },
+      {
+        'key': 'space_adventure',
+        'label': l10n.space_adventure,
+      },
+      {
+        'key': 'underwater_world',
+        'label': l10n.underwater_world,
+      },
+      {
+        'key': 'kitchen_time',
+        'label': l10n.fun_at_kitchen,
+      },
     ];
   }
 
@@ -62,7 +77,44 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
     _nameCtrl.dispose();
     super.dispose();
   }
+  String _buildPrompt() {
+    final topic = _topics.firstWhere(
+          (e) => e["key"] == _selectedTopic,
+    )["label"];
 
+    final concepts = _concepts
+        .where((e) => _selectedConcepts.contains(e["key"]))
+        .map((e) => e["label"])
+        .join("، ");
+
+    return """
+أنشئ قصة تفاعلية باللغة العربية لطفل مصاب بالتوحد.
+
+اسم الطفل: ${_nameCtrl.text.trim()}
+
+موضوع القصة:
+$topic
+
+المفاهيم المكانية المطلوب تعليمها:
+$concepts
+
+الشروط:
+
+- عدد الصفحات يساوي عدد المفاهيم.
+- كل صفحة تعلم مفهومًا واحدًا.
+- لكل صفحة:
+  - narration
+  - question
+  - خيارين فقط
+  - answer
+  - encouragement_message
+  - wrong_feedback
+  - retry_hint
+  - image_prompt
+
+أرجع JSON فقط بدون أي شرح.
+""";
+  }
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -104,7 +156,7 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
 
 
     return Container(
-      height: height * .15,
+      height: height * .16,
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 56, 18, 22),
       decoration: BoxDecoration(
@@ -124,7 +176,7 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
                 child: Text(
                   l10n.interactive_story,
                   textAlign: TextAlign.center,
-                  style: AppStyles.bold18Black,
+                  style: AppStyles.bold20Black,
                 ),
               ),
               // السهم - في اليمين للعربي، وفي اليسار للإنجليزي
@@ -246,6 +298,8 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
             final sel = _selectedConcepts.contains(c['key']);
             return GestureDetector(
               onTap: () => setState(() {
+                if (!sel && _selectedConcepts.length >= 3) return;
+
                 if (sel) {
                   _selectedConcepts.remove(c['key']);
                 } else {
@@ -283,12 +337,62 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
       child: ElevatedButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const LoadingScreen(),
-          ),
-        ),
+        onPressed: () {
+          final name = _nameCtrl.text.trim();
+
+          // 1️⃣ التحقق من الاسم
+          if (name.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(
+                backgroundColor: AppColors.redColor,
+                content: Text(l10n.enter_child_name),
+              ),
+            );
+            return;
+          }
+
+          // 2️⃣ التحقق من اختيار موضوع واحد فقط
+          if (_selectedTopic == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(
+                backgroundColor: AppColors.redColor,
+                content: Text(l10n.please_choose_story_theme),
+              ),
+            );
+            return;
+          }
+
+          // 3️⃣ التحقق من اختيار 3 مفاهيم بالظبط
+          if (_selectedConcepts.length != 3) {
+            ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(
+                backgroundColor: AppColors.redColor,
+                content: Text(l10n.please_select_exactly_concepts),
+              ),
+            );
+            return;
+          }
+
+          final String topic = _topics.firstWhere(
+                (e) => e["key"] == _selectedTopic,
+          )["label"]!;
+
+          final List<String> concepts = _concepts
+              .where((e) => _selectedConcepts.contains(e["key"]))
+              .map((e) => e["label"]!)
+              .toList();
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => LoadingScreen(
+                childName: name,
+                theme: topic,
+                concepts: concepts,
+              ),
+            ),
+          );
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.softBlue,
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -297,8 +401,10 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
           ),
           elevation: 0,
         ),
-        child: Text(l10n.start_interactive_story, style: AppStyles.bold16White),
+        child: Text(
+          l10n.start_interactive_story,
+          style: AppStyles.bold16White,
+        ),
       ),
     );
-  }
-}
+  }}

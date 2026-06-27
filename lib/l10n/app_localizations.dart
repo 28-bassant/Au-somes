@@ -1556,6 +1556,18 @@ abstract class AppLocalizations {
   /// **'Supermarket Trip🛒'**
   String get supermarket_trip;
 
+  /// No description provided for @day_at_school.
+  ///
+  /// In en, this message translates to:
+  /// **'A Day at School 🏫'**
+  String get day_at_school;
+
+  /// No description provided for @fun_at_kitchen.
+  ///
+  /// In en, this message translates to:
+  /// **'Fun in the Kitchen 🍳'**
+  String get fun_at_kitchen;
+
   /// No description provided for @generating_interactive_story.
   ///
   /// In en, this message translates to:
@@ -1705,6 +1717,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Let\'s try again together'**
   String get lets_try_again;
+
+  /// No description provided for @please_choose_story_theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose story theme'**
+  String get please_choose_story_theme;
+
+  /// No description provided for @please_select_exactly_concepts.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select exactly 3 concepts'**
+  String get please_select_exactly_concepts;
+
+  /// No description provided for @how_would_you_rate_our_app.
+  ///
+  /// In en, this message translates to:
+  /// **'How would you rate our app?'**
+  String get how_would_you_rate_our_app;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @thank_you_for_rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your feedback'**
+  String get thank_you_for_rating;
+
+  /// No description provided for @about_us_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Empowering Every Child to Learn, Grow, and Shine'**
+  String get about_us_title;
+
+  /// No description provided for @about_us_content.
+  ///
+  /// In en, this message translates to:
+  /// **'AU-Somes is an educational and interactive application designed to support children with Autism Spectrum Disorder (ASD) in developing essential cognitive, communication, and daily living skills through engaging activities and personalized learning experiences.\n\nOur mission is to provide a safe, enjoyable, and accessible environment where children can learn at their own pace while helping parents and therapists monitor their progress. The application includes educational games, storytelling, visual learning activities, and progress tracking to encourage continuous development.\n\nAt AU-Somes, we believe that every child has unique abilities and deserves learning tools that meet their individual needs. Our goal is to make learning more enjoyable, inclusive, and effective for every child.'**
+  String get about_us_content;
 }
 
 class _AppLocalizationsDelegate

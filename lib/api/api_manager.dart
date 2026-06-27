@@ -6,6 +6,7 @@ import '../core/cache/token_utils.dart';
 import '../models/activities/activity_response.dart';
 import '../models/login_response.dart';
 import '../models/register_response.dart';
+import '../models/story/story_response.dart';
 import '../utils/app_routes.dart';
 import 'api_constants.dart';
 import 'api_endpoints.dart';
@@ -246,31 +247,61 @@ class ApiManager {
     }
   }
 
+  // static Future<ActivityResponse> getActivity(
+  //     String activityId, int param1, int param2) async {
+  //
+  //   final url =
+  //       "${ApiConstants.baseUrl}${ApiEndpoints.getActivity}/$activityId/$param1/$param2";
+  //   Uri uri = Uri.parse(url);
+  //
+  //   print("Request URL: $uri");
+  //
+  //   final response = await http.get(uri);
+  //
+  //   print("Raw response body: ${response.body}");
+  //
+  //   if (response.statusCode == 200) {
+  //     final data = jsonDecode(response.body);
+  //     print("Decoded JSON: $data");
+  //
+  //     return ActivityResponse.fromJson(data);
+  //   } else {
+  //     throw Exception(
+  //         "Failed to fetch activity: ${response.statusCode} - ${response.body}");
+  //   }
+  // }
+
   static Future<ActivityResponse> getActivity(
       String activityId, int param1, int param2) async {
 
     final url =
         "${ApiConstants.baseUrl}${ApiEndpoints.getActivity}/$activityId/$param1/$param2";
-    Uri uri = Uri.parse(url);
+
+    final uri = Uri.parse(url);
 
     print("Request URL: $uri");
 
-    final response = await http.get(uri);
+    try {
+      final response = await http.get(uri);
 
-    print("Raw response body: ${response.body}");
+      print("Status: ${response.statusCode}");
+      print("Body: ${response.body}");
 
-    if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print("Decoded JSON: $data");
-
       return ActivityResponse.fromJson(data);
-    } else {
-      throw Exception(
-          "Failed to fetch activity: ${response.statusCode} - ${response.body}");
+
+    } on HandshakeException catch (e) {
+      print("HandshakeException: $e");
+      rethrow;
+    } on SocketException catch (e) {
+      print("SocketException: $e");
+      rethrow;
+    } catch (e, s) {
+      print(e);
+      print(s);
+      rethrow;
     }
   }
-
-
   static Future<void> updateProfile({
     required String email,
     required String childName,
@@ -318,5 +349,168 @@ class ApiManager {
     throw Exception(
       "Failed to update profile: ${response.statusCode}",
     );
+  }
+//   static Future<StoryResponse> generateStories({
+//     required String childName,
+//     required String theme,
+//     required List<String> concepts,
+//   }) async {
+//     Uri url = Uri.parse(
+//       ApiConstants.storiesBaseUrl + ApiEndpoints.storiesEndpoint,
+//     );
+//
+//     final String prompt = """
+// أنشئ قصة تفاعلية باللغة العربية لطفل مصاب بالتوحد.
+//
+// اسم الطفل: $childName
+//
+// موضوع القصة:
+// $theme
+//
+// المفاهيم المكانية:
+// ${concepts.join("، ")}
+//
+// الشروط:
+//
+// - اجعل عدد الصفحات مساويًا لعدد المفاهيم.
+// - كل صفحة تعلم مفهومًا واحدًا فقط.
+// - لكل صفحة:
+//   - narration
+//   - question
+//   - خيارين فقط داخل options
+//   - answer
+//   - feedback يحتوي على:
+//       encouragement_message
+//       wrong_feedback
+//       retry_hint
+//   - image_prompt
+//
+// أرجع JSON فقط بدون أي نص إضافي.
+// """;
+//
+//     var body = jsonEncode({
+//       "model": "qwen2.5-3b-lora",
+//       "messages": [
+//         {
+//           "role": "user",
+//           "content": prompt,
+//         }
+//       ],
+//       "temperature": 0.05,
+//       "max_new_tokens": 2048,
+//     });
+//
+//     final response = await http.post(
+//       url,
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: body,
+//     );
+//
+//     if (response.statusCode == 200) {
+//       final data = jsonDecode(response.body);
+//
+//       final String content =
+//       data["choices"][0]["message"]["content"];
+//
+//       final Map<String, dynamic> storyJson =
+//       jsonDecode(content);
+//
+//       return StoryResponse.fromJson(storyJson);
+//     } else {
+//       throw Exception(
+//         "Failed to generate story: ${response.statusCode}\n${response.body}",
+//       );
+//     }
+//   }
+
+  // في api_manager.dart - استبدل الدالة الموجودة بهذه
+
+  static Future<StoryResponse> generateStories({
+    required String childName,
+    required String theme,
+    required List<String> concepts,
+  }) async {
+    try {
+      print("🚀 Starting API call...");
+      print("👶 Child: $childName");
+      print("📚 Theme: $theme");
+      print("📖 Concepts: ${concepts.join(', ')}");
+
+      // 1️⃣ بناء الـ prompt بالتنسيق الصحيح
+      final String userPrompt = """
+Child name: $childName | Theme: $theme | Concepts: ${concepts.join('، ')}
+""";
+
+      // 2️⃣ إعداد الـ request body
+      var body = jsonEncode({
+        "model": "qwen2.5-3b-lora",
+        "messages": [
+          {
+            "role": "user",
+            "content": userPrompt,
+          }
+        ],
+        "max_new_tokens": 2048,
+        "temperature": 0.05,
+        "top_p": 0.9,
+        "top_k": 50,
+        "repetition_penalty": 1.1,
+      });
+
+      print("📦 Request Body: $body");
+
+      // 3️⃣ إرسال الـ request
+      final response = await http.post(
+        Uri.parse(ApiConstants.storiesBaseUrl + ApiEndpoints.storiesEndpoint),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body,
+      );
+
+      print("📩 Response status: ${response.statusCode}");
+      print("📩 Response body: ${response.body}");
+
+      // 4️⃣ معالجة الـ response
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // استخراج المحتوى من الـ response
+        final String content = data["choices"][0]["message"]["content"];
+
+        print("📖 Raw content: $content");
+
+        // تنظيف النص من أي علامات إضافية
+        String cleanContent = content
+            .replaceAll(RegExp(r'```json'), '')
+            .replaceAll(RegExp(r'```'), '')
+            .trim();
+
+        // تحويل النص إلى JSON
+        final Map<String, dynamic> storyJson = jsonDecode(cleanContent);
+
+        print("✅ Story parsed successfully");
+
+        return StoryResponse.fromJson(storyJson);
+      } else {
+        // محاولة قراءة رسالة الخطأ
+        String errorMessage = "Unknown error";
+        try {
+          final errorData = jsonDecode(response.body);
+          if (errorData.containsKey("error")) {
+            errorMessage = errorData["error"]["message"] ?? errorData["error"].toString();
+          }
+        } catch (_) {
+          errorMessage = response.body;
+        }
+
+        throw Exception("Failed to generate story: ${response.statusCode}\n$errorMessage");
+      }
+    } catch (e) {
+      print("❌ ERROR in generateStories: $e");
+      rethrow;
+    }
   }
 }

@@ -7,6 +7,7 @@ class ApiEndpoints {
   static const String resetPassword = "/Author/reset-password";
   static const String getActivity = "/api/Activity/get-activity";
   static const String updateProfile = "/Account/update-profile";
+  static const String storiesEndpoint = "/v1/chat/completions";
 
 }
 
