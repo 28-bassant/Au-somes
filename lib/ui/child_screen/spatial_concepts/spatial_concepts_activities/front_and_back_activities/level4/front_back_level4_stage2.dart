@@ -301,7 +301,6 @@ class FrontBackLevel4Stage2ActivityState extends State<FrontBackLevel4Stage2Acti
         body: Stack(
           children: [
 
-            // wrong shadow (المتحرك)
             Positioned(
               left: wrongShadowLeft-50,
               top: wrongShadowTop-20,
@@ -337,7 +336,6 @@ class FrontBackLevel4Stage2ActivityState extends State<FrontBackLevel4Stage2Acti
               ),
             ),
 
-            // actor draggable
             if (!_isPlacedCorrectly)
               Positioned(
                 right: actorRight,
@@ -369,7 +367,6 @@ class FrontBackLevel4Stage2ActivityState extends State<FrontBackLevel4Stage2Acti
                 ),
               ),
 
-            // anchor
             Positioned.fill(
               child: Center(
                 child: Image.network(
@@ -379,7 +376,6 @@ class FrontBackLevel4Stage2ActivityState extends State<FrontBackLevel4Stage2Acti
               ),
             ),
 
-            // correct shadow (الثابت)
             Positioned(
               left: correctShadowLeft,
               top: correctShadowTop+20,

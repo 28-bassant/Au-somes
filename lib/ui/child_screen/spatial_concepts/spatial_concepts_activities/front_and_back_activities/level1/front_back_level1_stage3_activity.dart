@@ -28,7 +28,6 @@ class FrontBackLevel1Stage3ActivityState
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -38,10 +37,8 @@ class FrontBackLevel1Stage3ActivityState
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة بسرعة أقل
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -61,10 +58,8 @@ class FrontBackLevel1Stage3ActivityState
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -168,22 +163,20 @@ class FrontBackLevel1Stage3ActivityState
         height: double.infinity,
         child: Stack(
           children: [
-            // عنصر Try Again (الخطأ)
             Positioned(
-              right: screenWidth * 0.35,  // 100 ÷ 400 = 0.25
-              bottom: screenHeight * 0.3, // 320 ÷ 800 = 0.4
+              right: screenWidth * 0.35,
+              bottom: screenHeight * 0.3,
               child: GestureDetector(
                 onTap: () {
                   _handleWrongAnswer();
                 },
                 child: Image.network(
                   firstElement.imageUrl ?? '',
-                  width: screenWidth * 0.875, // 350 ÷ 400 = 0.875
+                  width: screenWidth * 0.875,
                   fit: BoxFit.contain,
                 ),
               ),
             ),
-            // صورة الخلفية
             Positioned.fill(
               child: FittedBox(
                 fit: BoxFit.contain,
@@ -195,10 +188,9 @@ class FrontBackLevel1Stage3ActivityState
 
 
 
-            // العنصر الصحيح
             Positioned(
-              left: screenWidth * 0.25,  // 100 ÷ 400 = 0.25
-              top: screenHeight * 0.3,   // 320 ÷ 800 = 0.4
+              left: screenWidth * 0.25,
+              top: screenHeight * 0.3,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
@@ -216,7 +208,7 @@ class FrontBackLevel1Stage3ActivityState
                 child: GestureDetector(
                   onTapDown: (details) {
                     final local = details.localPosition;
-                    final w = screenWidth * 0.625; // 250 ÷ 400 = 0.625
+                    final w = screenWidth * 0.625;
                     final h = screenWidth * 0.625;
 
                     final correctArea = Rect.fromLTWH(

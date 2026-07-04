@@ -62,10 +62,8 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
           activity = response;
         });
 
-        // Preload الصور أولاً
         await preloadImages(response!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
           await _player.stop();
           await _player.play(UrlSource(activity!.deceptionInstructions!.first));
@@ -114,16 +112,14 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
   void repeatSound() => playSound();
   void _handleWrongAnswer() {
     if (_wrongAttempts == 0) {
-      // أول مرة: صوت Try Again
       TryAgainSound.play();
       setState(() {
         _wrongAttempts = 1;
       });
     } else if (_wrongAttempts == 1 && !_isAnimatingAnswer) {
-      // المرة الثانية: شغل حركة الإجابة الصحيحة مرة واحدة
       _startAnswerAnimation();
       setState(() {
-        _wrongAttempts = 2; // تمنع إعادة الحركة في أي ضغط بعد كده
+        _wrongAttempts = 2;
       });
     }
   }
@@ -165,23 +161,19 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
       final screenWidth = constraints.maxWidth;
       final screenHeight = constraints.maxHeight;
 
-      // 🪑 حجم ومكان الكرسي
       final anchorWidth = screenWidth * 2.6;
       final anchorHeight = screenHeight * 0.7;
       final anchorTop = screenHeight * 0.14;
 
-      // 🐱 حجم ومكان القطة الصحيحة
       final actorSize = anchorWidth * 0.20;
       final seatLevel = anchorTop + anchorHeight * 0.53;
       final actorTop = seatLevel - actorSize * 0.85;
       final actorLeft = (screenWidth - actorSize) / 2 + 16;
 
-      // 🐱 حجم ومكان القطة الخطأ
       final bottomCatSize = actorSize * 0.87;
       final bottomCatTop = anchorTop + anchorHeight - bottomCatSize * 1.2;
       final bottomCatLeft = (screenWidth - bottomCatSize) / 2.9;
 
-      // 🌟 الكونتينر على القطة الصحيحة
       final containerLeft = width * 0.40;
       final containerTop = height * 0.254;
       final containerWidth = width * 0.29;
@@ -189,7 +181,6 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
       final containerRect =
       Rect.fromLTWH(containerLeft, containerTop, containerWidth, containerHeight);
 
-      // 🌟 الكونتينر على القطة الخطأ
       final wrongContainerLeft = bottomCatLeft + 40;
       final wrongContainerTop = bottomCatTop + 41;
       final wrongContainerWidth = containerWidth * 0.9;
@@ -198,7 +189,6 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
           wrongContainerLeft, wrongContainerTop, wrongContainerWidth, wrongContainerHeight);
       return Stack(
         children: [
-          /// 🪑 الكرسي
           Positioned(
             top: anchorTop,
             left: (screenWidth - anchorWidth) / 2 + 15,
@@ -210,7 +200,6 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
             ),
           ),
 
-          /// ✅ القطة الصحيحة مع اهتزاز
           Positioned(
             top: actorTop,
             left: actorLeft,
@@ -223,7 +212,6 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
               ),
             ),
 
-          /// ❌ القطة الخطأ
           Positioned(
             top: bottomCatTop,
             left: bottomCatLeft,
@@ -247,7 +235,6 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
             ),
           )),
 
-          /// 🌟 الضغط على القطة الخطأ
           Positioned(
             left: wrongContainerLeft,
             top: wrongContainerTop,
@@ -275,7 +262,6 @@ class DownLevel1Stage4ActivityState extends State<DownLevel1Stage4Activity>
             ),
           ),
 
-          /// 🌟 الضغط على القطة الصحيحة
           Positioned(
             left: containerLeft,
             top: containerTop,

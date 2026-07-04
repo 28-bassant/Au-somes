@@ -28,7 +28,6 @@ class FrontBackLevel1Stage1ActivityState
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -38,10 +37,8 @@ class FrontBackLevel1Stage1ActivityState
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة بسرعة أقل
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -61,10 +58,8 @@ class FrontBackLevel1Stage1ActivityState
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -168,7 +163,6 @@ class FrontBackLevel1Stage1ActivityState
         height: double.infinity,
         child: Stack(
           children: [
-            // عنصر Try Again (الخطأ)
             Positioned(
               right: screenWidth * 0.45,  // 100 ÷ 400 = 0.25
               bottom: screenHeight * 0.2, // 320 ÷ 800 = 0.4
@@ -183,7 +177,6 @@ class FrontBackLevel1Stage1ActivityState
                 ),
               ),
             ),
-            // صورة الخلفية
             Positioned.fill(
               child: FittedBox(
                 fit: BoxFit.contain,
@@ -195,10 +188,9 @@ class FrontBackLevel1Stage1ActivityState
 
 
 
-            // العنصر الصحيح
             Positioned(
-              left: screenWidth * 0.5,  // 100 ÷ 400 = 0.25
-              top: screenHeight * 0.45,   // 320 ÷ 800 = 0.4
+              left: screenWidth * 0.5,
+              top: screenHeight * 0.45,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {

@@ -53,10 +53,8 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
           _activity = response;
         });
 
-        // تحميل الصور أولاً
         await _preloadImages(response!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -106,7 +104,6 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     } else if (_wrongAttempts >= 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
@@ -139,15 +136,15 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_activity == null) return const Center(child: Text('Error loading activity'));
 
-    final firstElement = _activity!.elements!.first;  // الصح
-    final lastElement = _activity!.elements!.last;    // الخطأ
+    final firstElement = _activity!.elements!.first;
+    final lastElement = _activity!.elements!.last;
     final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
     return LayoutBuilder(
         builder: (context, constraints) {
       final screenWidth = constraints.maxWidth;
       final screenHeight = constraints.maxHeight;
-      final scale = screenWidth / 400; // التصميم الأصلي 400px
+      final scale = screenWidth / 400;
 
       final anchorTop = 340 * scale;
       final actorLeft = 120 * scale;
@@ -168,7 +165,6 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
         ),
       ),
 
-    // الأكتور الصحيح مع اهتزاز
     Positioned(
     left: actorLeft,
     top: actorTop,
@@ -186,7 +182,6 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
     },
       child: GestureDetector(
         onTap: () {
-          // الضغط على الأكتور الصح → WellDone + المرحلة التالية
           WellDoneOverlay.show(context);
           Future.delayed(const Duration(seconds: 3), () {
             if (mounted) widget.onNextStage?.call();
@@ -212,7 +207,6 @@ class BetweenLevel1Stage1ActivityState extends State<BetweenLevel1Stage1Activity
         ),
          ),
 
-    // الأكتور الخطأ
     Positioned(
     left: 310 * scale,
     top: actorTop,

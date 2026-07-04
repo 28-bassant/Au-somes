@@ -27,7 +27,6 @@ class FrontBackLevel3Stage3ActivityState
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -37,10 +36,8 @@ class FrontBackLevel3Stage3ActivityState
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة بسرعة أقل
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -52,7 +49,7 @@ class FrontBackLevel3Stage3ActivityState
       final activity = await ApiManager.getActivity(
         ApiConstants.front_back_activityId,
         1,
-        4, // Stage 4
+        4,
       );
 
       if (mounted) {
@@ -60,10 +57,8 @@ class FrontBackLevel3Stage3ActivityState
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -107,32 +102,26 @@ class FrontBackLevel3Stage3ActivityState
     _imagesLoaded = true;
   }
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة (في الواجهة)
       _startCorrectAnswerAnimation();
     }
   }
 
-  // دالة لبدء حركة الإجابة الصحيحة (تهتز في مكانها)
   void _startCorrectAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -154,36 +143,27 @@ class FrontBackLevel3Stage3ActivityState
 
   @override
   Widget build(BuildContext context) {
-    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
 
-    // استخراج العناصر حسب الـ Response
     final anchorElement = _activity!.elements!
-        .firstWhere((e) => e.role == 'Anchor'); // العنصر الأساسي
+        .firstWhere((e) => e.role == 'Anchor');
 
-    // كل الـ Actors
     final allActors = _activity!.elements!
         .where((e) => e.role == 'Actor')
-        .toList(); // هيرجع 2 Actors
+        .toList();
 
-    // العنصر الصحيح من API (isCorrect = true)
     final apiCorrectElement = allActors.firstWhere((e) => e.isCorrect == true);
 
-    // العنصر الغلط من API (isCorrect = false)
     final apiWrongElement = allActors.firstWhere((e) => e.isCorrect == false);
 
-    // تبديل الأدوار في الواجهة:
-    // wrongElement من API يصبح هو الصحيح في الواجهة
-    // correctElement من API يصبح هو الخطأ في الواجهة
-    final correctElement = apiWrongElement; // الصحيح في الواجهة
-    final wrongElement = apiCorrectElement; // الخطأ في الواجهة
+    final correctElement = apiWrongElement;
+    final wrongElement = apiCorrectElement;
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -194,8 +174,7 @@ class FrontBackLevel3Stage3ActivityState
         height: double.infinity,
         child: Stack(
           children: [
-            // العنصر الصحيح في الواجهة (على اليمين) - كان wrongElement من API
-            // وهذا هو الذي يهتز عند الخطأ للمرة الثانية
+
             Positioned(
               right: screenWidth * 0.65,
               bottom: screenHeight * 0.3,
@@ -213,7 +192,6 @@ class FrontBackLevel3Stage3ActivityState
                 },
                 child: GestureDetector(
                   onTap: () {
-                    // هذا هو الصحيح في الواجهة: يؤدي للفوز
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -236,7 +214,6 @@ class FrontBackLevel3Stage3ActivityState
                 ),
               ),
             ),
-            // صورة الخلفية
             Positioned.fill(
               child: FittedBox(
                 fit: BoxFit.contain,
@@ -248,13 +225,11 @@ class FrontBackLevel3Stage3ActivityState
 
 
 
-            // العنصر الخطأ في الواجهة (على اليسار) - كان correctElement من API
             Positioned(
               left: screenWidth * 0.4,
               top: screenHeight * 0.4,
               child: GestureDetector(
                 onTapDown: (details) {
-                  // هذا هو الخطأ في الواجهة: يؤدي لزيادة المحاولات الخاطئة
                   _handleWrongAnswer();
                 },
                 child: Image.network(

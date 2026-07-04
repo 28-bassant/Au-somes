@@ -24,7 +24,6 @@ class Activity1Level4Stage1State extends State<Activity1Level4Stage1>
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -34,10 +33,8 @@ class Activity1Level4Stage1State extends State<Activity1Level4Stage1>
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,

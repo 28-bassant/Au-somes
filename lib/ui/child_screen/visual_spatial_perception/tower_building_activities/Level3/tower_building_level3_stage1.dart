@@ -25,19 +25,17 @@ class TowerBuildingLevel3Stage1State extends State<TowerBuildingLevel3Stage1> {
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // حالة استبدال كل Shadow
-  bool _firstShadowReplaced = false;   // Shadow الأول للـ Actor الأول (index 1)
-  bool _secondShadowReplaced = false;  // Shadow الثاني (index 5)
-  bool _thirdShadowReplaced = false;   // Shadow الثالث (index 6)
-  bool _fourthShadowReplaced = false;  // Shadow الرابع للـ Actor الرابع (index 1 - نفس الصورة)
-  bool _fifthShadowReplaced = false;   // Shadow الخامس للـ Actor الخامس (index 1 - نفس الصورة)
+  bool _firstShadowReplaced = false;
+  bool _secondShadowReplaced = false;
+  bool _thirdShadowReplaced = false;
+  bool _fourthShadowReplaced = false;
+  bool _fifthShadowReplaced = false;
 
-  // حالة اختفاء كل Actor من الأسفل
-  bool _actor1Removed = false;   // Actor الأول اختفى
-  bool _actor2Removed = false;   // Actor الثاني اختفى
-  bool _actor3Removed = false;   // Actor الثالث اختفى
-  bool _actor4Removed = false;   // Actor الرابع اختفى
-  bool _actor5Removed = false;   // Actor الخامس اختفى
+  bool _actor1Removed = false;
+  bool _actor2Removed = false;
+  bool _actor3Removed = false;
+  bool _actor4Removed = false;
+  bool _actor5Removed = false;
 
   // التحكم في تفعيل كل Actor (قابلية السحب)
   bool _actor1Draggable = true;   // Actor الأول قابل للسحب من البداية

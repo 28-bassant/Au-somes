@@ -58,10 +58,8 @@ class FrontBackLevel3Stage1ActivityState
           _activity = activity;
         });
 
-        // تحميل جميع الصور أولاً
         await _preloadImages(activity);
 
-        // بعد تحميل الصور، نشغل الصوت
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -99,13 +97,11 @@ class FrontBackLevel3Stage1ActivityState
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
-    // تحميل كل الصور في الخلفية
     final List<Future> precacheFutures = [];
     for (final url in images) {
       precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
-    // انتظار تحميل جميع الصور
     await Future.wait(precacheFutures);
 
     setState(() {
@@ -179,7 +175,6 @@ class FrontBackLevel3Stage1ActivityState
         child: Stack(
           children: [
 
-            // الصورة الأولى (أصبحت الإجابة الصحيحة)
             Positioned(
               right: screenWidth * 0.45,
               bottom: screenHeight * 0.2,
@@ -225,7 +220,6 @@ class FrontBackLevel3Stage1ActivityState
               ),
             ),
 
-            // الخلفية
             Positioned.fill(
               child: FittedBox(
                 fit: BoxFit.contain,
@@ -235,7 +229,6 @@ class FrontBackLevel3Stage1ActivityState
               ),
             ),
 
-            // الصورة الثانية (أصبحت الإجابة الخاطئة)
             Positioned(
               left: screenWidth * 0.5,
               top: screenHeight * 0.45,

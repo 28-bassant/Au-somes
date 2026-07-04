@@ -34,7 +34,9 @@ class StoryPage {
   final List<String> options;
   final String answer;
   final StoryFeedback feedback;
-  final String imagePrompt;
+
+  // بدل imagePrompt
+  final String imageUrl;
 
   StoryPage({
     required this.pageNumber,
@@ -44,7 +46,7 @@ class StoryPage {
     required this.options,
     required this.answer,
     required this.feedback,
-    required this.imagePrompt,
+    required this.imageUrl,
   });
 
   factory StoryPage.fromJson(Map<String, dynamic> json) {
@@ -56,7 +58,12 @@ class StoryPage {
       options: List<String>.from(json["options"]),
       answer: json["answer"],
       feedback: StoryFeedback.fromJson(json["feedback"]),
-      imagePrompt: json["image_prompt"],
+
+      // لو اسمه image_url
+      imageUrl: json["image_url"] ?? "",
+
+      // لو الـ API عندكم بيرجع imageUrl استخدمي:
+      // imageUrl: json["imageUrl"] ?? "",
     );
   }
 }

@@ -26,7 +26,6 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
   bool _imagesLoaded = false;
   late AudioPlayer _player;
 
-  // 👇 لإدارة الأخطاء والتحريك
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   late AnimationController _animationController;
@@ -56,10 +55,8 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
           _activity = response;
         });
 
-        // تحميل الصور أولاً
         await _preloadImages(response!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -102,14 +99,12 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
   void repeatSound() => playSound();
 
   void _handleWrongAnswer() {
-    if (_wrongAttempts >= 2) return; // بعد المرة الثانية مش يحصل حاجة
+    if (_wrongAttempts >= 2) return;
     _wrongAttempts++;
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: صوت Try Again
      TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: اهتزاز الأكتور الصح
       _startAnswerAnimation();
     }
   }
@@ -138,8 +133,8 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_activity == null) return const Center(child: Text('Error loading activity'));
 
-    final firstElement = _activity!.elements!.first;  // الأكتور الصح
-    final lastElement = _activity!.elements!.last;    // الأكتور الخطأ
+    final firstElement = _activity!.elements!.first;
+    final lastElement = _activity!.elements!.last;
     final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
     return LayoutBuilder(
@@ -159,7 +154,6 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
       final actorTop = anchorTop + anchorHeight * 0.53 - actorHeight * 0.35;
       final actorLeft = (screenWidth - actorWidth) / 2 - (screenWidth * .09);
 
-      // Container على الأكتور الصح
       final containerLeft = actorLeft + actorWidth * 0.364;
       final containerTop = actorTop + actorHeight * 0.16;
       final containerWidth = actorWidth * 0.26;
@@ -180,7 +174,6 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
         ),
       ),
 
-    // Actor الصح مع اهتزاز
     Positioned(
     top: actorTop,
     left: actorLeft,
@@ -205,7 +198,6 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
     ),
     ),
 
-          // Actor الخطأ
           Positioned(
             top: actorTop,
             right: screenWidth * 0.02,
@@ -219,7 +211,6 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
             ),
           ),
 
-          // GestureDetector على الكونتينر الصح
           Positioned(
             left: containerLeft,
             top: containerTop,
@@ -233,7 +224,7 @@ class BetweenLevel1Stage2ActivityState extends State<BetweenLevel1Stage2Activity
               child: Container(
                 width: containerWidth,
                 height: containerHeight,
-                color: Colors.transparent, // لو عايزة تشوفيه خليها Colors.red.withOpacity(.3)
+                color: Colors.transparent,
               ),
             ),
           ),

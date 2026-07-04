@@ -29,18 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   bool obscure = true;
 
-
   @override
   Widget build(BuildContext context) {
     var languageProvider = Provider.of<AppLanguageProvider>(context);
-    var height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    var width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 8,
@@ -63,12 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
 
                           Positioned(top: 0,
-                              right: languageProvider.appLanguage == 'en'
-                                  ? 0
-                                  : null,
-                              left: languageProvider.appLanguage == 'ar'
-                                  ? 0
-                                  : null,
+                              right: languageProvider.appLanguage == 'en' ? 0 : null,
+                              left: languageProvider.appLanguage == 'ar' ? 0 : null,
                               child: CustomLanguageWidget()),
                         ],
                       ),

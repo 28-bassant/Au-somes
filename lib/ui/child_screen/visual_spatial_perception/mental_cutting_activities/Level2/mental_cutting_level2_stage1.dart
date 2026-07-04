@@ -26,17 +26,14 @@ class MentalCuttingLevel2Stage1State extends State<MentalCuttingLevel2Stage1>
   bool _imagesLoaded = false;
   bool _dataLoaded = false;
 
-  // متغيرات للتحكم في الـ Container الفارغ
-  bool _containerFilled = false; // هل تم ملء الـ Container أم لا
-  String? _correctActorImageUrl; // صورة الـ Actor الصحيح
-  String? _correctActorId; // ID الـ Actor الصحيح
+  bool _containerFilled = false;
+  String? _correctActorImageUrl;
+  String? _correctActorId;
 
-  // متغيرات للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
 
-  // GlobalKey للـ Container
   final GlobalKey _containerKey = GlobalKey();
 
   @override

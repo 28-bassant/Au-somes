@@ -27,7 +27,6 @@ class FrontBackLevel3Stage2ActivityState
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -37,10 +36,8 @@ class FrontBackLevel3Stage2ActivityState
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة بسرعة أقل
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -52,7 +49,7 @@ class FrontBackLevel3Stage2ActivityState
       final activity = await ApiManager.getActivity(
         ApiConstants.front_back_activityId,
         1,
-        2, // Stage 2
+        2,
       );
 
       if (mounted) {
@@ -60,10 +57,8 @@ class FrontBackLevel3Stage2ActivityState
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -108,32 +103,26 @@ class FrontBackLevel3Stage2ActivityState
     _imagesLoaded = true;
   }
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة (الموجودة على اليمين)
       _startCorrectAnswerAnimation();
     }
   }
 
-  // دالة لبدء حركة الإجابة الصحيحة (تهتز في مكانها)
   void _startCorrectAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -155,18 +144,16 @@ class FrontBackLevel3Stage2ActivityState
 
   @override
   Widget build(BuildContext context) {
-    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
 
-    final firstElement = _activity!.elements!.first; // الإجابة الصحيحة
-    final lastElement = _activity!.elements!.last;   // الإجابة الخاطئة
+    final firstElement = _activity!.elements!.first;
+    final lastElement = _activity!.elements!.last;
     final anchorElement =
     _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
@@ -179,7 +166,6 @@ class FrontBackLevel3Stage2ActivityState
         height: double.infinity,
         child: Stack(
           children: [
-            // الإجابة الصحيحة (على اليمين) - وهي التي تتحرك عند الخطأ للمرة الثانية
             Positioned(
               right: screenWidth * 0.62,
               bottom: screenHeight * 0.35,
@@ -197,7 +183,6 @@ class FrontBackLevel3Stage2ActivityState
                 },
                 child: GestureDetector(
                   onTap: () {
-                    // الضغط على الإجابة الصحيحة يؤدي للفوز
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -222,7 +207,6 @@ class FrontBackLevel3Stage2ActivityState
                 ),
               ),
             ),
-            // صورة الخلفية (Anchor) - متجاوبة مع الشاشة
             Positioned.fill(
               child: FittedBox(
                 child: IgnorePointer(
@@ -234,13 +218,11 @@ class FrontBackLevel3Stage2ActivityState
 
 
 
-            // الإجابة الخاطئة (على اليسار)
             Positioned(
               left: screenWidth * 0.375,
               top: screenHeight * 0.375,
               child: GestureDetector(
                 onTap: () {
-                  // الضغط على الإجابة الخاطئة يزيد عدد المحاولات الخاطئة
                   _handleWrongAnswer();
                 },
                 child: Image.network(

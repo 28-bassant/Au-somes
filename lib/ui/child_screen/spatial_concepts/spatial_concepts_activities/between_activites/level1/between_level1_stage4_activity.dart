@@ -27,7 +27,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
   bool _imagesLoaded = false;
   late AudioPlayer _player;
 
-  // متغيرات الإجابة الخاطئة وحركة الإجابة الصحيحة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -56,10 +55,8 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
           _activity = response;
         });
 
-        // تحميل الصور أولاً
         await _preloadImages(response!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -83,7 +80,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
   }
 
   Future<void> _preloadImages(ActivityResponse activity) async {
-    // تحميل الصور من النشاط
     final images = activity.elements!
         .map((e) => e.imageUrl)
         .where((url) => url != null && url!.isNotEmpty)
@@ -159,7 +155,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
         final screenWidth = constraints.maxWidth;
         final screenHeight = constraints.maxHeight;
 
-        // 🪑 حجم الأنكور
         final anchorWidth = screenWidth * 0.33;
         final anchorHeight = screenHeight * 0.18;
 
@@ -170,16 +165,12 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
           Offset(screenWidth * 0.39, screenHeight * 0.62),
         ];
 
-        // 🐱 حجم الأكتور
         final actorWidth = screenWidth * 0.55;
         final actorHeight = screenHeight * 0.4;
-        // موقع الأكتور الصح
         final actorOffset = Offset((screenWidth - actorWidth) / 2, screenHeight * 0.20);
 
-        // موقع الأكتور الغلط
         final wrongOffset = Offset(screenWidth * 0.6, screenHeight * 0.48);
 
-        // 🌟 الكونتينر الشفاف على الأكتور الصح
         final correctRect = Rect.fromLTWH(
           actorOffset.dx + actorWidth * 0.29,
           actorOffset.dy + actorHeight * 0.2,
@@ -187,7 +178,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
           actorHeight * 0.57,
         );
 
-        // 🌟 الكونتينر الشفاف على الأكتور الخطأ
         final wrongRect = Rect.fromLTWH(
           wrongOffset.dx + actorWidth * 0.29,
           wrongOffset.dy + actorHeight * 0.2,
@@ -197,7 +187,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
 
         return Stack(
           children: [
-            // الأنكور - Image.asset كما في الأصل
             for (final offset in anchors)
               Positioned(
                 left: offset.dx,
@@ -210,7 +199,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
                 ),
               ),
 
-            // 🐱 الأكتور الصح مع الاهتزاز
             Positioned(
               left: actorOffset.dx,
               top: actorOffset.dy,
@@ -235,7 +223,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
               ),
             ),
 
-            // 🐱 الأكتور الخطأ
             Positioned(
               left: wrongOffset.dx,
               top: wrongOffset.dy,
@@ -247,7 +234,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
               ),
             ),
 
-            // 🌟 كونتينر الأكتور الصح مع GestureDetector
             Positioned(
               left: correctRect.left,
               top: correctRect.top,
@@ -261,7 +247,7 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
                   _animationController?.value = 0;
 
                   WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () { // تغيير من 2 إلى 3 ثواني
+                  Future.delayed(const Duration(seconds: 3), () {
                     if (mounted) {
                       widget.onNextStage?.call();
                     }
@@ -275,7 +261,6 @@ class BetweenLevel1Stage4ActivityState extends State<BetweenLevel1Stage4Activity
               ),
             ),
 
-            // 🌟 كونتينر الأكتور الخطأ مع GestureDetector
             Positioned(
               left: wrongRect.left,
               top: wrongRect.top,

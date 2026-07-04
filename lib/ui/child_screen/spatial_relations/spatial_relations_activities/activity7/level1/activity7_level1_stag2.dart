@@ -30,7 +30,6 @@ class Activity7Level1Stage2State extends State<Activity7Level1Stage2>
   final ValueNotifier<double> ballScale = ValueNotifier(1.0);
   late Offset basketCenter;
 
-  // متغيرات لإدارة الأخطاء وتحريك السلّة
   int _wrongAttempts = 0;
   bool _isAnimatingBasket = false;
   AnimationController? _basketAnimationController;

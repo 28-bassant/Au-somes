@@ -28,8 +28,8 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
   bool _imagesLoaded = false;
   bool _dataLoaded = false;
 
-  final GlobalKey _shadowLeftKey = GlobalKey(); // الشمال (المفروض غلط)
-  final GlobalKey _shadowRightKey = GlobalKey(); // اليمين (المفروض صح)
+  final GlobalKey _shadowLeftKey = GlobalKey();
+  final GlobalKey _shadowRightKey = GlobalKey();
 
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
@@ -61,14 +61,12 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
           _dataLoaded = true;
         });
 
-        // تحميل جميع الصور أولاً
         await _preloadImages(activity);
 
         setState(() {
           _imagesLoaded = true;
         });
 
-        // بعد تحميل البيانات والصور، نشغل الصوت
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -90,26 +88,22 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
     }
   }
 
-  // دالة لتحميل جميع الصور مسبقاً
   Future<void> _preloadImages(ActivityResponse activity) async {
     final images = activity.elements!
         .map((e) => e.imageUrl)
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
-    // تحميل كل الصور في الخلفية
     final List<Future> precacheFutures = [];
     for (final url in images) {
       precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
-    // انتظار تحميل جميع الصور
     await Future.wait(precacheFutures);
     print('All images preloaded successfully');
   }
 
   Future<void> playSound() async {
-    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
     if (!_dataLoaded || !_imagesLoaded) {
       print('Waiting for data and images to load before playing sound');
       return;
@@ -130,7 +124,6 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
   }
 
   void repeatSound() {
-    // تأكد من تحميل كل شيء قبل إعادة تشغيل الصوت
     if (_dataLoaded && _imagesLoaded) {
       playSound();
     }
@@ -177,9 +170,7 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
       details.offset.dy + actorSize / 2,
     );
 
-    // =========================
-    // تحقق من الظل الشمال (المفروض يكون غلط)
-    // =========================
+
     final shadowLeftBox =
     _shadowLeftKey.currentContext?.findRenderObject() as RenderBox?;
 
@@ -194,14 +185,12 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
       );
 
       if (rect.contains(actorCenter)) {
-        _handleWrongAnswer(); // هذا غلط → نزيد المحاولات
+        _handleWrongAnswer();
         return;
       }
     }
 
-    // =========================
-    // تحقق من الظل اليمين (المفروض يكون صح)
-    // =========================
+
     final shadowRightBox =
     _shadowRightKey.currentContext?.findRenderObject() as RenderBox?;
 
@@ -256,9 +245,8 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
     final actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
     final actor2 = _activity!.elements!.lastWhere((e) => e.role == 'Actor');
 
-    // الظلال
-    final shadowLeft = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');  // الشمال (غلط)
-    final shadowRight = _activity!.elements!.lastWhere((e) => e.role == 'Shadow'); // اليمين (صح)
+    final shadowLeft = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
+    final shadowRight = _activity!.elements!.lastWhere((e) => e.role == 'Shadow');
 
     final anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
@@ -271,7 +259,6 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
     return Scaffold(
       body: Stack(
         children: [
-          // الظل الأيمن (الصح) - متحرك
           Positioned(
             left: screenWidth * 0.22,
             top: screenHeight * 0.42,
@@ -302,7 +289,6 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
             ),
           ),
 
-          // anchor
           Positioned.fill(
             child: Center(
               child: Image.network(
@@ -313,7 +299,6 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
             ),
           ),
 
-          // الظل الأيسر (الغلط)
           Positioned(
             left: screenWidth * 0.5,
             top: screenHeight * 0.45,
@@ -328,7 +313,6 @@ class FrontBackLevel4Stage1ActivityState extends State<FrontBackLevel4Stage1Acti
             ),
           ),
 
-          // actor draggable
           if (!_isPlacedCorrectly)
             Positioned(
               right: 150,

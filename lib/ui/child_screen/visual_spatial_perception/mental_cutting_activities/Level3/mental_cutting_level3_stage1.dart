@@ -4,7 +4,6 @@ import 'package:au_somes/api/api_constants.dart';
 import 'package:au_somes/api/api_manager.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/try_again_sound.dart';
 import 'package:au_somes/ui/child_screen/reinforcement_widgets/true_answer_sound.dart';
-import 'package:au_somes/utils/app_routes.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import '../../../../../../models/activities/activity_response.dart';
@@ -30,21 +29,18 @@ class MentalCuttingLevel3Stage1State extends State<MentalCuttingLevel3Stage1>
   bool _imagesLoaded = false;
   bool _dataLoaded = false;
 
-  // قائمة لتتبع أي Anchors تم ملؤها
   Map<String, bool> _filledAnchors = {};
   Map<String, String?> _anchorImages = {};
   Map<String, String?> _actorImages = {};
   Map<String, String?> _shadowImages = {};
-  Map<String, String?> _actorTargetAnchor = {}; // لتخزين الـ Anchor المستهدف لكل Actor
+  Map<String, String?> _actorTargetAnchor = {};
 
-  // لتتبع الأصوات التي تم تشغيلها لكل Anchor
   Map<String, bool> _soundPlayed = {};
 
-  // متغيرات للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-  String? _animatingAnchorId; // Anchor الذي يهتز وليس Actor
+  String? _animatingAnchorId;
 
   // GlobalKeys لكل Anchor
   final Map<String, GlobalKey> _anchorKeys = {};

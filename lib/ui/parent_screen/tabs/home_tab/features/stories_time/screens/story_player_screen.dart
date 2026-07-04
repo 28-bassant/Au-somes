@@ -255,24 +255,33 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   }
 
   Widget _buildImage() {
-    return Container(
-      width: double.infinity,
-      height: 220,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            _page.imagePrompt,
-            textAlign: TextAlign.center,
-          ),
-        ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Image.network(
+        _page.imageUrl,
+        width: double.infinity,
+        height: 220,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          print(error);
+          return const Center(
+            child: Icon(Icons.broken_image, size: 60),
+          );
+        },
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+
+          return const SizedBox(
+            height: 220,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
       ),
     );
-  }  Widget _buildStoryText() {
+  }
+  Widget _buildStoryText() {
     final isArabic = Provider.of<AppLanguageProvider>(context).isArabic();
     return Container(
       width: double.infinity,

@@ -25,8 +25,10 @@ class ProgressLevelScreen extends StatelessWidget{
           centerTitle: true,
           title: Column(
             children: [
-              Text(AppLocalizations.of(context)!.progress_level,style: AppStyles.bold22Black,),
-              Text(AppLocalizations.of(context)!.your_child_progress,style: AppStyles.regular14BlackWithOpacity60,),
+              Text(AppLocalizations.of(context)!.progress_level,
+                style: AppStyles.bold22Black,),
+              Text(AppLocalizations.of(context)!.your_child_progress,
+                style: AppStyles.regular14BlackWithOpacity60,),
             ],
           )
       ),

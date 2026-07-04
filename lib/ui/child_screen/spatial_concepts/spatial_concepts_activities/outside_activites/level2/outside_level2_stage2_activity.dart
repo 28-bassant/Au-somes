@@ -34,14 +34,13 @@ class OutsideLevel2Stage2ActivityState
   late AudioPlayer _player;
 
   late ActivityElement actor;
-  late ActivityElement shadow1; // الصح
-  late ActivityElement shadow2; // الغلط
+  late ActivityElement shadow1;
+  late ActivityElement shadow2;
   late ActivityElement anchor;
 
   final GlobalKey _shadow2Key = GlobalKey();
   final GlobalKey _shadow1Key = GlobalKey();
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   AnimationController? _animationController;
@@ -70,16 +69,13 @@ class OutsideLevel2Stage2ActivityState
           _activity = activity;
         });
 
-        // البحث عن العناصر
         actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
         shadow1 = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
         shadow2 = _activity!.elements!.lastWhere((e) => e.role == 'Shadow');
         anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        // تحميل الصور أولاً
         await _preloadImages(_activity!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -122,32 +118,26 @@ class OutsideLevel2Stage2ActivityState
 
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الـ Shadow الصحيح
       _startShadowAnimation();
     }
   }
 
-  // دالة لبدء حركة الـ Shadow الصحيح
   void _startShadowAnimation() {
     if (!_isAnimatingShadow && _animationController != null) {
       setState(() {
         _isAnimatingShadow = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingShadow) {
           setState(() {
@@ -181,11 +171,9 @@ class OutsideLevel2Stage2ActivityState
       builder: (context, constraints) {
         final double screenWidth = constraints.maxWidth;
         final double screenHeight = constraints.maxHeight;
-        // افتراض أن التصميم الأصلي على شاشة 400px
         final double designWidth = 400.0;
         final double scale = screenWidth / designWidth;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
         final double shadow2Left = 15 * scale;
         final double shadow2Top = 350 * scale;
         final double shadow2Width = 90 * scale;
@@ -207,17 +195,14 @@ class OutsideLevel2Stage2ActivityState
 
         return Stack(
           children: [
-            /// ===== Shadow الغلط =====
             Positioned(
               left: shadow2Left,
               top: shadow2Top,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
-                  // حساب قيمة الحركة للاهتزاز
                   double shakeValue = 0;
                   if (_isAnimatingShadow) {
-                    // إنشاء حركة اهتزازية متجاوبة
                     shakeValue = shakeIntensity * sin(_animationController!.value * 4* pi);
                   }
 
@@ -232,7 +217,6 @@ class OutsideLevel2Stage2ActivityState
                   child: DragTarget<String>(
                     onWillAccept: (data) => data == actor.id,
                     onAccept: (_) {
-                      // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
                       setState(() {
                         isPlacedCorrectly = true;
                         _wrongAttempts = 0;
@@ -277,7 +261,6 @@ class OutsideLevel2Stage2ActivityState
               ),
             ),
 
-            /// ===== الخلفية =====
             Positioned(
               right: anchorRight,
               top: anchorTop,
@@ -287,7 +270,6 @@ class OutsideLevel2Stage2ActivityState
               ),
             ),
 
-            /// ===== Shadow الصح مع الحركة =====
             Positioned(
               right: shadow1Right,
               top: shadow1Top,
@@ -313,7 +295,6 @@ class OutsideLevel2Stage2ActivityState
 
             ),
 
-            /// ===== Actor =====
             if (!isPlacedCorrectly)
               Positioned(
                 left: actorLeft,
@@ -347,7 +328,6 @@ class OutsideLevel2Stage2ActivityState
                       details.offset.dy + actorSize / 2,
                     );
 
-                    // Shadow الصح
                     final shadow1Box = _shadow1Key.currentContext?.findRenderObject() as RenderBox?;
 
                     if (shadow1Box != null) {
@@ -361,7 +341,6 @@ class OutsideLevel2Stage2ActivityState
                         _handleWrongAnswer();
                     }
 
-                    // Shadow الغلط
                     final shadow2Box = _shadow2Key.currentContext?.findRenderObject() as RenderBox?;
 
                     if (shadow2Box != null) {
@@ -380,7 +359,6 @@ class OutsideLevel2Stage2ActivityState
                       );
 
                       if (wrongRect.contains(actorCenter)) {
-                        // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
                         setState(() {
                           isPlacedCorrectly = true;
                           _wrongAttempts = 0;

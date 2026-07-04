@@ -27,8 +27,8 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
   bool _isPlacedCorrectly = false;
   bool _imagesLoaded = false;
 
-  final GlobalKey _shadowLeftKey = GlobalKey(); // الشمال (الغلط)
-  final GlobalKey _shadowRightKey = GlobalKey(); // اليمين (الصح)
+  final GlobalKey _shadowLeftKey = GlobalKey();
+  final GlobalKey _shadowRightKey = GlobalKey();
 
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
@@ -59,10 +59,8 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
           _activity = activity;
         });
 
-        // تحميل جميع الصور أولاً
         await _preloadImages(activity);
 
-        // بعد تحميل الصور، نشغل الصوت
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -151,9 +149,7 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       details.offset.dy + actorSize / 2,
     );
 
-    // =========================
-    // تحقق من الظل الشمال (الغلط)
-    // =========================
+
     final shadowLeftBox =
     _shadowLeftKey.currentContext?.findRenderObject() as RenderBox?;
 
@@ -168,14 +164,12 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       );
 
       if (rect.contains(actorCenter)) {
-        _handleWrongAnswer(); // غلط → نزيد المحاولات
+        _handleWrongAnswer();
         return;
       }
     }
 
-    // =========================
-    // تحقق من الظل اليمين (الصح)
-    // =========================
+
     final shadowRightBox =
     _shadowRightKey.currentContext?.findRenderObject() as RenderBox?;
 
@@ -229,9 +223,8 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
 
     final actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
 
-    // الظلال
-    final shadowLeft = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');  // الشمال (غلط)
-    final shadowRight = _activity!.elements!.lastWhere((e) => e.role == 'Shadow'); // اليمين (صح)
+    final shadowLeft = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
+    final shadowRight = _activity!.elements!.lastWhere((e) => e.role == 'Shadow');
 
     final anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
@@ -244,7 +237,6 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
     return Scaffold(
       body: Stack(
         children: [
-          // shadow الشمال (الغلط)
           Positioned(
             left: screenWidth * 0.22,
             top: screenHeight * 0.42,
@@ -270,7 +262,6 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
             ),
           ),
 
-          // shadow اليمين (الصح) - وهو الذي يهتز عند الخطأ
           Positioned(
             left: screenWidth * 0.5,
             top: screenHeight * 0.45,
@@ -301,7 +292,6 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
             ),
           ),
 
-          // actor draggable
           if (!_isPlacedCorrectly)
             Positioned(
               right: 150,

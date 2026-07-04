@@ -42,7 +42,7 @@ class _StoryTimeScreenState extends State<StoryTimeScreen> {
         'label': l10n.underwater_world,
       },
       {
-        'key': 'kitchen_time',
+        'key': 'kitchen',
         'label': l10n.fun_at_kitchen,
       },
     ];

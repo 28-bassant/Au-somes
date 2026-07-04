@@ -25,7 +25,6 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
   bool _imagesLoaded = false;
   late AudioPlayer _player;
 
-  // متغيرات لإدارة الإجابات الخاطئة وحركة الإجابة الصحيحة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -54,10 +53,8 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
           _activity = response;
         });
 
-        // تحميل الصور أولاً
         await _preloadImages(response!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -99,17 +96,14 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
 
   void repeatSound() => playSound();
 
-  // التعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: صوت Try Again
       TryAgainSound.play();
     } else if (_wrongAttempts >= 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
@@ -149,8 +143,8 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
       return const Center(child: Text('Error loading activity'));
     }
 
-    final actorElement = _activity!.elements!.firstWhere((e) => e.role == 'Actor'); // صح
-    final wrongActorElement = _activity!.elements!.lastWhere((e) => e.role == 'Actor'); // خطأ
+    final actorElement = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
+    final wrongActorElement = _activity!.elements!.lastWhere((e) => e.role == 'Actor');
     final anchorElement = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
     return LayoutBuilder(
@@ -158,22 +152,17 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
         final screenWidth = constraints.maxWidth;
         final screenHeight = constraints.maxHeight;
 
-        // حجم ومكان الأنكور
         final anchorWidth = screenWidth * 1.0;
         final anchorHeight = screenHeight * 0.35;
         final anchorTop = screenHeight * 0.5;
 
-        // حجم ومكان الأكتور
         final actorWidth = screenWidth * 1.0;
         final actorHeight = screenHeight * 0.4;
 
-        // موضع الأكتور الصحيح
         final actorOffset = Offset((screenWidth - actorWidth) / 2, screenHeight * 0.15);
 
-        // موضع الأكتور الخطأ
         final wrongOffset = Offset(actorOffset.dx + actorWidth * 0.4, actorOffset.dy + actorHeight * 0.6);
 
-        // كونتينر الأكتور الصحيح
         final correctRect = Rect.fromLTWH(
           actorOffset.dx + actorWidth * 0.39,
           actorOffset.dy + actorHeight * 0.34,
@@ -181,7 +170,6 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
           actorHeight * 0.56,
         );
 
-        // كونتينر الأكتور الخطأ
         final wrongRect = Rect.fromLTWH(
           wrongOffset.dx + actorWidth * 0.25,
           wrongOffset.dy + actorHeight * 0.55,
@@ -191,7 +179,6 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
 
         return Stack(
           children: [
-            // الأنكور
             Positioned(
               top: anchorTop,
               left: 0,
@@ -203,7 +190,6 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
               ),
             ),
 
-            // الأكتور الصحيح مع اهتزاز
             Positioned(
               left: actorOffset.dx,
               top: actorOffset.dy,
@@ -228,13 +214,11 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
               ),
             ),
 
-            // كونتينر على الأكتور الصحيح مع GestureDetector
             Positioned(
               left: correctRect.left,
               top: correctRect.top,
               child: GestureDetector(
                 onTap: () {
-                  // الإجابة صحيحة
                   setState(() {
                     _wrongAttempts = 0;
                     _isAnimatingAnswer = false;
@@ -243,7 +227,7 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
                   _animationController?.value = 0;
 
                   WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () { // تغيير من 2 إلى 3 ثواني
+                  Future.delayed(const Duration(seconds: 3), () {
                     if (mounted) {
                       widget.onNextStage?.call();
                     }
@@ -257,13 +241,11 @@ class BetweenLevel1Stage3ActivityState extends State<BetweenLevel1Stage3Activity
               ),
             ),
 
-            // كونتينر على الأكتور الخطأ مع GestureDetector
             Positioned(
               left: wrongRect.left,
               top: wrongRect.top,
               child: GestureDetector(
                 onTap: () {
-                  // الإجابة خاطئة
                   _handleWrongAnswer();
                 },
                 child: Container(
