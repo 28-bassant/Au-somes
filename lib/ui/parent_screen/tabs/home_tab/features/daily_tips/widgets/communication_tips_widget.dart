@@ -55,7 +55,7 @@ class CommunicationTipsWidget extends StatelessWidget{
           },
 
         ],
-        "color": AppColors.pastelPink,
+        "color": AppColors.softBlue,
       },
       {
         "title": AppLocalizations.of(context)!.communication_tip5_title,

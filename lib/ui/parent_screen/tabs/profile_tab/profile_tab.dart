@@ -102,16 +102,22 @@ class _ProfileTabState extends State<ProfileTab> {
 
                     SizedBox(height: height * .03),
 
-                    ProfileItem(
-                      text: AppLocalizations.of(context)!.about_us,
-                      image: AppAssets.aboutIcon,
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.aboutUsScreenRouteName),
+                      child: ProfileItem(
+                        text: AppLocalizations.of(context)!.about_us,
+                        image: AppAssets.aboutIcon,
+                      ),
                     ),
 
                     SizedBox(height: height * .03),
 
-                    ProfileItem(
-                      text: AppLocalizations.of(context)!.review_au_somes,
-                      image: AppAssets.reviewIcon,
+                    GestureDetector(
+                      onTap:() => showRatingDialog(context),
+                      child: ProfileItem(
+                        text: AppLocalizations.of(context)!.review_au_somes,
+                        image: AppAssets.reviewIcon,
+                      ),
                     ),
 
                     SizedBox(height: height * .03),
@@ -138,6 +144,90 @@ class _ProfileTabState extends State<ProfileTab> {
           ),
         ),
       ),
+    );
+  }
+  int selectedRating = 0;
+
+  void showRatingDialog(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.whiteColor,
+
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: AppColors.softBlue,
+                  width: 4
+                )
+              ),
+              title:  Center(
+                child: Text(AppLocalizations.of(context)!.review_au_somes,
+                style: AppStyles.bold16SoftBlue,),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                   Text(
+                    AppLocalizations.of(context)!.how_would_you_rate_our_app,
+                    textAlign: TextAlign.center,
+                     style: AppStyles.medium16BlackWithOpacity60,
+                  ),
+                   SizedBox(height: height * .02),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return IconButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedRating = index + 1;
+                          });
+                        },
+                        icon: Icon(
+                          index < selectedRating
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: AppColors.softBlue,
+                          size: 35,
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+              actionsAlignment: MainAxisAlignment.spaceEvenly,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child:  Text(AppLocalizations.of(context)!.cancel,
+                  style: AppStyles.medium16Red,),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                       SnackBar(
+                         backgroundColor: AppColors.softBlue,
+                        content: Text(AppLocalizations.of(context)!.thank_you_for_rating,
+                        style: AppStyles.bold16White,
+
+                        ),
+                      ),
+                    );
+                  },
+                  child:  Text(AppLocalizations.of(context)!.submit,
+                  style: AppStyles.medium16SoftBlue,),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

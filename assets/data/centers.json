@@ -1,22 +1,5 @@
 [
   {
-    "name": "Bloom ABA",
-    "phone": "+201224113761",
-
-    "address": "253 North 90 Street, Cairo",
-    "locationName": "Bloom ABA Location",
-    "latitude": 30.0370247,
-    "longitude": 31.1824484,
-
-    "facebookName": "Bloom ABA ",
-    "facebookLink": "https://www.facebook.com/profile.php?id=100087282496134",
-
-    "websiteName": "Bloom",
-    "websiteLink": "https://www.bloom-aba.com",
-
-    "image": "assets/images/bloom.png"
-  },
-  {
     "name": "Progressive Behaviour Services",
     "phone": "+201222175725",
 
@@ -33,23 +16,7 @@
 
     "image": "assets/images/progressive.png"
   },
-  {
-    "name": "Simplify",
-    "phone": "+201222419129",
 
-    "address": "End of Ahmed Ismail El-Moshir St., Sheraton, Heliopolis, Cairo",
-    "locationName": "ٍSimplify Location",
-    "latitude": 30.164757,
-    "longitude": 31.456373,
-
-    "facebookName": "Simplifyegypt",
-    "facebookLink": "https://www.facebook.com/simplifyegypt",
-
-    "websiteName": "Simplify",
-    "websiteLink": "https://simplifyegypt.com/?utm_source=chatgpt.com",
-
-    "image": "assets/images/simplify.png"
-  },
   {
     "name": "ACE Behaviour Center",
     "phone": "+201551054297",
@@ -68,6 +35,24 @@
     "image": "assets/images/ACE.png"
   },
   {
+    "name": "Simplify",
+    "phone": "+201222419129",
+
+    "address": "End of Ahmed Ismail El-Moshir St., Sheraton, Heliopolis, Cairo",
+    "locationName": "ٍSimplify Location",
+    "latitude": 30.164757,
+    "longitude": 31.456373,
+
+    "facebookName": "Simplifyegypt",
+    "facebookLink": "https://www.facebook.com/simplifyegypt",
+
+    "websiteName": "Simplify",
+    "websiteLink": "https://simplifyegypt.com/?utm_source=chatgpt.com",
+
+    "image": "assets/images/simplify.png"
+  },
+
+  {
     "name": "Chance ",
     "phone": "+201113879992",
 
@@ -82,6 +67,23 @@
     "websiteLink": "https://www.chanceeg.com/iq/?utm_source=chatgpt.com",
 
     "image": "assets/images/chance.png"
+  },
+  {
+    "name": "Bloom ABA",
+    "phone": "+201224113761",
+
+    "address": "253 North 90 Street, Cairo",
+    "locationName": "Bloom ABA Location",
+    "latitude": 30.0370247,
+    "longitude": 31.1824484,
+
+    "facebookName": "Bloom ABA ",
+    "facebookLink": "https://www.facebook.com/profile.php?id=100087282496134",
+
+    "websiteName": "Bloom",
+    "websiteLink": "https://www.bloom-aba.com",
+
+    "image": "assets/images/bloom.png"
   },
   {
     "name": "Momentum for Behavioral Services ",

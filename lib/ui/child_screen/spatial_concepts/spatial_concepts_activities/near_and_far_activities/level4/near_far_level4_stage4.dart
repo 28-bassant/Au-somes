@@ -30,9 +30,8 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
   bool _imagesLoaded = false;
   bool isPlacedCorrectly = false;
 
-  // لإدارة المحاولات
   int _wrongAttempts = 0;
-  bool _isAnimatingShadow = false; // تغيير الاسم من _isAnimatingActor إلى _isAnimatingShadow
+  bool _isAnimatingShadow = false;
   AnimationController? _animationController;
 
   late ActivityElement actor;
@@ -49,7 +48,6 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
       duration: const Duration(milliseconds: 800),
     );
 
-    // تحميل النشاط مرة واحدة
     _loadActivity();
   }
 
@@ -66,7 +64,6 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
           _activity = activity;
         });
 
-        // حفظ العناصر
         actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
         shadow = activity.elements!.firstWhere((e) => e.role == 'Shadow');
         anchor = activity.elements!.firstWhere((e) => e.role == 'Anchor');
@@ -118,25 +115,23 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
   void _handleWrongDrop() {
     _wrongAttempts++;
     if (_wrongAttempts == 1) {
-      // المرة الأولى: صوت Try Again
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: هزة Shadow الصحيح
-      _startShadowShake(); // تغيير اسم الدالة
+      _startShadowShake();
     }
   }
 
-  void _startShadowShake() { // تغيير اسم الدالة
-    if (!_isAnimatingShadow && _animationController != null) { // تغيير الشرط
+  void _startShadowShake() {
+    if (!_isAnimatingShadow && _animationController != null) {
       setState(() {
-        _isAnimatingShadow = true; // تغيير القيمة
+        _isAnimatingShadow = true;
       });
       _animationController!.repeat(reverse: true);
 
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
           setState(() {
-            _isAnimatingShadow = false; // تغيير القيمة
+            _isAnimatingShadow = false;
           });
           _animationController!.stop();
           _animationController!.value = 0;
@@ -174,7 +169,6 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
 
     return Stack(
       children: [
-        /// ===== Anchor =====
         Align(
           alignment: Alignment.centerRight,
           child: Image.network(
@@ -184,7 +178,6 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
           ),
         ),
 
-        /// ===== Shadow wrong =====
         Positioned(
           right: shadowLeft,
           top: shadowTop,
@@ -200,15 +193,15 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
           ),
         ),
 
-        /// ===== Shadow correct =====
+
         Positioned(
           right: wrongShadowLeft-30,
           top: wrongShadowTop,
-          child: AnimatedBuilder( // إضافة AnimatedBuilder لتحريك Shadow
+          child: AnimatedBuilder(
             animation: _animationController!,
             builder: (context, child) {
               double shakeOffset = 0;
-              if (_isAnimatingShadow) { // استخدام _isAnimatingShadow بدلاً من _isAnimatingActor
+              if (_isAnimatingShadow) {
                 shakeOffset = 12 * sin(_animationController!.value * pi);
               }
               return Transform.translate(
@@ -241,12 +234,11 @@ class NearFarLevel4Stage4State extends State<NearFarLevel4Stage4>
           ),
         ),
 
-        /// ===== Actor =====
         if (!isPlacedCorrectly)
           Positioned(
             right: actorRight,
             bottom: actorBottom + 20,
-            child: Draggable<String>( // إزالة AnimatedBuilder من هنا
+            child: Draggable<String>(
               data: actor.targetedZoneId,
               feedback: Material(
                 color: Colors.transparent,

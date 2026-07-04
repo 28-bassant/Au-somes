@@ -6,46 +6,69 @@ import '../../../../../../../providers/app_language_provider.dart';
 import '../../../../../../../utils/app_colors.dart';
 import '../../../../../../../utils/app_routes.dart';
 import 'story_player_screen.dart';
+import '../../../../../../../api/api_manager.dart';
+import '../../../../../../../models/story/story_response.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key});
+  final String childName;
+  final String theme;
+  final List<String> concepts;
+
+  const LoadingScreen({
+    super.key,
+    required this.childName,
+    required this.theme,
+    required this.concepts,
+  });
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _progress;
+class _LoadingScreenState extends State<LoadingScreen> {
+
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    );
-    _progress = Tween<double>(begin: 0, end: 1)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
-    _ctrl.forward().then((_) {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>  StoryPlayerScreen(),
-          ),
-        );
-      }
-    });
+    _generateStory();
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
     super.dispose();
   }
+  Future<void> _generateStory() async {
+    try {
+      final StoryResponse story =
+      await ApiManager.generateStories(
+        childName: widget.childName,
+        theme: widget.theme,
+        concepts: widget.concepts,
+      );
 
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => StoryPlayerScreen(
+            story: story,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+
+      Navigator.pop(context);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -73,7 +96,7 @@ class _LoadingScreenState extends State<LoadingScreen>
               Center(
                 child: Text(
                   l10n.generating_interactive_story,
-                  style: AppStyles.bold14Black,
+                  style: AppStyles.bold20Black,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -103,37 +126,31 @@ class _LoadingScreenState extends State<LoadingScreen>
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: AnimatedBuilder(
-                animation: _progress,
-                builder: (_, __) => Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: LinearProgressIndicator(
-                        value: _progress.value,
-                        backgroundColor: AppColors.lightPastelBlue,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.softBlue,
-                        ),
-                        minHeight: 10,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('⏳', style: TextStyle(fontSize: 16)),
-                        const SizedBox(width: 6),
-                        Text(
-                          l10n.generating_interactive_story,
-                          style: AppStyles.bold16SoftBlue
-                        ),
-                      ],
-                    ),
-                  ],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                SizedBox(
+                width: double.infinity,
+                child: LinearProgressIndicator(
+                  color: AppColors.softBlue,
+                  backgroundColor: AppColors.greyColor.withOpacity(0.3),
+                  minHeight: 8,
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
+                  const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('⏳', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 6),
+                    Text(
+                        l10n.generating_interactive_story,
+                        style: AppStyles.bold16SoftBlue
+                    ),
+                    ]),
+                ],
+              )
             ),
           ),
         ),

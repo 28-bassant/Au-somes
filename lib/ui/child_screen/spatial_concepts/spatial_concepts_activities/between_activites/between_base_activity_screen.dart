@@ -125,15 +125,15 @@ class _BetweenBaseActivityScreenState extends State<BetweenBaseActivityScreen> {
             ),
             backgroundColor: AppColors.redColor,
 
-            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+            behavior: SnackBarBehavior.floating,
 
             margin: EdgeInsets.symmetric(
                 horizontal: 34,
                 vertical: 16
-            ), // مسافة من كل الجهات
+            ),
 
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+              borderRadius: BorderRadius.circular(24),
             ),
           ),
 

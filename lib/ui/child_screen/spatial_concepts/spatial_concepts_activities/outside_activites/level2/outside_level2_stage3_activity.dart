@@ -35,14 +35,13 @@ class OutsideLevel2Stage3ActivityState
   late AudioPlayer _player;
 
   late ActivityElement actor;
-  late ActivityElement shadow1; // الصح
-  late ActivityElement shadow2; // الغلط
+  late ActivityElement shadow1;
+  late ActivityElement shadow2;
   late ActivityElement anchor;
 
   final GlobalKey _shadow2Key = GlobalKey();
   final GlobalKey _shadow1Key = GlobalKey();
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   AnimationController? _animationController;
@@ -71,16 +70,13 @@ class OutsideLevel2Stage3ActivityState
           _activity = activity;
         });
 
-        // البحث عن العناصر
         actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
         shadow1 = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
         shadow2 = _activity!.elements!.lastWhere((e) => e.role == 'Shadow');
         anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        // تحميل الصور أولاً
         await _preloadImages(_activity!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -127,7 +123,6 @@ class OutsideLevel2Stage3ActivityState
 
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
@@ -135,7 +130,7 @@ class OutsideLevel2Stage3ActivityState
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      _startShadowAnimation(); // تهز Shadow الغلط السابق
+      _startShadowAnimation();
     }
   }
 
@@ -144,10 +139,8 @@ class OutsideLevel2Stage3ActivityState
       setState(() {
         _isAnimatingShadow = true;
       });
-      // تحريك متكرر
       _animationController!.repeat(reverse: true);
 
-      // توقف بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingShadow) {
           setState(() {
@@ -182,16 +175,14 @@ class OutsideLevel2Stage3ActivityState
       final double screenWidth = constraints.maxWidth;
       final double screenHeight = constraints.maxHeight;
 
-      // افتراض أن التصميم الأصلي على شاشة 400px
       final double designWidth = 400.0;
       final double scale = screenWidth / designWidth;
 
-      // تحويل القيم الثابتة إلى قيم متجاوبة
-      final double shadow2Left = 10 * scale; // دلوقتي هو الصح
+      final double shadow2Left = 10 * scale;
       final double shadow2Top = 220 * scale;
       final double shadow2Width = 90 * scale;
 
-      final double shadow1Right = 132 * scale; // دلوقتي هو الغلط
+      final double shadow1Right = 132 * scale;
       final double shadow1Top = 231 * scale;
       final double shadow1Width = 50 * scale;
 
@@ -211,7 +202,6 @@ class OutsideLevel2Stage3ActivityState
 
       return Stack(
         children: [
-        /// ===== Shadow الصح (دلوقتي Shadow الغلط سابقاً) =====
           Positioned(
             left: shadow2Left,
             top: shadow2Top,
@@ -220,7 +210,6 @@ class OutsideLevel2Stage3ActivityState
               builder: (context, child) {
                 double shakeValue = 0;
                 if (_isAnimatingShadow) {
-                  // الاهتزاز هنا للشادو الغلط السابق
                   shakeValue = shakeIntensity * sin(_animationController!.value * 2 * 2 * pi);
                 }
                 return Transform.translate(
@@ -229,12 +218,11 @@ class OutsideLevel2Stage3ActivityState
                 );
               },
               child: Container(
-                key: _shadow2Key, // اتأكد ان المفتاح هنا هو shadow2Key
+                key: _shadow2Key,
                 width: shadow2Width,
                 child: DragTarget<String>(
                   onWillAccept: (data) => data == actor.id,
                   onAccept: (_) {
-                    // Actor على Shadow الغلط السابق → نجاح
                     setState(() {
                       isPlacedCorrectly = true;
                       _wrongAttempts = 0;
@@ -244,7 +232,6 @@ class OutsideLevel2Stage3ActivityState
                     _animationController?.value = 0;
                     WellDoneOverlay.show(context);
 
-                    // اجعل Actor يظهر مكانه
                     Future.delayed(const Duration(milliseconds: 100), () {
                       if (mounted) setState(() {});
                     });
@@ -272,7 +259,6 @@ class OutsideLevel2Stage3ActivityState
               ),
             ),
           ),
-    /// ===== الخلفية =====
     Positioned(
     right: anchorRight,
     top: anchorTop,
@@ -282,7 +268,6 @@ class OutsideLevel2Stage3ActivityState
     ),
     ),
 
-    /// ===== Shadow الغلط (دلوقتي Shadow الصح سابقاً مع الحركة) =====
           Positioned(
             right: shadow1Right,
             top: shadow1Top,
@@ -292,8 +277,7 @@ class OutsideLevel2Stage3ActivityState
               child: DragTarget<String>(
                 onWillAccept: (data) => data == actor.id,
                 onAccept: (_) {
-                  // Actor على Shadow الصح السابق → خطأ
-                  _handleWrongAnswer(); // يشغل Try Again و يهز Shadow الغلط السابق
+                  _handleWrongAnswer();
                 },
                 builder: (context, _, __) {
                   return Image.network(
@@ -306,7 +290,6 @@ class OutsideLevel2Stage3ActivityState
             ),
           ),
 
-          /// ===== Actor =====
           if (!isPlacedCorrectly)
             Positioned(
               left: actorLeft,
@@ -334,7 +317,6 @@ class OutsideLevel2Stage3ActivityState
                     details.offset.dy + actorSize / 2,
                   );
 
-                  // Shadow الصح السابق (دلوقتي الغلط)
                   final shadow1Box =
                   _shadow1Key.currentContext?.findRenderObject() as RenderBox?;
                   if (shadow1Box != null) {
@@ -348,7 +330,6 @@ class OutsideLevel2Stage3ActivityState
                     }
                   }
 
-                  // Shadow الغلط السابق (دلوقتي الصح)
                   final shadow2Box =
                   _shadow2Key.currentContext?.findRenderObject() as RenderBox?;
                   if (shadow2Box != null) {

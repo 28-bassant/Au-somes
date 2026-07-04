@@ -37,8 +37,8 @@
  "search" : "Search",
   "welcome":"Welcome !\nHow can i help you ?",
   "what_is_visual_spatial_perception":"What is spatial visualization?",
-  "how_is_visual_spatial_perception_related_to_autism":"How is spatial visualization related to autism?",
-  "game_improve":"What games improve visual–spatial skills",
+    "how_is_visual_spatial_perception_related_to_autism":"How is spatial visualization related to autism?",
+   "game_improve":"What games improve visual–spatial skills",
   "confusion":"How can I help my child with direction confusion?",
   "another_question":"Another Question",
   "visual_spatial_perception_meaning":"Visual–spatial perception is the ability to understand what we see and how objects relate to each other in space, such as shape, size, distance, and position (up, down, left, right).",
@@ -235,7 +235,8 @@
      "visual_spatial_autism_info":"Although some autistic individuals demonstrate strengths in specific visual-spatial tasks, spatial skills vary widely across the autism spectrum. Structured training can help improve spatial orientation, directional awareness, and functional navigation skills.",
 "visual_spatial_games":"Jigsaw puzzles, tangrams, LEGO building, maze games, and shape-matching activities can help improve visual–spatial skills.",
 "visual_spatial_training_tips":"Help your child learn directions through visual cues, simple navigation games, obstacle courses, and consistent practice with concepts like left/right, up/down, and front/back.",
- "title": "Food Delivery",
+
+       "title": "Food Delivery",
        "subtitle": "Delivering the hot pizza to Grandma's house 🧓",
 
        "above": "Above",
@@ -259,6 +260,8 @@
        "start_interactive_story": "✨ Start the Interactive Story ✨",
        "day_at_kindergarten": "A Day at Kindergarten🏠",
        "park_outing": "Park Outing🌴",
+       "day_at_school": "A Day at School 🏫",
+              "fun_at_kitchen": "Fun in the Kitchen 🍳",
        "space_adventure": "Space Adventure🚀",
        "underwater_world": "Underwater World🐠",
        "supermarket_trip": "Supermarket Trip🛒",
@@ -287,6 +290,21 @@
        "keep_going": "Keep going like this",
        "wonderful": "Wonderful! 🎉",
        "well_done": "Well done! 🌟",
-       "lets_try_again": "Let's try again together"
+       "lets_try_again": "Let's try again together",
+"please_choose_story_theme": "Please choose story theme",
+       "please_select_exactly_concepts": "Please select exactly 3 concepts",
+       "how_would_you_rate_our_app": "How would you rate our app?",
+       "cancel": "Cancel",
+       "submit": "Submit",
+       "thank_you_for_rating": "Thank you for your feedback",
+       "about_us_title": "Empowering Every Child to Learn, Grow, and Shine",
+       "about_us_content": "AU-Somes is an educational and interactive application designed to support children with Autism Spectrum Disorder (ASD) in developing essential cognitive, communication, and daily living skills through engaging activities and personalized learning experiences.\n\nOur mission is to provide a safe, enjoyable, and accessible environment where children can learn at their own pace while helping parents and therapists monitor their progress. The application includes educational games, storytelling, visual learning activities, and progress tracking to encourage continuous development.\n\nAt AU-Somes, we believe that every child has unique abilities and deserves learning tools that meet their individual needs. Our goal is to make learning more enjoyable, inclusive, and effective for every child."
+
+
+
+
+
+
+
 
 }

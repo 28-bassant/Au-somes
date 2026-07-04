@@ -203,7 +203,7 @@ class FrontBackLevel4Stage3ActivityState extends State<FrontBackLevel4Stage3Acti
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final anchorWidth = screenWidth * 1.2; // 600/400
+    final anchorWidth = screenWidth * 1.2;
     final wrongShadowLeft = screenWidth * 0.1;
     final wrongShadowTop = screenHeight * 0.1875;
     final wrongShadowSize = screenWidth * 0.5;
@@ -218,7 +218,6 @@ class FrontBackLevel4Stage3ActivityState extends State<FrontBackLevel4Stage3Acti
       body: Stack(
         children: [
 
-          // Shadow الصح
           Positioned(
             left: wrongShadowLeft - 60,
             top: wrongShadowTop-20,
@@ -237,20 +236,19 @@ class FrontBackLevel4Stage3ActivityState extends State<FrontBackLevel4Stage3Acti
           child: _isPlacedCorrectly
               ? Image.network(
             actor2.imageUrl ?? '',
-            width: correctShadowSize*.8, // نفس مقاس Shadow بعد الإجابة الصح
+            width: correctShadowSize*.8,
             height: correctShadowSize*.8,
             key: _shadowCorrectKey,
           )
               : Image.network(
             shadowWrong.imageUrl ?? '',
-            width: correctShadowSize * 0.8, // مقاس Shadow الأصلي قبل الإجابة
+            width: correctShadowSize * 0.8,
             height: correctShadowSize * 0.8,
             key: _shadowCorrectKey,
           ),
         ),
       ),
 
-        // Actor draggable
         if (!_isPlacedCorrectly)
           Positioned(
       right: actorRight,
@@ -259,7 +257,7 @@ class FrontBackLevel4Stage3ActivityState extends State<FrontBackLevel4Stage3Acti
         data: actor2.id,
         feedback: Image.network(
           actor2.imageUrl ?? '',
-          width: actorSize, // مقاس Actor الأصلي
+          width: actorSize,
           height: actorSize,
         ),
         childWhenDragging: const SizedBox(),
@@ -275,7 +273,6 @@ class FrontBackLevel4Stage3ActivityState extends State<FrontBackLevel4Stage3Acti
 
 
 
-          // Anchor
           Positioned.fill(
             child: Center(
               child: Image.network(
@@ -285,8 +282,6 @@ class FrontBackLevel4Stage3ActivityState extends State<FrontBackLevel4Stage3Acti
             ),
           ),
 
-          // ...
-// Shadow الغلط
           Positioned(
             left: correctShadowLeft,
             top: correctShadowTop - 10,

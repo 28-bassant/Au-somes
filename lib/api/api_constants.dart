@@ -1,5 +1,6 @@
 class ApiConstants {
-  static const String baseUrl = 'http://au-somes.runasp.net';
+  static const String baseUrl = 'https://au-somes.runasp.net';
+  static const String storiesBaseUrl = "https://candidates-smoke-haven-thehun.trycloudflare.com";
   static const String front_back_activityId = "b53c1f0b-1fed-46d2-ba7e-61f6c949bf77";
   static const String up_down_activityId = "810ce01d-1dfa-4f58-81e7-868efc7d9de0";
   static const String between_activityId = "6b84f943-6b7a-4489-9ed1-d81806eef1c9";

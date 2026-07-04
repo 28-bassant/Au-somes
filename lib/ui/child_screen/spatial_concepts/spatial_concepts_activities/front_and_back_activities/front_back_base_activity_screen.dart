@@ -56,9 +56,7 @@ class _FrontBackBaseActivityScreenState extends State<FrontBackBaseActivityScree
       FrontBackLevel1Stage2Activity(key: stage12Key,
         onNextStage: goToNextActivity,
       ),
-      // FrontBackLevel1Stage3Activity(key: stage13Key,
-      //   onNextStage: goToNextActivity,
-      // ),
+
        FrontBackLevel1Stage4Activity(key: stage14Key,
         onNextStage: goToNextActivity,
       ),
@@ -100,8 +98,6 @@ FrontBackLevel4Stage3Activity(key: stage43Key,
     } else if (currentActivityIndex == 1) {
       stage12Key.currentState?.repeatSound();
     }
-    // else if (currentActivityIndex == 2) {
-    //   stage13Key.currentState?.repeatSound();}
     else if (currentActivityIndex == 2) {
         stage14Key.currentState?.repeatSound();
 
@@ -155,15 +151,15 @@ FrontBackLevel4Stage3Activity(key: stage43Key,
             ),
             backgroundColor: AppColors.redColor,
 
-            behavior: SnackBarBehavior.floating, // يخليه مش لازق في الشاشة
+            behavior: SnackBarBehavior.floating,
 
             margin: EdgeInsets.symmetric(
                 horizontal: 34,
                 vertical: 16
-            ), // مسافة من كل الجهات
+            ),
 
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24), // البوردر ريديوس
+              borderRadius: BorderRadius.circular(24),
             ),
           ),
 

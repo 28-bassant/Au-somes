@@ -805,6 +805,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get park_outing => 'نزهة في الحديقة🌴';
 
   @override
+  String get day_at_school => 'يوم في المدرسة 🏫';
+
+  @override
+  String get fun_at_kitchen => 'المرح في المطبخ 🍳';
+
+  @override
   String get space_adventure => 'مغامرة فضائية🚀';
 
   @override
@@ -887,4 +893,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get lets_try_again => 'لنحاول معاً مرة أخرى';
+
+  @override
+  String get please_choose_story_theme => 'من فضلك اختر موضوع القصة';
+
+  @override
+  String get please_select_exactly_concepts => 'من فضلك اختر 3 مفاهيم بالضبط';
+
+  @override
+  String get how_would_you_rate_our_app => 'ما رأيك في تطبيقنا؟';
+
+  @override
+  String get cancel => 'الغاء';
+
+  @override
+  String get submit => 'تأكيد';
+
+  @override
+  String get thank_you_for_rating => 'شكرا على تقييمك';
+
+  @override
+  String get about_us_title => 'تمكين كل طفل من التعلم والنمو والتألق';
+
+  @override
+  String get about_us_content =>
+      'AU-Somes هو تطبيق تعليمي وتفاعلي صُمم لدعم الأطفال المصابين باضطراب طيف التوحد (ASD) في تنمية المهارات المعرفية، ومهارات التواصل، والمهارات الحياتية الأساسية من خلال أنشطة ممتعة وتجارب تعليمية مخصصة.\n\nتتمثل رسالتنا في توفير بيئة آمنة، ممتعة، وسهلة الوصول، تُمكّن الأطفال من التعلم وفقًا لسرعتهم الخاصة، مع مساعدة أولياء الأمور والأخصائيين على متابعة تقدمهم. يتضمن التطبيق ألعابًا تعليمية، وقصصًا تفاعلية، وأنشطة للتعلم البصري، بالإضافة إلى تتبع التقدم لتشجيع التطور المستمر.\n\nفي AU-Somes، نؤمن بأن لكل طفل قدرات فريدة ويستحق أدوات تعليمية تلبي احتياجاته الفردية. هدفنا هو جعل التعلم أكثر متعة، وشمولًا، وفعالية لكل طفل.';
 }

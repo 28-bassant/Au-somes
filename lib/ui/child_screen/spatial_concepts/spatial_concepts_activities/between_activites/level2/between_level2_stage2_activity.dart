@@ -36,12 +36,10 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
   late ActivityElement shadowWrong;
   late ActivityElement anchor;
 
-  /// ===== Error Handling =====
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   late AnimationController _animationController;
 
-  /// ===== Keys =====
   final GlobalKey _shadowCorrectKey = GlobalKey();
   final GlobalKey _shadowWrongKey = GlobalKey();
 
@@ -117,7 +115,6 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
 
   void repeatSound() => playSound();
 
-  /// ===== Wrong Answer Logic =====
   void _handleWrongAnswer() {
     setState(() => _wrongAttempts++);
 
@@ -190,7 +187,6 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
       return Stack(
         children: [
 
-          /// ===== Anchor =====
           Positioned(
             top: anchorTop,
             left: 0,
@@ -201,7 +197,6 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
             ),
           ),
 
-          /// ===== Shadow الغلط =====
           Positioned(
             top: shadowTop,
             left: shadowLeft * 6,
@@ -215,7 +210,6 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
             ),
           ),
 
-          /// ===== Shadow الصح =====
           Positioned(
             left: shadowLeft,
             top: shadowTop,
@@ -253,7 +247,6 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
             ),
           ),
 
-          /// ===== Actor =====
           if (!isPlacedCorrectly)
             Positioned(
               right: actorRight,
@@ -285,7 +278,6 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
                     details.offset.dy + actorWidth / 2,
                   );
 
-                  /// ===== Check Shadow الصح =====
                   final correctBox = _shadowCorrectKey.currentContext?.findRenderObject() as RenderBox?;
                   if (correctBox != null) {
                     final pos = correctBox.localToGlobal(Offset.zero);
@@ -317,7 +309,6 @@ class BetweenLevel2Stage2Activity extends StatefulWidget {
                     }
                   }
 
-                  /// ===== Check Shadow الغلط =====
                   final wrongBox = _shadowWrongKey.currentContext?.findRenderObject() as RenderBox?;
                   if (wrongBox != null) {
                     final pos = wrongBox.localToGlobal(Offset.zero);

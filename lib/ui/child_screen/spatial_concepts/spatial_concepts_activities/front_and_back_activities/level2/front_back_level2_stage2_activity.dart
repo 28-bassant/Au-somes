@@ -285,7 +285,6 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
       body: Stack(
         children: [
 
-          // wrong shadow
           Positioned(
             left: wrongShadowLeft-40,
             top: wrongShadowTop-20,
@@ -306,7 +305,6 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
             ),
           ),
 
-          //correct shadow
           Positioned(
             left: correctShadowLeft,
             top: correctShadowTop ,

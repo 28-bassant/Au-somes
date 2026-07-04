@@ -27,7 +27,6 @@ class FrontBackLevel1Stage4ActivityState
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -37,10 +36,8 @@ class FrontBackLevel1Stage4ActivityState
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة بسرعة أقل
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -52,7 +49,7 @@ class FrontBackLevel1Stage4ActivityState
       final activity = await ApiManager.getActivity(
         ApiConstants.front_back_activityId,
         1,
-        4, // تم التصحيح: Stage 4
+        4,
       );
 
       if (mounted) {
@@ -60,10 +57,8 @@ class FrontBackLevel1Stage4ActivityState
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -104,32 +99,26 @@ class FrontBackLevel1Stage4ActivityState
     _imagesLoaded = true;
   }
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
 
-  // دالة لبدء حركة الإجابة الصحيحة (تهتز في مكانها)
   void _startAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -151,29 +140,23 @@ class FrontBackLevel1Stage4ActivityState
 
   @override
   Widget build(BuildContext context) {
-    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
 
-    // استخراج العناصر حسب الـ Response الجديد
     final anchorElement = _activity!.elements!
-        .firstWhere((e) => e.role == 'Anchor'); // العنصر الأساسي
+        .firstWhere((e) => e.role == 'Anchor');
 
-// كل الـ Actors
     final allActors = _activity!.elements!
         .where((e) => e.role == 'Actor')
-        .toList(); // هيرجع 2 Actors
+        .toList();
 
-// العنصر الصحيح (isCorrect = true)
     final correctElement = allActors.firstWhere((e) => e.isCorrect == true);
 
-// العنصر الغلط (isCorrect = false)
     final wrongElement = allActors.firstWhere((e) => e.isCorrect == false);
 
 
@@ -186,22 +169,20 @@ class FrontBackLevel1Stage4ActivityState
         height: double.infinity,
         child: Stack(
           children: [
-            // عنصر Try Again (الخطأ)
             Positioned(
-              right: screenWidth * 0.65,  // 100 ÷ 400 = 0.25
-              bottom: screenHeight * 0.3, // 320 ÷ 800 = 0.4
+              right: screenWidth * 0.65,
+              bottom: screenHeight * 0.3,
               child: GestureDetector(
                 onTap: () {
                   _handleWrongAnswer();
                 },
                 child: Image.network(
                   wrongElement.imageUrl ?? '',
-                  width: screenWidth * 0.35, // 350 ÷ 400 = 0.875
+                  width: screenWidth * 0.35,
                   fit: BoxFit.contain,
                 ),
               ),
             ),
-            // صورة الخلفية
             Positioned.fill(
               child: FittedBox(
                 fit: BoxFit.contain,
@@ -213,10 +194,9 @@ class FrontBackLevel1Stage4ActivityState
 
 
 
-            // العنصر الصحيح
             Positioned(
-              left: screenWidth * 0.4,  // 100 ÷ 400 = 0.25
-              top: screenHeight * 0.4,   // 320 ÷ 800 = 0.4
+              left: screenWidth * 0.4,
+              top: screenHeight * 0.4,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
@@ -234,7 +214,7 @@ class FrontBackLevel1Stage4ActivityState
                 child: GestureDetector(
                   onTapDown: (details) {
                     final local = details.localPosition;
-                    final w = screenWidth * 0.625; // 250 ÷ 400 = 0.625
+                    final w = screenWidth * 0.625;
                     final h = screenWidth * 0.625;
 
                     final correctArea = Rect.fromLTWH(
