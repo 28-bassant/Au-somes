@@ -24,7 +24,6 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -34,10 +33,8 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -57,10 +54,8 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -101,32 +96,26 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
 
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
 
-  // دالة لبدء حركة الإجابة الصحيحة
   void _startAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -148,29 +137,24 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
 
   @override
   Widget build(BuildContext context) {
-    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
 
-    final firstElement = _activity!.elements!.first; // الصورة الغلط
-    final lastElement = _activity!.elements!.last;   // الصورة الصح
+    final firstElement = _activity!.elements!.first;
+    final lastElement = _activity!.elements!.last;
 
-    // استخدام LayoutBuilder للحصول على حجم الشاشة
     return LayoutBuilder(
       builder: (context, constraints) {
         final double screenWidth = constraints.maxWidth;
         final double screenHeight = constraints.maxHeight;
 
-        // حساب عامل التحجيم بناءً على الشاشة (افتراض أن التصميم كان لشاشة 400px)
         final double scale = screenWidth / 400;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
         final double correctImageWidth = 200 * scale;
         final double wrongImageWidth = 300 * scale;
         final double spacingHeight = 30 * scale;
@@ -178,14 +162,11 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ✅ الصورة الصح (الأولى) مع الحركة
             AnimatedBuilder(
               animation: _animationController!,
               builder: (context, child) {
-                // حساب قيمة الحركة للاهتزاز بشكل متجاوب
                 double shakeValue = 0;
                 if (_isAnimatingAnswer) {
-                  // استخدام نسبة من الشاشة للاهتزاز
                   shakeValue = screenWidth * 0.05 * sin(_animationController!.value * pi);
                 }
 
@@ -196,7 +177,6 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
               },
               child: GestureDetector(
                 onTap: () {
-                  // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
                   setState(() {
                     _wrongAttempts = 0;
                     _isAnimatingAnswer = false;
@@ -213,7 +193,7 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
                 },
                 child: Container(
                   width: correctImageWidth,
-                  height: correctImageWidth, // للحفاظ على النسبة
+                  height: correctImageWidth,
                   child: Image.network(
                     lastElement.imageUrl ?? '',
                     fit: BoxFit.contain,
@@ -224,15 +204,13 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
 
             SizedBox(height: spacingHeight),
 
-            // ❌ الصورة الغلط (التانية)
             GestureDetector(
               onTap: () {
-                // عند النقر على الإجابة الخاطئة
                 _handleWrongAnswer();
               },
               child: Container(
                 width: wrongImageWidth,
-                height: wrongImageWidth, // للحفاظ على النسبة
+                height: wrongImageWidth,
                 child: Image.network(
                   firstElement.imageUrl ?? '',
                   fit: BoxFit.contain,

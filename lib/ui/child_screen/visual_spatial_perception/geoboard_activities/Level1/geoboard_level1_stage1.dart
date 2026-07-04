@@ -26,7 +26,6 @@ class GeoboardLevel1Stage1State extends State<GeoboardLevel1Stage1>
   bool _imagesLoaded = false;
   bool _dataLoaded = false;
 
-  // متغيرات للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;

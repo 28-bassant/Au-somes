@@ -19,31 +19,24 @@ class UpLevel2Stage2Activity extends StatefulWidget {
 
 class UpLevel2Stage2ActivityState extends State<UpLevel2Stage2Activity>
     with SingleTickerProviderStateMixin {
-  // 🔹 النشاط نفسه
   ActivityResponse? activity;
 
-  // 🔹 حالة التحميل
   bool isLoading = true;
   bool hasPlayedSound = false;
   bool imagesLoaded = false;
 
-  // 🔹 هل القطّة وضعت في مكانها الصحيح؟
   bool isPlacedCorrectly = false;
 
-  // 🔹 مشغل الصوت
   late AudioPlayer _player;
 
-  // 🔹 عناصر النشاط
-  ActivityElement? actor;          // القطّة
-  ActivityElement? shadowCorrect;  // Shadow الصح
-  ActivityElement? shadowWrong;    // Shadow الغلط
-  ActivityElement? anchor;         // الكرسي أو الطرابيزة
+  ActivityElement? actor;
+  ActivityElement? shadowCorrect;
+  ActivityElement? shadowWrong;
+  ActivityElement? anchor;
 
-  // 🔹 مفاتيح لتحديد أماكن الـ Shadows
   final GlobalKey _shadowWrongKey = GlobalKey();
   final GlobalKey _shadowCorrectKey = GlobalKey();
 
-  // 🔹 متغيرات لإدارة الإجابات الخاطئة وحركة الـ Shadow
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   late AnimationController _animationController;

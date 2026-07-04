@@ -26,7 +26,7 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
   bool _hasPlayedSound = false;
   bool _isPlacedCorrectly = false;
   bool _imagesLoaded = false;
-  bool _dataLoaded = false; // متغير جديد للتأكد من تحميل البيانات
+  bool _dataLoaded = false;
 
   final GlobalKey _shadowCorrectKey = GlobalKey();
   final GlobalKey _shadowWrongKey = GlobalKey();
@@ -57,17 +57,15 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       if (mounted) {
         setState(() {
           _activity = activity;
-          _dataLoaded = true; // تم تحميل البيانات
+          _dataLoaded = true;
         });
 
-        // تحميل جميع الصور أولاً
         await _preloadImages(activity);
 
         setState(() {
           _imagesLoaded = true;
         });
 
-        // تشغيل الصوت بعد تحميل الصور والبيانات
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -95,19 +93,16 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
-    // تحميل كل الصور في الخلفية
     final List<Future> precacheFutures = [];
     for (final url in images) {
       precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
-    // انتظار تحميل جميع الصور
     await Future.wait(precacheFutures);
     print('All images preloaded successfully');
   }
 
   Future<void> playSound() async {
-    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
     if (!_dataLoaded || !_imagesLoaded) {
       print('Waiting for data and images to load before playing sound');
       return;
@@ -125,7 +120,6 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
   }
 
   void repeatSound() {
-    // التأكد من تحميل كل شيء قبل إعادة تشغيل الصوت
     if (_dataLoaded && _imagesLoaded) {
       playSound();
     }
@@ -246,7 +240,6 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       body: Stack(
         children: [
 
-          // Shadow الغلط
           Positioned(
             left: wrongShadowLeft - 60,
             top: wrongShadowTop-30,
@@ -258,7 +251,6 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
             ),
           ),
 
-          // Anchor
           Positioned.fill(
             child: Center(
               child: Image.network(
@@ -268,7 +260,6 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
             ),
           ),
 
-          // Shadow الصح
           Positioned(
             left: correctShadowLeft,
             top: correctShadowTop - 10,
@@ -300,7 +291,6 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
             ),
           ),
 
-          // Actor draggable
           if (!_isPlacedCorrectly)
             Positioned(
               right: actorRight,

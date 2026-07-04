@@ -52,10 +52,8 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
           activity = response;
         });
 
-        // Preload الصور أولاً
         await preloadImages(response!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
           await _player.stop();
           await _player.play(UrlSource(activity!.deceptionInstructions!.first));
@@ -182,7 +180,6 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
         final wrongContainerHeight = containerHeight * .83;
         return Stack(
           children: [
-            /// 🪑 الكرسي
             Positioned(
               top: anchorTop,
               left: (screenWidth - anchorWidth) / 2 + 15,
@@ -194,7 +191,6 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
               ),
             ),
 
-            /// ✅ القطة الصح (مع اهتزاز)
             Positioned(
               top: actorTop,
               left: actorLeft,
@@ -208,7 +204,6 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
               ),
 
 
-            /// ❌ القطة الغلط
             Positioned(
               top: bottomCatTop,
               left: bottomCatLeft,
@@ -232,7 +227,7 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
               ),
             )),
 
-            /// الضغط على الغلط
+
             Positioned(
               left: wrongContainerLeft,
               top: wrongContainerTop,
@@ -275,7 +270,6 @@ class DownLevel1Stage1ActivityState extends State<DownLevel1Stage1Activity>
               ),
             ),
 
-            /// الضغط على الصح
             Positioned(
               left: containerLeft,
               top: containerTop,

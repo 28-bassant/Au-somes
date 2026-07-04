@@ -34,7 +34,7 @@ class StoryHeader extends StatelessWidget {
 
 
     return Container(
-      height: height * .2,
+      height: height * .22,
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 52, 16, 18),
       decoration: const BoxDecoration(

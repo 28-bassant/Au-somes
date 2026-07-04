@@ -26,7 +26,6 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
   bool _imagesLoaded = false;
   late AudioPlayer _player;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -55,10 +54,8 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
           _activity = response;
         });
 
-        // تحميل الصور أولاً
         await _preloadImages(response!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -104,22 +101,18 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
 
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
       _startAnswerAnimation();
     }
   }
 
-  // دالة لبدء حركة الإجابة الصحيحة
   void _startAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
@@ -166,11 +159,9 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
         final double screenWidth = constraints.maxWidth;
         final double screenHeight = constraints.maxHeight;
 
-        // افتراض أن التصميم الأصلي على شاشة 400px
         final double designWidth = 400.0;
         final double scale = screenWidth / designWidth;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
         final double wrong1Right = 0 * scale;
         final double wrong1Top = 190 * scale;
         final double wrong1Width = 300 * scale;
@@ -188,7 +179,6 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
         return Stack(
           alignment: Alignment.center,
           children: [
-            /// الأنكور الأول ( Try Again)
             Positioned(
               right: wrong1Right,
               top: wrong1Top,
@@ -202,7 +192,6 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
               ),
             ),
 
-            /// الأنكور الثاني ( Try Again)
             Positioned(
               left: wrong2Left,
               top: wrong2Top,
@@ -222,7 +211,6 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
                 },
                 child: GestureDetector(
                   onTap: () {
-                    // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -249,7 +237,6 @@ class OutsideLevel1Stage4ActivityState extends State<OutsideLevel1Stage4Activity
                 ),
               ),
             )),
-            /// العنصر الصحيح مع الحركة
             Positioned(
               right: correctRight,
               top: correctTop,

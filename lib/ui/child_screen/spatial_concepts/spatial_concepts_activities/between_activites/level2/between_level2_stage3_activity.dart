@@ -31,8 +31,8 @@ class BetweenLevel2Stage3ActivityState
 
   late AudioPlayer _player;
   late ActivityElement actor;
-  late ActivityElement shadow1; // الصح
-  late ActivityElement shadow2; // الغلط
+  late ActivityElement shadow1;
+  late ActivityElement shadow2;
   late ActivityElement anchor;
 
   final GlobalKey _shadow2Key = GlobalKey();
@@ -64,16 +64,13 @@ class BetweenLevel2Stage3ActivityState
           _activity = activity;
         });
 
-        // البحث عن العناصر
         actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
         shadow1 = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
         shadow2 = _activity!.elements!.lastWhere((e) => e.role == 'Shadow');
         anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        // تحميل الصور أولاً
         await _preloadImages(_activity!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -97,7 +94,6 @@ class BetweenLevel2Stage3ActivityState
   }
 
   Future<void> _preloadImages(ActivityResponse activity) async {
-    // تحميل صور الشبكة
     final images = activity.elements!
         .map((e) => e.imageUrl)
         .where((url) => url != null && url!.isNotEmpty)
@@ -173,11 +169,9 @@ class BetweenLevel2Stage3ActivityState
         final double screenWidth = constraints.maxWidth;
         final double screenHeight = constraints.maxHeight;
 
-        // افتراض أن التصميم الأصلي على شاشة 400px
         final double designWidth = 400.0;
         final double scale = screenWidth / designWidth;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
         final double shadow2Right = 0 * scale;
         final double shadow2Top = 400 * scale;
         final double shadow2Width = 200 * scale;
@@ -203,7 +197,6 @@ class BetweenLevel2Stage3ActivityState
 
         return Stack(
           children: [
-            /// ===== Shadow الغلط =====
             Positioned(
               right: shadow2Right,
               top: shadow2Top,
@@ -218,7 +211,6 @@ class BetweenLevel2Stage3ActivityState
               ),
             ),
 
-            /// ===== Anchor 1 =====
             Positioned(
               top: anchorTop,
               left: 0,
@@ -231,7 +223,6 @@ class BetweenLevel2Stage3ActivityState
               ),
             ),
 
-            /// ===== Anchor 2 (Bag 1) =====
             Positioned(
               top: bag1Top,
               left: bag1Left1,
@@ -242,7 +233,6 @@ class BetweenLevel2Stage3ActivityState
               ),
             ),
 
-            /// ===== Anchor 3 (Bag 2) =====
             Positioned(
               top: bag1Top,
               left: bag1Left2,
@@ -253,7 +243,6 @@ class BetweenLevel2Stage3ActivityState
               ),
             ),
 
-            /// ===== Shadow الصح =====
             Positioned(
               left: shadow1Left,
               top: shadow1Top,
@@ -262,7 +251,7 @@ class BetweenLevel2Stage3ActivityState
                 builder: (context, child) {
                   double shake = 0;
                   if (_isAnimatingShadow) {
-                    shake = shakeIntensity * sin(_animationController!.value * 2 * pi); // تصحيح: * 2 * pi
+                    shake = shakeIntensity * sin(_animationController!.value * 2 * pi);
                   }
                   return Transform.translate(offset: Offset(shake, 0), child: child);
                 },
@@ -291,7 +280,6 @@ class BetweenLevel2Stage3ActivityState
               ),
             ),
 
-            /// ===== Actor =====
             if (!isPlacedCorrectly)
               Positioned(
                 left: actorLeft,
@@ -320,7 +308,6 @@ class BetweenLevel2Stage3ActivityState
                       details.offset.dy + actorCenterSize / 2,
                     );
 
-                    /// ===== Check Shadow الصح =====
                     final shadow1Box = _shadow1Key.currentContext?.findRenderObject() as RenderBox?;
                     if (shadow1Box != null) {
                       final shadow1Pos = shadow1Box.localToGlobal(Offset.zero);
@@ -354,7 +341,6 @@ class BetweenLevel2Stage3ActivityState
                       }
                     }
 
-                    /// ===== Check Shadow الغلط =====
                     final shadow2Box = _shadow2Key.currentContext?.findRenderObject() as RenderBox?;
                     if (shadow2Box != null) {
                       final shadow2Pos = shadow2Box.localToGlobal(Offset.zero);

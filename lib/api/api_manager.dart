@@ -1,15 +1,18 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../core/cache/shared_prefs_utils.dart';
 import '../core/cache/token_utils.dart';
+import '../core/cache/token_utils.dart';
 import '../models/activities/activity_response.dart';
 import '../models/login_response.dart';
-import '../models/progress/log_attempt_response.dart';
-import '../models/progress/progress_summary_response.dart';
 import '../models/register_response.dart';
 import '../utils/app_routes.dart';
 import 'api_constants.dart';
 import 'api_endpoints.dart';
+import '../models/progress/log_attempt_response.dart';
+import '../models/progress/progress_summary_response.dart';
+import '../models/story/story_response.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -86,15 +89,14 @@ class ApiManager {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
-    print("🔵 LOGIN RAW RESPONSE = ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
+
       final loginResponse = LoginResponse.fromJson(data);
-      print("🟡 TOKEN PARSED = ${loginResponse.token}");
-      print("🟠 TOKEN BEFORE SAVE = ${loginResponse.token}");
+
       await TokenUtils.saveLoginTokens(loginResponse);
-      print("TOKEN AFTER LOGIN = ${await TokenUtils.getToken()}"); // 👈 هنا
+
       return loginResponse;
     } else {
       final errorJson = jsonDecode(response.body);
@@ -429,5 +431,90 @@ class ApiManager {
 
     return null;
   }
+  static Future<StoryResponse> generateStories({
+    required String childName,
+    required String theme,
+    required List<String> concepts,
+  }) async {
+    try {
+      print("🚀 Starting API call...");
+      print("👶 Child: $childName");
+      print("📚 Theme: $theme");
+      print("📖 Concepts: ${concepts.join(', ')}");
 
+      // 1️⃣ بناء الـ prompt بالتنسيق الصحيح
+      final String userPrompt = """
+Child name: $childName | Theme: $theme | Concepts: ${concepts.join('، ')}
+""";
+
+      // 2️⃣ إعداد الـ request body
+      var body = jsonEncode({
+        "model": "qwen2.5-3b-lora",
+        "messages": [
+          {
+            "role": "user",
+            "content": userPrompt,
+          }
+        ],
+        "max_new_tokens": 2048,
+        "temperature": 0.05,
+        "top_p": 0.9,
+        "top_k": 50,
+        "repetition_penalty": 1.1,
+      });
+
+      print("📦 Request Body: $body");
+
+      // 3️⃣ إرسال الـ request
+      final response = await http.post(
+        Uri.parse(ApiConstants.storiesBaseUrl + ApiEndpoints.storiesEndpoint),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body,
+      );
+
+      print("📩 Response status: ${response.statusCode}");
+      print("📩 Response body: ${response.body}");
+
+      // 4️⃣ معالجة الـ response
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // استخراج المحتوى من الـ response
+        final String content = data["choices"][0]["message"]["content"];
+
+        print("📖 Raw content: $content");
+
+        // تنظيف النص من أي علامات إضافية
+        String cleanContent = content
+            .replaceAll(RegExp(r'```json'), '')
+            .replaceAll(RegExp(r'```'), '')
+            .trim();
+
+        // تحويل النص إلى JSON
+        final Map<String, dynamic> storyJson = jsonDecode(cleanContent);
+
+        print("✅ Story parsed successfully");
+
+        return StoryResponse.fromJson(storyJson);
+      } else {
+        // محاولة قراءة رسالة الخطأ
+        String errorMessage = "Unknown error";
+        try {
+          final errorData = jsonDecode(response.body);
+          if (errorData.containsKey("error")) {
+            errorMessage = errorData["error"]["message"] ?? errorData["error"].toString();
+          }
+        } catch (_) {
+          errorMessage = response.body;
+        }
+
+        throw Exception("Failed to generate story: ${response.statusCode}\n$errorMessage");
+      }
+    } catch (e) {
+      print("❌ ERROR in generateStories: $e");
+      rethrow;
+    }
+  }
 }

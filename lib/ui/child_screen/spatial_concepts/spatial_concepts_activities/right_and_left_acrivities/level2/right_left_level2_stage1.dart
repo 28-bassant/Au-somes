@@ -28,14 +28,13 @@ class RightLeftLevel2Stage1State extends State<RightLeftLevel2Stage1>
   bool isPlacedCorrectly = false;
 
   late ActivityElement actor;
-  late ActivityElement shadow1; // الصح
-  late ActivityElement shadow2; // الغلط
+  late ActivityElement shadow1;
+  late ActivityElement shadow2;
   late ActivityElement anchor;
 
   final GlobalKey _shadow1Key = GlobalKey();
   final GlobalKey _shadow2Key = GlobalKey();
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   AnimationController? _animationController;

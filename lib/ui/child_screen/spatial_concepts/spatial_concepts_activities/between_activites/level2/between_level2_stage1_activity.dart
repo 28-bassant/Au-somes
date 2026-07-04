@@ -34,10 +34,9 @@ class BetweenLevel2Stage1ActivityState
   bool _usedHint = false;
   late AudioPlayer _player;
   late ActivityElement actor;
-  late ActivityElement shadow; // الصح
+  late ActivityElement shadow;
   late ActivityElement anchor;
 
-  // ===== إدارة الخطأ =====
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   late AnimationController _animationController;
@@ -109,7 +108,6 @@ class BetweenLevel2Stage1ActivityState
     await _player.play(UrlSource(_activity!.audioUrl!));
   }void repeatSound() => playSound();
 
-  // ===== منطق الخطأ =====
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
@@ -177,7 +175,6 @@ class BetweenLevel2Stage1ActivityState
 
       return Stack(
         children: [
-          /// ===== Anchor =====
           Positioned(
             top: anchorTop,
             left: 0,
@@ -188,7 +185,6 @@ class BetweenLevel2Stage1ActivityState
             ),
           ),
 
-          /// ===== Shadow الغلط =====
           Positioned(
             key: _wrongShadowKey,
             top: shadowTop,
@@ -200,7 +196,6 @@ class BetweenLevel2Stage1ActivityState
             ),
           ),
 
-          /// ===== Shadow الصح =====
           Positioned(
             left: shadowLeft,
             top: shadowTop,
@@ -237,7 +232,6 @@ class BetweenLevel2Stage1ActivityState
               ),
             ),
           ),
-          /// ===== Actor =====
           if (!isPlacedCorrectly)
             Positioned(
               right: actorRight,
@@ -263,7 +257,6 @@ class BetweenLevel2Stage1ActivityState
                     details.offset.dy + actorWidth / 2,
                   );
 
-                  /// ===== Check Shadow الصح =====
                   final correctBox =
                   _correctShadowKey.currentContext?.findRenderObject()
                   as RenderBox?;
@@ -309,7 +302,6 @@ class BetweenLevel2Stage1ActivityState
                     }
                   }
 
-                  /// ===== Check Shadow الغلط =====
                   final wrongBox =
                   _wrongShadowKey.currentContext?.findRenderObject()
                   as RenderBox?;
