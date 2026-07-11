@@ -28,20 +28,17 @@ class FrontBackLevel1Stage3ActivityState
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة بسرعة أقل
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -61,10 +58,8 @@ class FrontBackLevel1Stage3ActivityState
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -108,12 +103,23 @@ class FrontBackLevel1Stage3ActivityState
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
       _startAnswerAnimation();
+    }
+  }
+  Future<void> _logProgress() async {
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _usedHint,
+    );
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
     }
   }
 
@@ -162,28 +168,28 @@ class FrontBackLevel1Stage3ActivityState
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
         child: Stack(
           children: [
-            // عنصر Try Again (الخطأ)
             Positioned(
-              right: screenWidth * 0.35,  // 100 ÷ 400 = 0.25
-              bottom: screenHeight * 0.3, // 320 ÷ 800 = 0.4
+              right: screenWidth * 0.35,
+              bottom: screenHeight * 0.3,
               child: GestureDetector(
                 onTap: () {
                   _handleWrongAnswer();
                 },
                 child: Image.network(
                   firstElement.imageUrl ?? '',
-                  width: screenWidth * 0.875, // 350 ÷ 400 = 0.875
+                  width: screenWidth * 0.875,
                   fit: BoxFit.contain,
                 ),
               ),
             ),
-            // صورة الخلفية
             Positioned.fill(
               child: FittedBox(
                 fit: BoxFit.contain,
@@ -195,10 +201,9 @@ class FrontBackLevel1Stage3ActivityState
 
 
 
-            // العنصر الصحيح
             Positioned(
-              left: screenWidth * 0.25,  // 100 ÷ 400 = 0.25
-              top: screenHeight * 0.3,   // 320 ÷ 800 = 0.4
+              left: screenWidth * 0.25,
+              top: screenHeight * 0.3,
               child: AnimatedBuilder(
                 animation: _animationController!,
                 builder: (context, child) {
@@ -214,9 +219,9 @@ class FrontBackLevel1Stage3ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTapDown: (details) {
+                  onTapDown: (details) async {
                     final local = details.localPosition;
-                    final w = screenWidth * 0.625; // 250 ÷ 400 = 0.625
+                    final w = screenWidth * 0.625;
                     final h = screenWidth * 0.625;
 
                     final correctArea = Rect.fromLTWH(
@@ -235,12 +240,7 @@ class FrontBackLevel1Stage3ActivityState
                       _animationController?.stop();
                       _animationController?.value = 0;
 
-                      ApiManager.logAttemptStatus(
-                        phaseId: _activity!.phaseId!,
-                        userHint: false,
-                      );
-
-                      ApiManager.getProgressSummary();
+                      await _logProgress();
 
                       WellDoneOverlay.show(context);
 

@@ -33,7 +33,7 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
 
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
-
+  bool _usedHint = false;
   AnimationController? _animationController;
 
   @override
@@ -112,17 +112,14 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
   void repeatSound() => playSound();
 
   void _handleWrongAnswer() {
-
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-
       TryAgainSound.play();
-
     } else if (_wrongAttempts == 2) {
-
       _startShadowAnimation();
     }
   }
@@ -153,12 +150,14 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
   }
   Future<void> _logProgress() async {
     try {
-      await ApiManager.logAttemptStatus(
+      final result = await ApiManager.logAttemptStatus(
         phaseId: _activity!.phaseId!,
-        userHint: _wrongAttempts > 0,
+        userHint: _usedHint,
       );
 
-      await ApiManager.getProgressSummary();
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
     } catch (e) {
       print("Progress error: $e");
     }
@@ -189,16 +188,20 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
 
       if (shadowCorrectRect.contains(actorCenter)) {
 
+        print("👉 RIGHT ANSWER CLICKED");
+
+
+
+        _animationController?.stop();
+        _animationController?.value = 0;
+
         setState(() {
           _isPlacedCorrectly = true;
           _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
 
-        _animationController?.stop();
-        _animationController?.value = 0;
-
-        await _logProgress(); // 👈 ده الجديد
+        await _logProgress();
 
         WellDoneOverlay.show(context);
 
@@ -207,6 +210,8 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
             widget.onNextStage?.call();
           }
         });
+
+        return;
 
         return;
       }
@@ -282,50 +287,50 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
     final double actorSize = screenWidth * (140 / 400);
 
     return Scaffold(
-      body: Stack(
-        children: [
+        body: Stack(
+          children: [
 
-          // wrong shadow
           Positioned(
-            left: wrongShadowLeft-40,
-            top: wrongShadowTop-20,
+          left: wrongShadowLeft-40,
+          top: wrongShadowTop-20,
+          child: Image.network(
+            shadowCorrect.imageUrl ?? '',
+            key: _shadowWrongKey,
+            width: wrongShadowSize,
+            height: wrongShadowSize,
+          ),
+        ),
+
+        Positioned.fill(
+          child: Center(
             child: Image.network(
-              shadowCorrect.imageUrl ?? '',
-              key: _shadowWrongKey,
-              width: wrongShadowSize,
-              height: wrongShadowSize,
+              anchor.imageUrl ?? '',
+              width: anchorWidth,
             ),
           ),
+        ),
 
-          Positioned.fill(
-            child: Center(
-              child: Image.network(
-                anchor.imageUrl ?? '',
-                width: anchorWidth,
-              ),
-            ),
-          ),
-
-          //correct shadow
-          Positioned(
+        Positioned(
             left: correctShadowLeft,
             top: correctShadowTop ,
             child: AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
+                animation: _animationController!,
+                builder: (context, child) {
 
-                double shakeValue = 0;
+                  double shakeValue = 0;
 
-                if (_isAnimatingShadow) {
-                  shakeValue = screenWidth * 0.03 *
-                      sin(_animationController!.value * pi);
-                }
+                  if (_isAnimatingShadow) {
+                    shakeValue = screenWidth * 0.03 *
+                        sin(_animationController!.value * pi);
+                  }
 
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
+
+
+                  return Transform.translate(
+                    offset: Offset(shakeValue, 0),
+                    child: child,
+                  );
+                },
               child: _isPlacedCorrectly
                   ? Image.network(
                 actor.imageUrl ?? '',
@@ -340,40 +345,40 @@ class FrontBackLevel2Stage2ActivityState extends State<FrontBackLevel2Stage2Acti
                 height: correctShadowSize,
               ),
             ),
-          ),
+        ),
 
-          if (!_isPlacedCorrectly)
-            Positioned(
-              right: actorRight,
-              bottom: actorBottom+20,
-              child: Draggable<String>(
+            if (!_isPlacedCorrectly)
+              Positioned(
+                right: actorRight,
+                bottom: actorBottom+20,
+                child: Draggable<String>(
 
-                data: actor.id,
+                  data: actor.id,
 
-                feedback: Material(
-                  color: Colors.transparent,
+                  feedback: Material(
+                    color: Colors.transparent,
+                    child: Image.network(
+                      actor.imageUrl ?? '',
+                      width: actorSize,
+                      height: actorSize,
+                    ),
+                  ),
+
+                  childWhenDragging: const SizedBox(),
+
                   child: Image.network(
                     actor.imageUrl ?? '',
-                    width: actorSize,
-                    height: actorSize,
+                    width: actorSize*.8,
+                    height: actorSize*.8,
                   ),
+
+                  onDragEnd: (details) {
+                    _handleDragEnd(details, actorSize);
+                  },
                 ),
-
-                childWhenDragging: const SizedBox(),
-
-                child: Image.network(
-                  actor.imageUrl ?? '',
-                  width: actorSize*.8,
-                  height: actorSize*.8,
-                ),
-
-                onDragEnd: (details) {
-                  _handleDragEnd(details, actorSize);
-                },
               ),
-            ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 }

@@ -4,19 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../../../l10n/app_localizations.dart';
 import '../../../../../../../utils/app_colors.dart';
-import '../models/story_model.dart';
+import '../../../../../../child_screen/reinforcement_widgets/sound_helper.dart';
 import '../widgets/encourangement_popup.dart';
 import '../widgets/story_header.dart';
 import '../widgets/answer_option_button.dart';
 import 'story_complete_screen.dart';
-
+import 'package:flutter_tts/flutter_tts.dart';
+import '../../../../../../../models/story/story_response.dart';
 class StoryPlayerScreen extends StatefulWidget {
-  const StoryPlayerScreen({super.key});
+  final StoryResponse story;
+
+  const StoryPlayerScreen({
+    super.key,
+    required this.story,
+  });
 
   @override
   State<StoryPlayerScreen> createState() => _StoryPlayerScreenState();
 }
-
 class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   int _currentPage = 0;
   int? _selectedAnswer;
@@ -25,130 +30,94 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   bool _showPopup = false;
   bool _showHint = false;
   int _score = 0;
-
-  final List<StoryPage> _pages = const [
-    StoryPage(
-      imagePath: 'assets/images/pizza_kitchen.png',
-      storyTextKey: 'story_text_pizza',
-      question: StoryQuestion(
-        questionKey: 'where_is_pizza',
-        optionKeys: ['inside_box', 'outside_box'],
-        correctIndex: 0,
-        hintKey: 'pizza_hint',
-      ),
-    ),
-    StoryPage(
-      imagePath: 'assets/images/delivery_bike.png',
-      storyTextKey: 'story_text_bike',
-      question: StoryQuestion(
-        questionKey: 'where_is_bag',
-        optionKeys: ['at_back', 'at_front'],
-        correctIndex: 0,
-        hintKey: 'bag_hint',
-      ),
-    ),
-    StoryPage(
-      imagePath: 'assets/images/delivery_arrive.png',
-      storyTextKey: 'story_text_arrive',
-      question: StoryQuestion(
-        questionKey: 'where_is_grandma',
-        optionKeys: ['in_front_of_door', 'behind_door'],
-        correctIndex: 0,
-        hintKey: 'grandma_hint',
-      ),
-    ),
-  ];
+  final FlutterTts _tts = FlutterTts();
+  List<StoryPage> get _pages => widget.story.pages;
 
   StoryPage get _page => _pages[_currentPage];
   bool get _isLastPage => _currentPage == _pages.length - 1;
   bool get _isCorrect =>
-      _answered && _selectedAnswer == _page.question.correctIndex;
+      _answered &&
+          _selectedAnswer != null &&
+          _page.options[_selectedAnswer!] == _page.answer;
   bool get _showRetryBanner => _wrongAttempts >= 1 && !_isCorrect;
 
   bool get isArabic => Provider.of<AppLanguageProvider>(context).isArabic();
 
-  String _getLocalizedText(String key) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (key) {
-      case 'title':
-        return l10n.title;
-      case 'subtitle':
-        return l10n.subtitle;
-      case 'where_is_pizza':
-        return l10n.where_is_pizza;
-      case 'inside_box':
-        return l10n.inside_box;
-      case 'outside_box':
-        return l10n.outside_box;
-      case 'where_is_bag':
-        return l10n.where_is_bag;
-      case 'at_back':
-        return l10n.at_back;
-      case 'at_front':
-        return l10n.at_front;
-      case 'where_is_grandma':
-        return l10n.where_is_grandma;
-      case 'in_front_of_door':
-        return l10n.in_front_of_door;
-      case 'behind_door':
-        return l10n.behind_door;
-      case 'pizza_hint':
-        return l10n.pizza_hint;
-      case 'bag_hint':
-        return l10n.bag_hint;
-      case 'grandma_hint':
-        return l10n.grandma_hint;
-      // case 'story_text_pizza':
-      //   return l10n.story_text_pizza;
-      // case 'story_text_bike':
-      //   return l10n.story_text_bike;
-      // case 'story_text_arrive':
-      //   return l10n.story_text_arrive;
-      default:
-        return key;
-    }
-  }
 
-  String _getPopupMessage() {
-    final l10n = AppLocalizations.of(context)!;
-    final messages = [l10n.keep_going, l10n.wonderful, l10n.well_done];
-    return messages[_currentPage % messages.length];
-  }
 
   void _selectAnswer(int index) {
     if (_answered) return;
-    final correct = index == _page.question.correctIndex;
+
+    final correct = _page.options[index] == _page.answer;
+
     setState(() {
       _selectedAnswer = index;
+
       if (correct) {
         _answered = true;
         _score++;
+
         Future.delayed(const Duration(milliseconds: 350), () {
-          if (mounted) setState(() => _showPopup = true);
+          if (!mounted) return;
+
+          setState(() {
+            _showPopup = true;
+          });
         });
-      } else {
+      }
+      else {
         _wrongAttempts++;
+
+        _speakWrongFeedback();
+
         Future.delayed(const Duration(milliseconds: 600), () {
-          if (mounted) setState(() => _selectedAnswer = null);
+          if (mounted) {
+            setState(() => _selectedAnswer = null);
+          }
         });
       }
     });
   }
 
   void _dismissPopup() {
-    setState(() => _showPopup = false);
-    Future.delayed(const Duration(milliseconds: 150), _goNext);
-  }
+    if (!mounted) return;
 
+    setState(() {
+      _showPopup = false;
+    });
+
+    if (_isLastPage) {
+      _goNext();
+    }
+  }
+  Future<void> _speak() async {
+    await _tts.setLanguage("en-US"); // أو "ar"
+    await _tts.setSpeechRate(0.5);
+
+    await _tts.speak(_page.narration);
+  }
+  Future<void> _speakWrongFeedback() async {
+    final isArabic =
+    RegExp(r'[\u0600-\u06FF]').hasMatch(_page.feedback.wrongFeedback);
+
+    await _tts.stop();
+
+    await _tts.setLanguage(isArabic ? "ar-EG" : "en-US");
+    await _tts.setSpeechRate(0.45);
+    await _tts.setPitch(1.0);
+
+    await _tts.speak(_page.feedback.wrongFeedback);
+  }
   void _goNext() {
     if (_isLastPage) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => StoryCompleteScreen(
+            storyId: widget.story.storyId,
             score: _score,
             total: _pages.length,
-          ),
+          )
         ),
       );
     } else {
@@ -165,15 +134,19 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
 
   OptionState _optionState(int index) {
     if (_selectedAnswer == null) return OptionState.idle;
-    if (index == _page.question.correctIndex && _answered) {
+
+    if (_answered &&
+        _page.options[index] == _page.answer) {
       return OptionState.correct;
     }
-    if (index == _selectedAnswer && index != _page.question.correctIndex) {
+
+    if (_selectedAnswer == index &&
+        _page.options[index] != _page.answer) {
       return OptionState.wrong;
     }
+
     return OptionState.idle;
   }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -184,8 +157,8 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
       body: Stack(children: [
         Column(children: [
           StoryHeader(
-            title: l10n.title,
-            subtitle: l10n.subtitle,
+            title: widget.story.theme,
+            subtitle: widget.story.mission,
             currentPage: _currentPage + 1,
             totalPages: _pages.length,
           ),
@@ -211,30 +184,27 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: _speak,
                         icon: const Icon(
                           Icons.volume_up_rounded,
                           color: AppColors.softBlue,
-                          size: 22,
                         ),
-                        padding: EdgeInsets.zero,
-                      ),
+                      )
                     ),
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    _getLocalizedText(_page.question.questionKey),
+                      _page.question,
                     textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: AppStyles.bold14Black
                   ),
                   const SizedBox(height: 10),
                   ...List.generate(
-                    _page.question.optionKeys.length,
+                    _page.options.length,
                         (i) => Padding(
                       padding: const EdgeInsets.only(bottom: 9),
                       child: AnswerOptionButton(
-                        text: _getLocalizedText(
-                            _page.question.optionKeys[i]),
+                        text: _page.options[i],
                         state: _optionState(i),
                         onTap: _answered ? null : () => _selectAnswer(i),
                       ),
@@ -264,8 +234,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _goNext,
-                        style: ElevatedButton.styleFrom(
+                        onPressed: _answered ? _goNext : null,                        style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.softBlue,
                           padding:
                           const EdgeInsets.symmetric(vertical: 15),
@@ -290,7 +259,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         if (_showPopup)
           Positioned.fill(
             child: EncouragementPopup(
-              message: _getPopupMessage(),
+              message: _page.feedback.encouragementMessage,
               onDismiss: _dismissPopup,
             ),
           ),
@@ -301,23 +270,30 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   Widget _buildImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
-      child: Image.asset(
-        _page.imagePath,
+      child: Image.network(
+        _page.imageUrl,
         width: double.infinity,
-        height: 200,
+        height: 220,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-          width: double.infinity,
-          height: 200,
-          color: const Color(0xFFFFE0B2),
-          child: const Center(
-            child: Text('🍕', style: TextStyle(fontSize: 60)),
-          ),
-        ),
+        errorBuilder: (context, error, stackTrace) {
+          print(error);
+          return const Center(
+            child: Icon(Icons.broken_image, size: 60),
+          );
+        },
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+
+          return const SizedBox(
+            height: 220,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
       ),
     );
   }
-
   Widget _buildStoryText() {
     final isArabic = Provider.of<AppLanguageProvider>(context).isArabic();
     return Container(
@@ -329,7 +305,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         border: Border.all(color: AppColors.greyColor),
       ),
       child: Text(
-        _getLocalizedText(_page.storyTextKey),
+          _page.narration,
         textAlign: isArabic ? TextAlign.right : TextAlign.left,
         style:AppStyles.medium10Black
       ),
@@ -342,7 +318,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       decoration: BoxDecoration(
-        color: AppColors.redColor,
+        color: AppColors.redColor.withOpacity(0.3),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.redColor.withOpacity(0.3)),
       ),
@@ -352,7 +328,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
           const Text('⚠️', style: TextStyle(fontSize: 16)),
           const SizedBox(width: 8),
           Text(
-            l10n.lets_try_again,
+              _page.feedback.wrongFeedback,
             style: AppStyles.bold14Black
           ),
         ],
@@ -376,7 +352,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              _getLocalizedText(_page.question.hintKey),
+                _page.feedback.retryHint,
               textAlign: isArabic ? TextAlign.right : TextAlign.left,
               style:AppStyles.bold14BlackWithOpacity60
             ),

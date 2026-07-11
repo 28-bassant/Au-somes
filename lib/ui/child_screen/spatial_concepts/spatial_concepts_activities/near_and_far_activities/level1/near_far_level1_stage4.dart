@@ -24,20 +24,18 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
+  bool _isCompleted = false;
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
 
-    // تحميل النشاط مرة واحدة في البداية
     _loadActivity();
 
-    // تهيئة المتحكم في الحركة
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -57,10 +55,8 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
           _activity = activity;
         });
 
-        // تحميل الصور
         await _preloadImages(activity);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -101,32 +97,46 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
 
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
+    if (_isCompleted) return;
+
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
-    } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الإجابة الصحيحة
+    } else if (_wrongAttempts >= 2) {
       _startAnswerAnimation();
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
-  // دالة لبدء حركة الإجابة الصحيحة
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
+
   void _startAnswerAnimation() {
     if (!_isAnimatingAnswer && _animationController != null) {
       setState(() {
         _isAnimatingAnswer = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingAnswer) {
           setState(() {
@@ -148,100 +158,97 @@ class NearFarLevel1Stage4State extends State<NearFarLevel1Stage4>
 
   @override
   Widget build(BuildContext context) {
-    // إذا كان في مرحلة التحميل
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // إذا كان هناك خطأ في تحميل النشاط
     if (_activity == null) {
       return const Center(child: Text('Error loading activity'));
     }
 
-    final firstElement = _activity!.elements!.first; // الصورة الغلط (الكبيرة)
-    final lastElement = _activity!.elements!.last;   // الصورة الصح (الصغيرة)
+    final firstElement = _activity!.elements!.first;
+    final lastElement = _activity!.elements!.last;
 
-    // استخدام LayoutBuilder للحصول على حجم الشاشة
     return LayoutBuilder(
-      builder: (context, constraints) {
-        final double screenWidth = constraints.maxWidth;
-        final double screenHeight = constraints.maxHeight;
+        builder: (context, constraints) {
+          final double screenWidth = constraints.maxWidth;
+          final double screenHeight = constraints.maxHeight;
 
-        // حساب عامل التحجيم بناءً على الشاشة (افتراض أن التصميم كان لشاشة 400px)
-        final double scale = screenWidth / 400;
+          final double scale = screenWidth / 400;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
-        final double wrongImageWidth = 300 * scale;  // الصورة الكبيرة
-        final double correctImageWidth = 200 * scale; // الصورة الصغيرة
-        final double spacingHeight = 30 * scale;
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // ❌ الصورة الغلط (الأولى - الكبيرة)
-            GestureDetector(
-              onTap: () {
-                // عند النقر على الإجابة الخاطئة
-                _handleWrongAnswer();
-              },
-              child: Container(
-                width: wrongImageWidth,
-                height: wrongImageWidth, // للحفاظ على النسبة
-                child: Image.network(
-                  firstElement.imageUrl ?? '',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
+          final double wrongImageWidth = 300 * scale;
+          final double correctImageWidth = 200 * scale;
+          final double spacingHeight = 30 * scale;
 
-            SizedBox(height: spacingHeight),
-
-            // ✅ الصورة الصح (التانية - الصغيرة) مع الحركة
-            AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                // حساب قيمة الحركة للاهتزاز بشكل متجاوب
-                double shakeValue = 0;
-                if (_isAnimatingAnswer) {
-                  // استخدام نسبة من الشاشة للاهتزاز
-                  shakeValue = screenWidth * 0.04 * sin(_animationController!.value * pi);
-                }
-
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
                 onTap: () {
-                  // إعادة تعيين المحاولات الخاطئة عند الإجابة الصحيحة
-                  setState(() {
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  _animationController?.stop();
-                  _animationController?.value = 0;
-
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
+                  _handleWrongAnswer();
                 },
                 child: Container(
-                  width: correctImageWidth,
-                  height: correctImageWidth, // للحفاظ على النسبة
+                  width: wrongImageWidth,
+                  height: wrongImageWidth,
                   child: Image.network(
-                    lastElement.imageUrl ?? '',
+                    firstElement.imageUrl ?? '',
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+
+              SizedBox(height: spacingHeight),
+
+              AnimatedBuilder(
+                animation: _animationController!,
+                builder: (context, child) {
+                  double shakeValue = 0;
+                  if (_isAnimatingAnswer) {
+                    shakeValue = screenWidth * 0.04 * sin(_animationController!.value * pi);
+                  }
+
+                  return Transform.translate(
+                    offset: Offset(shakeValue, 0),
+                    child: child,
+                  );
+                },
+                child: GestureDetector(
+                  onTap: () async {
+                    if (_isCompleted) return;
+
+                    setState(() {
+                      _isCompleted = true;
+                      _wrongAttempts = 0;
+                      _isAnimatingAnswer = false;
+                    });
+
+                    _animationController?.stop();
+                    _animationController?.value = 0;
+
+                    await _logProgress();
+
+                    WellDoneOverlay.show(context);
+
+                    Future.delayed(const Duration(seconds: 3), () {
+                      if (mounted) {
+                        widget.onNextStage?.call();
+                      }
+                    });
+                  },
+                  child: Container(
+                    width: correctImageWidth,
+                    height: correctImageWidth,
+                    child: Image.network(
+                      lastElement.imageUrl ?? '',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
     );
   }
 }

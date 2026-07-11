@@ -26,9 +26,9 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
   bool _hasPlayedSound = false;
   bool _isPlacedCorrectly = false;
   bool _imagesLoaded = false;
-
-  final GlobalKey _shadowLeftKey = GlobalKey(); // الشمال (الغلط)
-  final GlobalKey _shadowRightKey = GlobalKey(); // اليمين (الصح)
+  bool _usedHint = false;
+  final GlobalKey _shadowLeftKey = GlobalKey();
+  final GlobalKey _shadowRightKey = GlobalKey();
 
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
@@ -59,10 +59,8 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
           _activity = activity;
         });
 
-        // تحميل جميع الصور أولاً
         await _preloadImages(activity);
 
-        // بعد تحميل الصور، نشغل الصوت
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -113,6 +111,7 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -121,20 +120,20 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       _startShadowAnimation();
     }
   }
-
   Future<void> _logProgress() async {
     try {
-      await ApiManager.logAttemptStatus(
+      final result = await ApiManager.logAttemptStatus(
         phaseId: _activity!.phaseId!,
-        userHint: _wrongAttempts > 0,
+        userHint: _usedHint,
       );
 
-      await ApiManager.getProgressSummary();
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
     } catch (e) {
       print("Progress error: $e");
     }
   }
-
   void _startShadowAnimation() {
     if (!_isAnimatingShadow && _animationController != null) {
       setState(() {
@@ -164,14 +163,14 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       details.offset.dy + actorSize / 2,
     );
 
-    // =========================
-    // تحقق من الظل الشمال (الغلط)
-    // =========================
+
     final shadowLeftBox =
     _shadowLeftKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (shadowLeftBox != null) {
       final pos = shadowLeftBox.localToGlobal(Offset.zero);
+
+
 
       final rect = Rect.fromLTWH(
         pos.dx,
@@ -181,14 +180,12 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       );
 
       if (rect.contains(actorCenter)) {
-        _handleWrongAnswer(); // غلط → نزيد المحاولات
+        _handleWrongAnswer();
         return;
       }
     }
 
-    // =========================
-    // تحقق من الظل اليمين (الصح)
-    // =========================
+
     final shadowRightBox =
     _shadowRightKey.currentContext?.findRenderObject() as RenderBox?;
 
@@ -203,16 +200,18 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
       );
 
       if (rect.contains(actorCenter)) {
+        print("👉 RIGHT ANSWER CLICKED");
+
+        _animationController?.stop();
+        _animationController?.value = 0;
+
         setState(() {
           _isPlacedCorrectly = true;
           _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
 
-        _animationController?.stop();
-        _animationController?.value = 0;
-
-        await _logProgress(); // 👈 ده الجديد
+        await _logProgress();
 
         WellDoneOverlay.show(context);
 
@@ -246,9 +245,8 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
 
     final actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
 
-    // الظلال
-    final shadowLeft = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');  // الشمال (غلط)
-    final shadowRight = _activity!.elements!.lastWhere((e) => e.role == 'Shadow'); // اليمين (صح)
+    final shadowLeft = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
+    final shadowRight = _activity!.elements!.lastWhere((e) => e.role == 'Shadow');
 
     final anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
@@ -261,64 +259,63 @@ class FrontBackLevel2Stage1ActivityState extends State<FrontBackLevel2Stage1Acti
     return Scaffold(
       body: Stack(
         children: [
-          // shadow الشمال (الغلط)
-          Positioned(
-            left: screenWidth * 0.22,
-            top: screenHeight * 0.42,
-            child: Container(
-              key: _shadowLeftKey,
-              width: 120,
-              height: 120,
-              child: Image.network(
-                shadowLeft.imageUrl ?? '',
-                fit: BoxFit.fill,
-              ),
-            ),
+        Positioned(
+        left: screenWidth * 0.22,
+        top: screenHeight * 0.42,
+        child: Container(
+          key: _shadowLeftKey,
+          width: 120,
+          height: 120,
+          child: Image.network(
+            shadowLeft.imageUrl ?? '',
+            fit: BoxFit.fill,
           ),
+        ),
+      ),
 
-          // anchor
-          Positioned.fill(
-            child: Center(
-              child: Image.network(
-                anchor.imageUrl ?? '',
-                width: anchorWidth,
-                fit: BoxFit.contain,
-              ),
-            ),
+      // anchor
+      Positioned.fill(
+        child: Center(
+          child: Image.network(
+            anchor.imageUrl ?? '',
+            width: anchorWidth,
+            fit: BoxFit.contain,
           ),
+        ),
+      ),
 
-          // shadow اليمين (الصح) - وهو الذي يهتز عند الخطأ
-          Positioned(
-            left: screenWidth * 0.5,
-            top: screenHeight * 0.45,
-            child: AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                double shake = 0;
+      Positioned(
+        left: screenWidth * 0.5,
+        top: screenHeight * 0.45,
+        child: AnimatedBuilder(
+          animation: _animationController!,
+          builder: (context, child) {
+            double shake = 0;
 
-                if (_isAnimatingShadow) {
-                  shake = screenWidth * 0.04 *
-                      sin(_animationController!.value * pi);
-                }
+            if (_isAnimatingShadow) {
+              shake = screenWidth * 0.04 *
+                  sin(_animationController!.value * pi);
+            }
 
-                return Transform.translate(
-                  offset: Offset(shake, 0),
-                  child: child,
-                );
-              },
-              child: Container(
-                key: _shadowRightKey,
-                width: 120,
-                height: 120,
-                child: _isPlacedCorrectly
-                    ? Image.network(actor.imageUrl ?? '', fit: BoxFit.fill)
-                    : Image.network(shadowRight.imageUrl ?? '',
-                    fit: BoxFit.fill),
-              ),
-            ),
+            return Transform.translate(
+              offset: Offset(shake, 0),
+              child: child,
+            );
+          },
+          child: Container(
+            key: _shadowRightKey,
+            width: 120,
+            height: 120,
+            child: _isPlacedCorrectly
+                ? Image.network(actor.imageUrl ?? '', fit: BoxFit.fill)
+                : Image.network(shadowRight.imageUrl ?? '',
+                fit: BoxFit.fill),
           ),
+        ),
+      ),
 
-          // actor draggable
+
+
           if (!_isPlacedCorrectly)
             Positioned(
               right: 150,

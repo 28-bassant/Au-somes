@@ -112,25 +112,38 @@ class _ProgressLevelScreenState
                       ),
                     ),
 
+                    // ProgressWidget(
+                    //   text1Style:
+                    //   AppStyles.regular14BlackWithOpacity60,
+                    //   text2Style:
+                    //   AppStyles.regular16BlackWithOpacity60,
+                    //   text3Style:
+                    //   AppStyles.bold24BlackWithOpacity60,
+                    //   containerColor: AppColors.pastelPink,
+                    //   icon: AppAssets.activitesDoneIcon,
+                    //   text1:
+                    //   AppLocalizations.of(context)!.today,
+                    //   text2:
+                    //   AppLocalizations.of(context)!
+                    //       .activities_done,
+                    //   text3: '5/8',
+                    //   smallContainerColor:
+                    //   AppColors.whiteColor.withOpacity(
+                    //     0.3,
+                    //   ),
+                    // ),
                     ProgressWidget(
-                      text1Style:
-                      AppStyles.regular14BlackWithOpacity60,
-                      text2Style:
-                      AppStyles.regular16BlackWithOpacity60,
-                      text3Style:
-                      AppStyles.bold24BlackWithOpacity60,
+                      text1Style: AppStyles.regular14BlackWithOpacity60,
+                      text2Style: AppStyles.regular16BlackWithOpacity60,
+                      text3Style: AppStyles.bold22BlackWithOpacity60,
                       containerColor: AppColors.pastelPink,
                       icon: AppAssets.activitesDoneIcon,
-                      text1:
-                      AppLocalizations.of(context)!.today,
-                      text2:
-                      AppLocalizations.of(context)!
-                          .activities_done,
-                      text3: '5/8',
-                      smallContainerColor:
-                      AppColors.whiteColor.withOpacity(
-                        0.3,
-                      ),
+                      text1: AppLocalizations.of(context)!.current,
+                      text2: AppLocalizations.of(context)!.learning_status,
+                      text3: (summary?.achievementPoints ?? 0) > 0
+                          ? AppLocalizations.of(context)!.active
+                          : AppLocalizations.of(context)!.inactive,
+                      smallContainerColor: AppColors.whiteColor.withOpacity(0.3),
                     ),
                   ],
                 ),
@@ -190,6 +203,8 @@ class _ProgressLevelScreenState
                   progressText:
                   '${summary?.totalPercentage.toStringAsFixed(0) ?? 0}%',
                 ),
+                SizedBox(height: height * .02),
+
                 /// Spatial Concepts
                 PercentLinearIndicator(
                   activityName:
@@ -251,4 +266,4 @@ class _ProgressLevelScreenState
 }
 
 
-//PercentCircularIndicator(percent: 0.56),
+//PercentCircularIndicator

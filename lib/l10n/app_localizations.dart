@@ -533,7 +533,7 @@ abstract class AppLocalizations {
   /// No description provided for @well_done.
   ///
   /// In en, this message translates to:
-  /// **'Well done! 🌟'**
+  /// **'Well Done'**
   String get well_done;
 
   /// No description provided for @thinking.
@@ -1562,6 +1562,18 @@ abstract class AppLocalizations {
   /// **'Park Outing🌴'**
   String get park_outing;
 
+  /// No description provided for @day_at_school.
+  ///
+  /// In en, this message translates to:
+  /// **'A Day at School 🏫'**
+  String get day_at_school;
+
+  /// No description provided for @fun_at_kitchen.
+  ///
+  /// In en, this message translates to:
+  /// **'Fun in the Kitchen 🍳'**
+  String get fun_at_kitchen;
+
   /// No description provided for @space_adventure.
   ///
   /// In en, this message translates to:
@@ -1729,6 +1741,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Let\'s try again together'**
   String get lets_try_again;
+
+  /// No description provided for @please_choose_story_theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose story theme'**
+  String get please_choose_story_theme;
+
+  /// No description provided for @please_select_exactly_concepts.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select exactly 3 concepts'**
+  String get please_select_exactly_concepts;
+
+  /// No description provided for @how_would_you_rate_our_app.
+  ///
+  /// In en, this message translates to:
+  /// **'How would you rate our app?'**
+  String get how_would_you_rate_our_app;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @current.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get current;
+
+  /// No description provided for @learning_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning Status'**
+  String get learning_status;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// No description provided for @help.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get help;
+
+  /// No description provided for @thank_you_for_rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your feedback'**
+  String get thank_you_for_rating;
+
+  /// No description provided for @about_us_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Empowering Every Child to Learn, Grow, and Shine'**
+  String get about_us_title;
+
+  /// No description provided for @about_us_content.
+  ///
+  /// In en, this message translates to:
+  /// **'AU-Somes is an educational and interactive application designed to support children with Autism Spectrum Disorder (ASD) in developing essential cognitive, communication, and daily living skills through engaging activities and personalized learning experiences.\n\nOur mission is to provide a safe, enjoyable, and accessible environment where children can learn at their own pace while helping parents and therapists monitor their progress. The application includes educational games, storytelling, visual learning activities, and progress tracking to encourage continuous development.\n\nAt AU-Somes, we believe that every child has unique abilities and deserves learning tools that meet their individual needs. Our goal is to make learning more enjoyable, inclusive, and effective for every child.'**
+  String get about_us_content;
+
+  /// No description provided for @ques1.
+  ///
+  /// In en, this message translates to:
+  /// **'What is Autism Spectrum Disorder (ASD)?'**
+  String get ques1;
+
+  /// No description provided for @ans1.
+  ///
+  /// In en, this message translates to:
+  /// **'Autism Spectrum Disorder (ASD) is a developmental condition that affects communication, social interaction, behavior, and learning. Every child with autism is unique and may have different strengths and challenges.'**
+  String get ans1;
+
+  /// No description provided for @ques2.
+  ///
+  /// In en, this message translates to:
+  /// **'What are the early signs of autism?'**
+  String get ques2;
+
+  /// No description provided for @ans2.
+  ///
+  /// In en, this message translates to:
+  /// **'Common early signs include delayed speech, limited eye contact, difficulty responding to their name, repetitive behaviors, and reduced interest in social interaction. Signs vary from one child to another.'**
+  String get ans2;
+
+  /// No description provided for @ques3.
+  ///
+  /// In en, this message translates to:
+  /// **'Can children with autism improve their skills?'**
+  String get ques3;
+
+  /// No description provided for @ans3.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes. With early intervention, consistent practice, and personalized learning, many children improve their communication, cognitive, social, and daily living skills.'**
+  String get ans3;
+
+  /// No description provided for @ques4.
+  ///
+  /// In en, this message translates to:
+  /// **'Why are visual activities important for children with autism?'**
+  String get ques4;
+
+  /// No description provided for @ans4.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual activities help children improve attention, problem-solving, spatial awareness, and memory while making learning more engaging and easier to understand.'**
+  String get ans4;
+
+  /// No description provided for @ques5.
+  ///
+  /// In en, this message translates to:
+  /// **'What is visual-spatial perception?'**
+  String get ques5;
+
+  /// No description provided for @ans5.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual-spatial perception is the ability to understand where objects are located in space and how they relate to each other. It helps children recognize shapes, directions, distances, and positions.'**
+  String get ans5;
+
+  /// No description provided for @ques6.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is visual-spatial perception important?'**
+  String get ques6;
+
+  /// No description provided for @ans6.
+  ///
+  /// In en, this message translates to:
+  /// **'It supports reading, writing, drawing, solving puzzles, navigating environments, and performing everyday tasks independently.'**
+  String get ans6;
+
+  /// No description provided for @ques7.
+  ///
+  /// In en, this message translates to:
+  /// **'What activities improve visual-spatial skills?'**
+  String get ques7;
+
+  /// No description provided for @ans7.
+  ///
+  /// In en, this message translates to:
+  /// **'Puzzles, matching games, block building, sorting objects, drawing, mazes, and memory games can strengthen visual-spatial perception.'**
+  String get ans7;
+
+  /// No description provided for @ques8.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is routine important for children with autism?'**
+  String get ques8;
+
+  /// No description provided for @ans8.
+  ///
+  /// In en, this message translates to:
+  /// **'A consistent daily routine helps children feel safe, reduces anxiety, and makes it easier to understand expectations and transitions.'**
+  String get ans8;
+
+  /// No description provided for @ques9.
+  ///
+  /// In en, this message translates to:
+  /// **'How can parents support learning at home?'**
+  String get ques9;
+
+  /// No description provided for @ans9.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents can encourage learning by practicing activities regularly, giving clear instructions, using positive reinforcement, and celebrating small achievements.'**
+  String get ans9;
+
+  /// No description provided for @ques10.
+  ///
+  /// In en, this message translates to:
+  /// **'What are sensory sensitivities?'**
+  String get ques10;
+
+  /// No description provided for @ans10.
+  ///
+  /// In en, this message translates to:
+  /// **'Some children with autism may be highly sensitive or less responsive to sounds, lights, textures, smells, or touch. These sensitivities differ from child to child.'**
+  String get ans10;
+
+  /// No description provided for @ques11.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is positive reinforcement important?'**
+  String get ques11;
+
+  /// No description provided for @ans11.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive reinforcement motivates children by rewarding desired behaviors, increasing confidence, and encouraging continued learning.'**
+  String get ans11;
+
+  /// No description provided for @ques12.
+  ///
+  /// In en, this message translates to:
+  /// **'Can autism be cured?'**
+  String get ques12;
+
+  /// No description provided for @ans12.
+  ///
+  /// In en, this message translates to:
+  /// **'Autism is not a disease and does not have a cure. However, therapy, education, and support can help children develop important life skills and reach their full potential.'**
+  String get ans12;
+
+  /// No description provided for @ques13.
+  ///
+  /// In en, this message translates to:
+  /// **'How can technology help children with autism?'**
+  String get ques13;
+
+  /// No description provided for @ans13.
+  ///
+  /// In en, this message translates to:
+  /// **'Educational applications provide interactive activities, personalized learning, and engaging experiences that support communication, cognitive development, and independence.'**
+  String get ans13;
+
+  /// No description provided for @ques14.
+  ///
+  /// In en, this message translates to:
+  /// **'Why should progress be tracked?'**
+  String get ques14;
+
+  /// No description provided for @ans14.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking progress helps parents and specialists identify strengths, recognize areas that need improvement, and adjust learning plans accordingly.'**
+  String get ans14;
+
+  /// No description provided for @ques15.
+  ///
+  /// In en, this message translates to:
+  /// **'What should I do if my child struggles with an activity?'**
+  String get ques15;
+
+  /// No description provided for @ans15.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay patient, encourage your child, simplify the task if needed, and allow breaks. Learning happens gradually, and every small achievement is valuable.'**
+  String get ans15;
+
+  /// No description provided for @ques16.
+  ///
+  /// In en, this message translates to:
+  /// **'How often should my child use the app?'**
+  String get ques16;
+
+  /// No description provided for @ans16.
+  ///
+  /// In en, this message translates to:
+  /// **'Short, regular sessions of 15–30 minutes a day are generally more effective than long sessions, depending on the child\'s attention span and individual needs.'**
+  String get ans16;
 }
 
 class _AppLocalizationsDelegate

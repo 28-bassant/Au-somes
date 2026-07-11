@@ -25,7 +25,6 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات المحاولات والحركة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
@@ -38,7 +37,7 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _loadActivity(); // تحميل النشاط مرة واحدة
+    _loadActivity();
   }
 
   Future<void> _loadActivity() async {
@@ -54,10 +53,8 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
           _activity = activity;
         });
 
-        // preload الصور مرة واحدة
         await _preloadImages(activity);
 
-        // تشغيل الصوت مرة واحدة
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -107,9 +104,9 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
     });
 
     if (_wrongAttempts == 1) {
-      TryAgainSound.play(); // المرة الأولى: Try Again
+      TryAgainSound.play();
     } else if (_wrongAttempts >= 2) {
-      _startAnswerAnimation(); // المرة الثانية: تهتز الصورة الصح
+      _startAnswerAnimation();
     }
   }
 
@@ -152,13 +149,11 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // نسبة التناسب مع حجم الشاشة
     final double scale = min(screenWidth / 400, screenHeight / 800);
 
     return Scaffold(
       body: Stack(
         children: [
-          // الصورة الأساسية (Anchor)
           Positioned.fill(
             child: Align(
               alignment: Alignment.centerLeft,
@@ -169,7 +164,6 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
             ),
           ),
 
-          // الصورة الغلط
           Positioned(
             right: 80 * scale + 120,
             top: 250 * scale - 40,
@@ -182,7 +176,6 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
             ),
           ),
 
-          // الصورة الصح
           Positioned(
             top: 130 * scale + 80,
             right: 40 * scale - 40,
@@ -192,7 +185,7 @@ class NearFarLevel3Stage1State extends State<NearFarLevel3Stage1>
               builder: (context, child) {
                 double offsetX = 0;
                 if (_isAnimatingAnswer) {
-                  offsetX = 10 * sin(_animationController!.value * pi); // اهتزاز
+                  offsetX = 10 * sin(_animationController!.value * pi);
                 }
                 return Transform.translate(offset: Offset(offsetX, 0), child: child);
               },

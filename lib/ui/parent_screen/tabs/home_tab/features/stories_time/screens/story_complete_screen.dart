@@ -4,21 +4,46 @@ import '../../../../../../../l10n/app_localizations.dart';
 import '../../../../../../../utils/app_colors.dart';
 import '../../../../../../../utils/app_routes.dart';
 import '../stories_time_screen.dart';
-
-class StoryCompleteScreen extends StatelessWidget {
+import '../../../../../../../api/api_manager.dart';
+class StoryCompleteScreen extends StatefulWidget {
+  final String storyId;
   final int score;
   final int total;
 
   const StoryCompleteScreen({
     super.key,
+    required this.storyId,
     required this.score,
     required this.total,
   });
 
   @override
+  State<StoryCompleteScreen> createState() =>
+      _StoryCompleteScreenState();
+}
+
+class _StoryCompleteScreenState extends State<StoryCompleteScreen> {
+  bool submitted = false;
+  @override
+  // void initState() {
+  //   super.initState();
+  //   _submitScore();
+  // }
+  // Future<void> _submitScore() async {
+  //   try {
+  //     await ApiManager.submitStoryScore(
+  //       storyId: widget.storyId,
+  //       score: widget.score,
+  //       total: widget.total,
+  //     );
+  //
+  //     submitted = true;
+  //   } catch (_) {}
+  // }
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final pct = score / total;
+    final pct = widget.score / widget.total;
 
     String emoji;
     String msg;
@@ -88,18 +113,18 @@ class StoryCompleteScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '$score / $total',
+                        '${widget.score} / ${widget.total}',
                         style: AppStyles.bold32SoftBlue
                       ),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                          total,
+                          widget.total,
                               (i) => Icon(
                             Icons.star,
                             size: 26,
-                            color: i < score
+                            color: i < widget.score
                                 ? AppColors.starGold
                                 : AppColors.starEmpty,
                           ),

@@ -1,15 +1,18 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../core/cache/shared_prefs_utils.dart';
 import '../core/cache/token_utils.dart';
+import '../core/cache/token_utils.dart';
 import '../models/activities/activity_response.dart';
 import '../models/login_response.dart';
-import '../models/progress/log_attempt_response.dart';
-import '../models/progress/progress_summary_response.dart';
 import '../models/register_response.dart';
 import '../utils/app_routes.dart';
 import 'api_constants.dart';
 import 'api_endpoints.dart';
+import '../models/progress/log_attempt_response.dart';
+import '../models/progress/progress_summary_response.dart';
+import '../models/story/story_response.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -86,15 +89,14 @@ class ApiManager {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
-    print("🔵 LOGIN RAW RESPONSE = ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body);
+
       final loginResponse = LoginResponse.fromJson(data);
-      print("🟡 TOKEN PARSED = ${loginResponse.token}");
-      print("🟠 TOKEN BEFORE SAVE = ${loginResponse.token}");
+
       await TokenUtils.saveLoginTokens(loginResponse);
-      print("TOKEN AFTER LOGIN = ${await TokenUtils.getToken()}"); // 👈 هنا
+
       return loginResponse;
     } else {
       final errorJson = jsonDecode(response.body);
@@ -227,7 +229,7 @@ class ApiManager {
 
   static Future<String> askChatbot(String prompt) async {
     Uri url = Uri.parse(
-      "http://au-somes.runasp.net/api/Chat/ask",
+      "https://au-somes.runasp.net/api/Chat/ask",
     );
 
     try {
@@ -429,5 +431,175 @@ class ApiManager {
 
     return null;
   }
+
+
+      static Future<StoryResponse> generateStories({
+        required String childName,
+        required String theme,
+        required List<String> concepts,
+      }) async {
+        try {
+          print("🚀 Starting API call...");
+          print("👶 Child: $childName");
+          print("📚 Theme: $theme");
+          print("📖 Concepts: ${concepts.join(', ')}");
+
+          final String userPrompt = """
+Child name: $childName | Theme: $theme | Concepts: ${concepts.join('، ')}
+""";
+
+          final body = jsonEncode({
+            "model": "qwen2.5-3b-lora",
+            "messages": [
+              {
+                "role": "user",
+                "content": userPrompt,
+              }
+            ],
+            "max_new_tokens": 2048,
+            "temperature": 0.05,
+            "top_p": 0.9,
+            "top_k": 50,
+            "repetition_penalty": 1.1,
+          });
+
+          print("📦 Request Body:");
+          print(body);
+
+          final response = await http.post(
+            Uri.parse(
+                ApiConstants.storiesBaseUrl + ApiEndpoints.storiesEndpoint),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: body,
+          );
+
+          print("📩 Response status: ${response.statusCode}");
+          print("📩 Response body:");
+          print(response.body);
+
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+
+            final String content =
+            data["choices"][0]["message"]["content"];
+
+            print("📖 Raw content:");
+            print(content);
+
+            final cleanContent = content
+                .replaceAll(RegExp(r'```json'), '')
+                .replaceAll(RegExp(r'```'), '')
+                .trim();
+
+            final Map<String, dynamic> storyJson =
+            jsonDecode(cleanContent);
+
+            print("✅ Story parsed successfully");
+
+            return StoryResponse.fromJson(storyJson);
+          } else {
+            // للمطور
+            print("══════════════════════════════");
+            print("❌ API ERROR");
+            print("Status Code: ${response.statusCode}");
+            print("Body:");
+            print(response.body);
+            print("══════════════════════════════");
+
+            String userMessage;
+
+            switch (response.statusCode) {
+              case 400:
+                userMessage =
+                "Invalid request. Please try again.";
+                break;
+
+              case 401:
+                userMessage =
+                "Authorization failed. Please try again later.";
+                break;
+
+              case 403:
+                userMessage =
+                "Access denied.";
+                break;
+
+              case 404:
+                userMessage =
+                "The service could not be found.";
+                break;
+
+              case 408:
+                userMessage =
+                "The request timed out. Please check your internet connection.";
+                break;
+
+              case 429:
+                userMessage =
+                "Too many requests. Please wait a moment and try again.";
+                break;
+
+              case 500:
+                userMessage =
+                "Server error. Please try again later.";
+                break;
+
+              case 502:
+              case 503:
+              case 504:
+                userMessage =
+                "The AI service is temporarily unavailable. Please try again later.";
+                break;
+
+              case 530:
+                userMessage =
+                "The AI server is currently offline. Please try again in a few minutes.";
+                break;
+
+              default:
+                userMessage =
+                "Something went wrong. Please try again.";
+            }
+
+            throw Exception(userMessage);
+          }
+        } on SocketException catch (e, stackTrace) {
+          print("══════════════════════════════");
+          print("❌ SOCKET EXCEPTION");
+          print(e);
+          print(stackTrace);
+          print("══════════════════════════════");
+
+          throw Exception(
+            "No internet connection. Please check your connection and try again.",
+          );
+        } on TimeoutException catch (e, stackTrace) {
+          print("══════════════════════════════");
+          print("❌ TIMEOUT");
+          print(e);
+          print(stackTrace);
+          print("══════════════════════════════");
+
+          throw Exception(
+            "The request took too long. Please try again.",
+          );
+        } catch (e, stackTrace) {
+          print("══════════════════════════════");
+          print("❌ UNEXPECTED ERROR");
+          print(e);
+          print(stackTrace);
+          print("══════════════════════════════");
+
+          if (e is Exception) {
+            rethrow;
+          }
+
+          throw Exception(
+            "Unexpected error. Please try again.",
+          );
+        }
+      }
 
 }

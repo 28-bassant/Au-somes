@@ -94,24 +94,34 @@ class _ProfileTabState extends State<ProfileTab> {
 
                     SizedBox(height: height * .03),
 
-                    ProfileItem(
-                      text: AppLocalizations.of(context)!
-                          .frequently_asked_questions,
-                      image: AppAssets.frequentlyQuestionIcon,
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.faq_ScreenRouteName),
+
+                      child: ProfileItem(
+                        text: AppLocalizations.of(context)!
+                            .frequently_asked_questions,
+                        image: AppAssets.frequentlyQuestionIcon,
+                      ),
                     ),
 
                     SizedBox(height: height * .03),
 
-                    ProfileItem(
-                      text: AppLocalizations.of(context)!.about_us,
-                      image: AppAssets.aboutIcon,
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.aboutUsScreenRouteName),
+                      child: ProfileItem(
+                        text: AppLocalizations.of(context)!.about_us,
+                        image: AppAssets.aboutIcon,
+                      ),
                     ),
 
                     SizedBox(height: height * .03),
 
-                    ProfileItem(
-                      text: AppLocalizations.of(context)!.review_au_somes,
-                      image: AppAssets.reviewIcon,
+                    GestureDetector(
+                      onTap:() => showRatingDialog(context),
+                      child: ProfileItem(
+                        text: AppLocalizations.of(context)!.review_au_somes,
+                        image: AppAssets.reviewIcon,
+                      ),
                     ),
 
                     SizedBox(height: height * .03),
@@ -140,4 +150,106 @@ class _ProfileTabState extends State<ProfileTab> {
       ),
     );
   }
-}
+  int selectedRating = 0;
+
+  void showRatingDialog(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.whiteColor,
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: width * 0.08,
+                vertical: height * 0.04,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              title: Center(
+                child: Text(
+                  AppLocalizations.of(context)!.review_au_somes,
+                  textAlign: TextAlign.center,
+                  style: AppStyles.bold16SoftBlue,
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: SizedBox(
+                  width: width * 0.8,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!
+                            .how_would_you_rate_our_app,
+                        textAlign: TextAlign.center,
+                        style: AppStyles.medium16BlackWithOpacity60,
+                      ),
+                      SizedBox(height: height * 0.025),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        children: List.generate(
+                          5,
+                              (index) => IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () {
+                              setState(() {
+                                selectedRating = index + 1;
+                              });
+                            },
+                            icon: Icon(
+                              index < selectedRating
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              color: AppColors.softBlue,
+                              size: width * 0.08, // Responsive
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actionsAlignment: MainAxisAlignment.spaceEvenly,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    AppLocalizations.of(context)!.cancel,
+                    style: AppStyles.medium16Red,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: AppColors.softBlue,
+                        content: Text(
+                          AppLocalizations.of(context)!
+                              .thank_you_for_rating,
+                          style: AppStyles.bold16White,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.submit,
+                    style: AppStyles.medium16SoftBlue,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }}

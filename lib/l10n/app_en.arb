@@ -37,8 +37,8 @@
  "search" : "Search",
   "welcome":"Welcome !\nHow can i help you ?",
   "what_is_visual_spatial_perception":"What is spatial visualization?",
-  "how_is_visual_spatial_perception_related_to_autism":"How is spatial visualization related to autism?",
-  "game_improve":"What games improve visual–spatial skills",
+    "how_is_visual_spatial_perception_related_to_autism":"How is spatial visualization related to autism?",
+   "game_improve":"What games improve visual–spatial skills",
   "confusion":"How can I help my child with direction confusion?",
   "another_question":"Another Question",
   "visual_spatial_perception_meaning":"Visual–spatial perception is the ability to understand what we see and how objects relate to each other in space, such as shape, size, distance, and position (up, down, left, right).",
@@ -235,7 +235,8 @@
      "visual_spatial_autism_info":"Although some autistic individuals demonstrate strengths in specific visual-spatial tasks, spatial skills vary widely across the autism spectrum. Structured training can help improve spatial orientation, directional awareness, and functional navigation skills.",
 "visual_spatial_games":"Jigsaw puzzles, tangrams, LEGO building, maze games, and shape-matching activities can help improve visual–spatial skills.",
 "visual_spatial_training_tips":"Help your child learn directions through visual cues, simple navigation games, obstacle courses, and consistent practice with concepts like left/right, up/down, and front/back.",
- "title": "Food Delivery",
+
+       "title": "Food Delivery",
        "subtitle": "Delivering the hot pizza to Grandma's house 🧓",
 
        "above": "Above",
@@ -259,6 +260,8 @@
        "start_interactive_story": "✨ Start the Interactive Story ✨",
        "day_at_kindergarten": "A Day at Kindergarten🏠",
        "park_outing": "Park Outing🌴",
+       "day_at_school": "A Day at School 🏫",
+              "fun_at_kitchen": "Fun in the Kitchen 🍳",
        "space_adventure": "Space Adventure🚀",
        "underwater_world": "Underwater World🐠",
        "supermarket_trip": "Supermarket Trip🛒",
@@ -286,7 +289,59 @@
        "grandma_hint": "Grandma is standing in front of the house door.",
        "keep_going": "Keep going like this",
        "wonderful": "Wonderful! 🎉",
-       "well_done": "Well done! 🌟",
-       "lets_try_again": "Let's try again together"
+       "lets_try_again": "Let's try again together",
+"please_choose_story_theme": "Please choose story theme",
+       "please_select_exactly_concepts": "Please select exactly 3 concepts",
+       "how_would_you_rate_our_app": "How would you rate our app?",
+       "cancel": "Cancel",
+       "submit": "Submit",
+       "current": "Current",
+       "learning_status": "Learning Status",
+       "active": "Active",
+       "inactive": "Inactive",
+       "help": "Help",
+       "thank_you_for_rating": "Thank you for your feedback",
+       "about_us_title": "Empowering Every Child to Learn, Grow, and Shine",
+       "about_us_content": "AU-Somes is an educational and interactive application designed to support children with Autism Spectrum Disorder (ASD) in developing essential cognitive, communication, and daily living skills through engaging activities and personalized learning experiences.\n\nOur mission is to provide a safe, enjoyable, and accessible environment where children can learn at their own pace while helping parents and therapists monitor their progress. The application includes educational games, storytelling, visual learning activities, and progress tracking to encourage continuous development.\n\nAt AU-Somes, we believe that every child has unique abilities and deserves learning tools that meet their individual needs. Our goal is to make learning more enjoyable, inclusive, and effective for every child.",
+       "ques1": "What is Autism Spectrum Disorder (ASD)?",
+       "ans1": "Autism Spectrum Disorder (ASD) is a developmental condition that affects communication, social interaction, behavior, and learning. Every child with autism is unique and may have different strengths and challenges.",
+       "ques2": "What are the early signs of autism?",
+       "ans2": "Common early signs include delayed speech, limited eye contact, difficulty responding to their name, repetitive behaviors, and reduced interest in social interaction. Signs vary from one child to another.",
+       "ques3": "Can children with autism improve their skills?",
+       "ans3": "Yes. With early intervention, consistent practice, and personalized learning, many children improve their communication, cognitive, social, and daily living skills.",
+       "ques4": "Why are visual activities important for children with autism?",
+       "ans4": "Visual activities help children improve attention, problem-solving, spatial awareness, and memory while making learning more engaging and easier to understand.",
+       "ques5": "What is visual-spatial perception?",
+       "ans5": "Visual-spatial perception is the ability to understand where objects are located in space and how they relate to each other. It helps children recognize shapes, directions, distances, and positions.",
+       "ques6": "Why is visual-spatial perception important?",
+       "ans6": "It supports reading, writing, drawing, solving puzzles, navigating environments, and performing everyday tasks independently.",
+       "ques7": "What activities improve visual-spatial skills?",
+       "ans7": "Puzzles, matching games, block building, sorting objects, drawing, mazes, and memory games can strengthen visual-spatial perception.",
+       "ques8": "Why is routine important for children with autism?",
+       "ans8": "A consistent daily routine helps children feel safe, reduces anxiety, and makes it easier to understand expectations and transitions.",
+       "ques9": "How can parents support learning at home?",
+       "ans9": "Parents can encourage learning by practicing activities regularly, giving clear instructions, using positive reinforcement, and celebrating small achievements.",
+       "ques10": "What are sensory sensitivities?",
+       "ans10": "Some children with autism may be highly sensitive or less responsive to sounds, lights, textures, smells, or touch. These sensitivities differ from child to child.",
+       "ques11": "Why is positive reinforcement important?",
+       "ans11": "Positive reinforcement motivates children by rewarding desired behaviors, increasing confidence, and encouraging continued learning.",
+       "ques12": "Can autism be cured?",
+       "ans12": "Autism is not a disease and does not have a cure. However, therapy, education, and support can help children develop important life skills and reach their full potential.",
+       "ques13": "How can technology help children with autism?",
+       "ans13": "Educational applications provide interactive activities, personalized learning, and engaging experiences that support communication, cognitive development, and independence.",
+       "ques14": "Why should progress be tracked?",
+       "ans14": "Tracking progress helps parents and specialists identify strengths, recognize areas that need improvement, and adjust learning plans accordingly.",
+       "ques15": "What should I do if my child struggles with an activity?",
+       "ans15": "Stay patient, encourage your child, simplify the task if needed, and allow breaks. Learning happens gradually, and every small achievement is valuable.",
+       "ques16": "How often should my child use the app?",
+       "ans16": "Short, regular sessions of 15–30 minutes a day are generally more effective than long sessions, depending on the child's attention span and individual needs."
+
+
+
+
+
+
+
+
 
 }

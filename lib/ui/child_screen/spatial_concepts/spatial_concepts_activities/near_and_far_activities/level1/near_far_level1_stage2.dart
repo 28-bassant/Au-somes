@@ -25,11 +25,11 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
   bool _hasPlayedSound = false;
   bool _imagesLoaded = false;
 
-  // متغيرات المحاولات والحركة
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
+  bool _isCompleted = false;
   @override
   void initState() {
     super.initState();
@@ -38,7 +38,7 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _loadActivity(); // تحميل النشاط مرة واحدة
+    _loadActivity();
   }
 
   Future<void> _loadActivity() async {
@@ -54,10 +54,8 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
           _activity = activity;
         });
 
-        // preload الصور مرة واحدة
         await _preloadImages(activity);
 
-        // تشغيل الصوت مرة واحدة
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -97,14 +95,17 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
   void repeatSound() => playSound();
 
   void _handleWrongAnswer() {
+    if (_isCompleted) return;
+
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
-      TryAgainSound.play(); // المرة الأولى: Try Again
+      TryAgainSound.play();
     } else if (_wrongAttempts >= 2) {
-      _startAnswerAnimation(); // المرة الثانية: تهتز الصورة الصح
+      _startAnswerAnimation();
     }
   }
 
@@ -127,6 +128,23 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
       });
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -147,13 +165,13 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // نسبة التناسب مع حجم الشاشة
+
+
     final double scale = min(screenWidth / 400, screenHeight / 800);
 
     return Scaffold(
       body: Stack(
         children: [
-          // الصورة الأساسية (Anchor)
           Positioned.fill(
             child: Align(
               alignment: Alignment.centerLeft,
@@ -164,7 +182,6 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
             ),
           ),
 
-          // الصورة الصحيحة (Actor Correct)
           Positioned(
             right: 80 * scale + 120,
             top: 300 * scale - 40,
@@ -173,22 +190,31 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
               builder: (context, child) {
                 double offsetX = 0;
                 if (_isAnimatingAnswer) {
-                  offsetX = 10 * sin(_animationController!.value * pi); // اهتزاز
+                  offsetX = 10 * sin(_animationController!.value * pi);
                 }
                 return Transform.translate(offset: Offset(offsetX, 0), child: child);
               },
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  if (_isCompleted) return;
+
                   setState(() {
+                    _isCompleted = true;
                     _wrongAttempts = 0;
                     _isAnimatingAnswer = false;
                   });
+
                   _animationController?.stop();
                   _animationController?.value = 0;
 
+                  await _logProgress();
+
                   WellDoneOverlay.show(context);
+
                   Future.delayed(const Duration(seconds: 3), () {
-                    widget.onNextStage?.call();
+                    if (mounted) {
+                      widget.onNextStage?.call();
+                    }
                   });
                 },
                 child: Image.network(
@@ -199,7 +225,6 @@ class NearFarLevel1Stage2State extends State<NearFarLevel1Stage2>
             ),
           ),
 
-          // الصورة الغلط (Actor Wrong)
           Positioned(
             top: 160 * scale + 80,
             right: 40 * scale - 40,

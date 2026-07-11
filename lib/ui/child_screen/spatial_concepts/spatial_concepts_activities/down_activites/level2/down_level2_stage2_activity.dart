@@ -19,31 +19,24 @@ class DownLevel2Stage2Activity extends StatefulWidget {
 
 class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
     with SingleTickerProviderStateMixin {
-  // 🔹 النشاط نفسه
   ActivityResponse? activity;
 
-  // 🔹 حالة التحميل
   bool isLoading = true;
   bool hasPlayedSound = false;
   bool imagesLoaded = false;
 
-  // 🔹 هل القطّة وضعت في مكانها الصحيح؟
   bool isPlacedCorrectly = false;
 
-  // 🔹 مشغل الصوت
   late AudioPlayer _player;
 
-  // 🔹 عناصر النشاط
-  ActivityElement? actor;          // القطّة
-  ActivityElement? shadowCorrect;  // Shadow الصح
-  ActivityElement? shadowWrong;    // Shadow الغلط
-  ActivityElement? anchor;         // الكرسي أو الطرابيزة
+  ActivityElement? actor;
+  ActivityElement? shadowCorrect;
+  ActivityElement? shadowWrong;
+  ActivityElement? anchor;
 
-  // 🔹 مفاتيح لتحديد أماكن الـ Shadows
   final GlobalKey _shadowWrongKey = GlobalKey();
   final GlobalKey _shadowCorrectKey = GlobalKey();
 
-  // 🔹 متغيرات لإدارة الإجابات الخاطئة وحركة الـ Shadow
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   late AnimationController _animationController;
@@ -52,20 +45,16 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
   void initState() {
     super.initState();
 
-    // 🔹 تهيئة مشغل الصوت
     _player = AudioPlayer();
 
-    // 🔹 تهيئة المتحكم في الحركة (اهتزاز الـ Shadow)
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
 
-    // 🔹 تحميل النشاط
     fetchActivity();
   }
 
-  // 🔹 تحميل النشاط من الـ API
   void fetchActivity() async {
     try {
       activity = await ApiManager.getActivity(
@@ -75,16 +64,13 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
       );
 
       if (mounted) {
-        // 🔹 تعيين العناصر حسب الدور
         actor = activity!.elements!.firstWhere((e) => e.role == 'Actor');
         shadowCorrect = activity!.elements!.firstWhere((e) => e.role == 'Shadow');
         shadowWrong = activity!.elements!.lastWhere((e) => e.role == 'Shadow');
         anchor = activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        // Preload الصور أولاً
         await preloadImages(activity!);
 
-        // 🔹 تشغيل الصوت بعد تحميل الصور
         if (!hasPlayedSound && activity?.audioUrl != null && activity!.audioUrl!.isNotEmpty) {
           await _player.stop();
           await _player.play(UrlSource(activity!.deceptionInstructions!.first));
@@ -93,7 +79,6 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
           });
         }
 
-        // 🔹 تغيير حالة التحميل
         setState(() {
           imagesLoaded = true;
           isLoading = false;
@@ -120,7 +105,6 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
     }
   }
 
-  // 🔹 تشغيل الصوت
   Future<void> playSound() async {
     if (activity?.deceptionInstructions == null ||
         activity!.deceptionInstructions!.isEmpty) return;
@@ -132,25 +116,20 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
   }
   void repeatSound() => playSound();
 
-  // 🔹 التعامل مع إجابة خاطئة
   void _handleWrongAnswer() {
     setState(() => _wrongAttempts++);
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تشغيل اهتزاز Shadow الصحيح
       _startShadowAnimation();
     }
   }
 
-  // 🔹 بدء حركة اهتزاز الـ Shadow الصحيح
   void _startShadowAnimation() {
     if (!_isAnimatingShadow) {
       setState(() => _isAnimatingShadow = true);
       _animationController.repeat(reverse: true);
 
-      // التوقف بعد ثانيتين
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           _animationController.stop();
@@ -161,7 +140,6 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
     }
   }
 
-  // 🔹 التعامل مع نهاية سحب القطّة
   void _handleDragEnd(DraggableDetails details) {
     if (isPlacedCorrectly) return;
 
@@ -173,13 +151,11 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
       details.offset.dy + (200 * scale) / 2,
     );
 
-    // 🔹 التحقق من Shadow الغلط أولاً (يعكس المنطق)
     final wrongBox = _shadowWrongKey.currentContext?.findRenderObject() as RenderBox?;
     if (wrongBox != null) {
       final pos = wrongBox.localToGlobal(Offset.zero);
       final rect = Rect.fromLTWH(pos.dx, pos.dy, wrongBox.size.width, wrongBox.size.height);
       if (rect.contains(actorCenter)) {
-        // ✅ الآن السحب على المكان "الغلط" يعتبر صح
         _animationController.stop();
         _animationController.value = 0;
         setState(() {
@@ -197,14 +173,12 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
       }
     }
 
-    // 🔹 التحقق من Shadow الصحيح (أصبح try again)
     final correctBox = _shadowCorrectKey.currentContext?.findRenderObject() as RenderBox?;
     if (correctBox != null) {
       final pos = correctBox.localToGlobal(Offset.zero);
       final rect = Rect.fromLTWH(pos.dx, pos.dy, correctBox.size.width, correctBox.size.height);
       if (rect.contains(actorCenter)) {
-        // ❌ السحب على المكان "الصح" → خطأ
-        _handleWrongAnswer(); // يحرك Shadow الغلط ويصدر صوت try again
+        _handleWrongAnswer();
       }
     }
   }
@@ -218,7 +192,6 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
 
   @override
   Widget build(BuildContext context) {
-    // 🔹 عرض مؤشر تحميل أثناء تحميل النشاط أو عدم تهيئة العناصر
     if (isLoading || actor == null || shadowCorrect == null || shadowWrong == null || anchor == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -226,18 +199,14 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // حساب عامل القياس بناءً على حجم الشاشة
-    // 360px هو عرض الشاشة المرجعية (مثل معظم الموبايلات)
     final scale = screenWidth / 360.0;
 
-    // 🔹 إعداد أبعاد الـ Anchor (الكرسي أو الطرابيزة)
     final anchorWidth = screenWidth * 2.6;
     final anchorHeight = screenHeight * 0.7;
     final anchorTop = screenHeight * 0.01;
 
     return Stack(
       children: [
-        /// 🔹 عرض الـ Anchor
         Positioned(
           top: anchorTop,
           left: (screenWidth - anchorWidth) / 2 + 15,
@@ -249,9 +218,8 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
           ),
         ),
 
-        /// ❌ Shadow الغلط
         Positioned(
-          left: 90 * scale, // أصبح متناسباً
+          left: 90 * scale,
           top: 340* scale,
           child: AnimatedBuilder(
             animation: _animationController,
@@ -267,18 +235,17 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
             },
             child: Container(
               key: _shadowWrongKey,
-              width: 110* scale, // أصبح متناسباً
-              height: 160* scale, // أصبح متناسباً
-              // 🔹 إظهار القطّة مكان الشادو عند الإجابة الصحيحة
+              width: 110* scale,
+              height: 160* scale,
               child: isPlacedCorrectly
                   ? Transform.translate(
-                offset: Offset(0, -1 * scale), // أصبح متناسباً
+                offset: Offset(0, -1 * scale),
                 child: Transform.scale(
                   scale: .98,
                   child: Image.network(
                     actor!.imageUrl ?? '',
-                    width: 100* scale, // أصبح متناسباً
-                    height: 160 * scale, // أصبح متناسباً
+                    width: 100* scale,
+                    height: 160 * scale,
                     fit: BoxFit.contain,
 
                   ),
@@ -286,41 +253,39 @@ class DownLevel2Stage2ActivityState extends State<DownLevel2Stage2Activity>
               )
                   : Image.network(
                 shadowWrong!.imageUrl ?? '',
-                width: 50 * scale, // أصبح متناسباً
-                height: 160 * scale, // أصبح متناسباً
+                width: 50 * scale,
+                height: 160 * scale,
                 fit: BoxFit.contain,
               ),
             ),
-          ),// أصبح متناسباً
+          ),
 
         ),
 
-        /// ✅ Shadow الصح مع الاهتزاز
         Positioned(
-          left: 120 * scale, // أصبح متناسباً
+          left: 120 * scale,
           top: 170 * scale,
           child: Container(
             key: _shadowCorrectKey,
-            width: 110 * scale, // أصبح متناسباً
-            height: 160 * scale, // أصبح متناسباً
+            width: 110 * scale,
+            height: 160 * scale,
             child: Image.network(shadowCorrect!.imageUrl ?? '', fit: BoxFit.contain),
-          ),// أصبح متناسباً
+          ),
 
         ),
 
-        /// 🐱 Actor draggable
         if (!isPlacedCorrectly)
           Positioned(
             right: 15*scale,
-            bottom: 5 * scale, // أصبح متناسباً
+            bottom: 5 * scale,
             child: Draggable<String>(
               data: actor!.id,
               feedback: Material(
                 color: Colors.transparent,
-                child: Image.network(actor!.imageUrl ?? '', width: 105 * scale), // أصبح متناسباً
+                child: Image.network(actor!.imageUrl ?? '', width: 105 * scale),
               ),
               childWhenDragging: const SizedBox(),
-              child: Image.network(actor!.imageUrl ?? '', width: 105 * scale), // أصبح متناسباً
+              child: Image.network(actor!.imageUrl ?? '', width: 105 * scale),
               onDragEnd: _handleDragEnd,
             ),
           ),

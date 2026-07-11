@@ -26,7 +26,7 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
   bool _hasPlayedSound = false;
   bool _isPlacedCorrectly = false;
   bool _imagesLoaded = false;
-  bool _dataLoaded = false; // متغير جديد للتأكد من تحميل البيانات
+  bool _dataLoaded = false;
 
   final GlobalKey _shadowCorrectKey = GlobalKey();
   final GlobalKey _shadowWrongKey = GlobalKey();
@@ -57,17 +57,15 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       if (mounted) {
         setState(() {
           _activity = activity;
-          _dataLoaded = true; // تم تحميل البيانات
+          _dataLoaded = true;
         });
 
-        // تحميل جميع الصور أولاً
         await _preloadImages(activity);
 
         setState(() {
           _imagesLoaded = true;
         });
 
-        // تشغيل الصوت بعد تحميل الصور والبيانات
         if (!_hasPlayedSound) {
           await playSound();
           _hasPlayedSound = true;
@@ -95,19 +93,16 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
         .where((url) => url != null && url!.isNotEmpty)
         .toList();
 
-    // تحميل كل الصور في الخلفية
     final List<Future> precacheFutures = [];
     for (final url in images) {
       precacheFutures.add(precacheImage(NetworkImage(url!), context));
     }
 
-    // انتظار تحميل جميع الصور
     await Future.wait(precacheFutures);
     print('All images preloaded successfully');
   }
 
   Future<void> playSound() async {
-    // التأكد من تحميل البيانات والصور قبل تشغيل الصوت
     if (!_dataLoaded || !_imagesLoaded) {
       print('Waiting for data and images to load before playing sound');
       return;
@@ -125,7 +120,6 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
   }
 
   void repeatSound() {
-    // التأكد من تحميل كل شيء قبل إعادة تشغيل الصوت
     if (_dataLoaded && _imagesLoaded) {
       playSound();
     }
@@ -157,8 +151,26 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       });
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
-  void _handleDragEnd(DraggableDetails details, double actorSize) {
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
+
+
+  Future<void> _handleDragEnd(
+      DraggableDetails details,
+      double actorSize,
+      ) async {
     if (_isPlacedCorrectly) return;
 
     final actorCenter = Offset(
@@ -176,27 +188,25 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       final rect = Rect.fromLTWH(pos.dx, pos.dy, shadowCorrectBox.size.width, shadowCorrectBox.size.height);
 
       if (rect.contains(actorCenter)) {
+        print("👉 RIGHT ANSWER CLICKED");
+
+        _animationController?.stop();
+        _animationController?.value = 0;
+
         setState(() {
           _isPlacedCorrectly = true;
           _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
 
-        _animationController?.stop();
-        _animationController?.value = 0;
-
-        // ✅ تسجيل الـ Progress هنا
-        ApiManager.logAttemptStatus(
-          phaseId: _activity!.phaseId!,
-          userHint: _usedHint,
-        );
-
-        ApiManager.getProgressSummary();
+        await _logProgress();
 
         WellDoneOverlay.show(context);
 
         Future.delayed(const Duration(seconds: 3), () {
-          if (mounted) widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
 
         return;
@@ -246,29 +256,27 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       body: Stack(
         children: [
 
-          // Shadow الغلط
-          Positioned(
-            left: wrongShadowLeft - 60,
-            top: wrongShadowTop-30,
-            child: Image.network(
-              shadowWrong.imageUrl ?? '',
-              key: _shadowWrongKey,
-              width: wrongShadowSize,
-              height: wrongShadowSize,
-            ),
-          ),
+        Positioned(
+        left: wrongShadowLeft - 60,
+        top: wrongShadowTop-30,
+        child: Image.network(
+          shadowWrong.imageUrl ?? '',
+          key: _shadowWrongKey,
+          width: wrongShadowSize,
+          height: wrongShadowSize,
+        ),
+      ),
 
-          // Anchor
-          Positioned.fill(
-            child: Center(
-              child: Image.network(
-                anchor.imageUrl ?? '',
-                width: anchorWidth,
-              ),
-            ),
+      Positioned.fill(
+        child: Center(
+          child: Image.network(
+            anchor.imageUrl ?? '',
+            width: anchorWidth,
           ),
+        ),
+      ),
 
-          // Shadow الصح
+
           Positioned(
             left: correctShadowLeft,
             top: correctShadowTop - 10,
@@ -300,7 +308,6 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
             ),
           ),
 
-          // Actor draggable
           if (!_isPlacedCorrectly)
             Positioned(
               right: actorRight,

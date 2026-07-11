@@ -38,9 +38,8 @@ class _DownBaseActivityScreenState extends State<DownBaseActivityScreen> {
   void initState() {
     super.initState();
 
-    currentActivityIndex = 0; // إعادة ضبط النشاط الحالي
+    currentActivityIndex = 0;
 
-    // إنشاء أنشطة جديدة مع GlobalKey جديدة لكل واحدة
     activities = [
       DownLevel1Stage1Activity(
         key: GlobalKey<DownLevel1Stage1ActivityState>(),

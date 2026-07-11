@@ -34,14 +34,13 @@ class OutsideLevel2Stage4ActivityState
   late AudioPlayer _player;
 
   late ActivityElement actor;
-  late ActivityElement shadow1; // الصح
-  late ActivityElement shadow2; // الغلط
+  late ActivityElement shadow1;
+  late ActivityElement shadow2;
   late ActivityElement anchor;
 
   final GlobalKey _shadow2Key = GlobalKey();
   final GlobalKey _shadow1Key = GlobalKey();
 
-  // متغيرات جديدة للإدارة
   int _wrongAttempts = 0;
   bool _isAnimatingShadow = false;
   AnimationController? _animationController;
@@ -70,16 +69,13 @@ class OutsideLevel2Stage4ActivityState
           _activity = activity;
         });
 
-        // البحث عن العناصر
         actor = _activity!.elements!.firstWhere((e) => e.role == 'Actor');
         shadow1 = _activity!.elements!.firstWhere((e) => e.role == 'Shadow');
         shadow2 = _activity!.elements!.lastWhere((e) => e.role == 'Shadow');
         anchor = _activity!.elements!.firstWhere((e) => e.role == 'Anchor');
 
-        // تحميل الصور أولاً
         await _preloadImages(_activity!);
 
-        // تشغيل الصوت بعد تحميل الصور
         if (!_hasPlayedSound) {
           await playSound();
           setState(() {
@@ -124,32 +120,26 @@ class OutsideLevel2Stage4ActivityState
   }
   void repeatSound() => playSound();
 
-  // دالة للتعامل مع الإجابة الخاطئة
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
     });
 
     if (_wrongAttempts == 1) {
-      // المرة الأولى: تشغيل صوت "حاول مجدداً"
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
-      // المرة الثانية: تحريك الـ Shadow الصحيح
       _startShadowAnimation();
     }
   }
 
-  // دالة لبدء حركة الـ Shadow الصحيح
   void _startShadowAnimation() {
     if (!_isAnimatingShadow && _animationController != null) {
       setState(() {
         _isAnimatingShadow = true;
       });
 
-      // بدء الحركة المتكررة
       _animationController!.repeat(reverse: true);
 
-      // توقف الحركة بعد 3 ثواني
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted && _isAnimatingShadow) {
           setState(() {
@@ -184,11 +174,9 @@ class OutsideLevel2Stage4ActivityState
         final double screenWidth = constraints.maxWidth;
         final double screenHeight = constraints.maxHeight;
 
-        // افتراض أن التصميم الأصلي على شاشة 400px
         final double designWidth = 400.0;
         final double scale = screenWidth / designWidth;
 
-        // تحويل القيم الثابتة إلى قيم متجاوبة
         final double shadow2Left = 10 * scale;
         final double shadow2Top = 400 * scale;
         final double shadow2Width = 140 * scale;
@@ -210,7 +198,6 @@ class OutsideLevel2Stage4ActivityState
 
         return Stack(
           children: [
-          /// Shadow الغلط السابق (الذي يجب أن يهتز عند الخطأ)
           Positioned(
           left: shadow2Left,
           top: shadow2Top,
@@ -272,7 +259,6 @@ class OutsideLevel2Stage4ActivityState
           ),
         ),
 
-        /// الخلفية
         Positioned(
         right: anchorRight,
         top: anchorTop,
@@ -282,7 +268,6 @@ class OutsideLevel2Stage4ActivityState
         ),
         ),
 
-        /// Shadow الصح السابق (الذي سيكون الخطأ الآن)
         Positioned(
         right: shadow1Right,
         top: shadow1Top,
@@ -307,7 +292,6 @@ class OutsideLevel2Stage4ActivityState
         ),
         ),
 
-        /// Actor
         if (!isPlacedCorrectly)
         Positioned(
           left: actorLeft,
@@ -340,7 +324,6 @@ class OutsideLevel2Stage4ActivityState
                 details.offset.dy + actorWidth / 2,
               );
 
-              // Shadow الصح السابق → خطأ
               final shadow1Box = _shadow1Key.currentContext?.findRenderObject() as RenderBox?;
               if (shadow1Box != null) {
                 final shadow1Pos = shadow1Box.localToGlobal(Offset.zero);
@@ -357,7 +340,6 @@ class OutsideLevel2Stage4ActivityState
                 }
               }
 
-              // Shadow الغلط السابق → نجاح
               final shadow2Box = _shadow2Key.currentContext?.findRenderObject() as RenderBox?;
               if (shadow2Box != null) {
                 final shadow2Pos = shadow2Box.localToGlobal(Offset.zero);

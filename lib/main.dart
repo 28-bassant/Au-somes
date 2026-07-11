@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:au_somes/providers/app_language_provider.dart';
 import 'package:au_somes/splash_screen/splash_screen.dart';
 import 'package:au_somes/ui/auth/forget_password/forged_password_screen1.dart';
@@ -26,7 +28,9 @@ import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_routine/d
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/daily_tips/daily_tips_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/progress_level/progress_level_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/home_tab/features/stories_time/stories_time_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/about_us/about_us_screen.dart';
 import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/edit_profile/edit_profile_screen.dart';
+import 'package:au_somes/ui/parent_screen/tabs/profile_tab/features/frequently_asked_questions/frequently_asked_questions_screen.dart';
 import 'package:au_somes/ui/select_screen/select_screen.dart';
 import 'package:au_somes/utils/app_routes.dart';
 import 'package:au_somes/utils/app_theme.dart';
@@ -39,7 +43,20 @@ import 'core/cache/shared_prefs_utils.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
 RouteObserver<ModalRoute<void>>();
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) {
+        print("Host: $host");
+        return true;
+      };
+  }
+}
 void main() async {
+  HttpOverrides.global = MyHttpOverrides();
+
   WidgetsFlutterBinding.ensureInitialized();
 
   await SharedPrefsUtils.init();
@@ -70,7 +87,7 @@ class MyApp extends StatelessWidget{
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       navigatorObservers: [routeObserver],
-      initialRoute: AppRoutes.loginScreenRouteName,
+      initialRoute: AppRoutes.splashScreenRouteName,
       routes:  {
         AppRoutes.splashScreenRouteName : (context) => SplashScreen(),
         AppRoutes.loginScreenRouteName : (context) => LoginScreen(),
@@ -84,6 +101,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.chatbotScreenRouteName:(context)=>ChatbotScreen(),
         AppRoutes.progressLevelScreenRouteName:(context)=>ProgressLevelScreen(),
         AppRoutes.editProfileScreenRouteName:(context)=>EditProfileScreen(),
+        AppRoutes.aboutUsScreenRouteName:(context)=>AboutUsPage(),
         AppRoutes.spatialConceptsScreenRouteName:(context)=>SpatialConceptsScreen(),
         AppRoutes.dailyRoutineScreenRouteName:(context)=>DailyRoutineScreen(),
         AppRoutes.dailyTipsScreenRouteName:(context)=>DailyTipsScreen(),
@@ -99,6 +117,7 @@ class MyApp extends StatelessWidget{
         AppRoutes.outsideBaseActivityScreenRouteName:(context)=>OutsideBaseActivityScreen(),
         AppRoutes.visualSpatialPerceptionScreenRouteName:(context)=>VisualSpatialPerceptionBaseScreen(),
         AppRoutes.mentalCutting32ActivityScreenRouteName:(context)=>MentalCuttingLevel3Stage2(),
+        AppRoutes.faq_ScreenRouteName:(context)=>FrequentlyAskedQuestions(),
 
       },
       theme: AppTheme.lightTheme,

@@ -233,7 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Update your child\'s info for a better personalized experience.';
 
   @override
-  String get well_done => 'Well done! 🌟';
+  String get well_done => 'Well Done';
 
   @override
   String get thinking => '...Thinking';
@@ -805,6 +805,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get park_outing => 'Park Outing🌴';
 
   @override
+  String get day_at_school => 'A Day at School 🏫';
+
+  @override
+  String get fun_at_kitchen => 'Fun in the Kitchen 🍳';
+
+  @override
   String get space_adventure => 'Space Adventure🚀';
 
   @override
@@ -887,4 +893,160 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lets_try_again => 'Let\'s try again together';
+
+  @override
+  String get please_choose_story_theme => 'Please choose story theme';
+
+  @override
+  String get please_select_exactly_concepts =>
+      'Please select exactly 3 concepts';
+
+  @override
+  String get how_would_you_rate_our_app => 'How would you rate our app?';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get current => 'Current';
+
+  @override
+  String get learning_status => 'Learning Status';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String get help => 'Help';
+
+  @override
+  String get thank_you_for_rating => 'Thank you for your feedback';
+
+  @override
+  String get about_us_title =>
+      'Empowering Every Child to Learn, Grow, and Shine';
+
+  @override
+  String get about_us_content =>
+      'AU-Somes is an educational and interactive application designed to support children with Autism Spectrum Disorder (ASD) in developing essential cognitive, communication, and daily living skills through engaging activities and personalized learning experiences.\n\nOur mission is to provide a safe, enjoyable, and accessible environment where children can learn at their own pace while helping parents and therapists monitor their progress. The application includes educational games, storytelling, visual learning activities, and progress tracking to encourage continuous development.\n\nAt AU-Somes, we believe that every child has unique abilities and deserves learning tools that meet their individual needs. Our goal is to make learning more enjoyable, inclusive, and effective for every child.';
+
+  @override
+  String get ques1 => 'What is Autism Spectrum Disorder (ASD)?';
+
+  @override
+  String get ans1 =>
+      'Autism Spectrum Disorder (ASD) is a developmental condition that affects communication, social interaction, behavior, and learning. Every child with autism is unique and may have different strengths and challenges.';
+
+  @override
+  String get ques2 => 'What are the early signs of autism?';
+
+  @override
+  String get ans2 =>
+      'Common early signs include delayed speech, limited eye contact, difficulty responding to their name, repetitive behaviors, and reduced interest in social interaction. Signs vary from one child to another.';
+
+  @override
+  String get ques3 => 'Can children with autism improve their skills?';
+
+  @override
+  String get ans3 =>
+      'Yes. With early intervention, consistent practice, and personalized learning, many children improve their communication, cognitive, social, and daily living skills.';
+
+  @override
+  String get ques4 =>
+      'Why are visual activities important for children with autism?';
+
+  @override
+  String get ans4 =>
+      'Visual activities help children improve attention, problem-solving, spatial awareness, and memory while making learning more engaging and easier to understand.';
+
+  @override
+  String get ques5 => 'What is visual-spatial perception?';
+
+  @override
+  String get ans5 =>
+      'Visual-spatial perception is the ability to understand where objects are located in space and how they relate to each other. It helps children recognize shapes, directions, distances, and positions.';
+
+  @override
+  String get ques6 => 'Why is visual-spatial perception important?';
+
+  @override
+  String get ans6 =>
+      'It supports reading, writing, drawing, solving puzzles, navigating environments, and performing everyday tasks independently.';
+
+  @override
+  String get ques7 => 'What activities improve visual-spatial skills?';
+
+  @override
+  String get ans7 =>
+      'Puzzles, matching games, block building, sorting objects, drawing, mazes, and memory games can strengthen visual-spatial perception.';
+
+  @override
+  String get ques8 => 'Why is routine important for children with autism?';
+
+  @override
+  String get ans8 =>
+      'A consistent daily routine helps children feel safe, reduces anxiety, and makes it easier to understand expectations and transitions.';
+
+  @override
+  String get ques9 => 'How can parents support learning at home?';
+
+  @override
+  String get ans9 =>
+      'Parents can encourage learning by practicing activities regularly, giving clear instructions, using positive reinforcement, and celebrating small achievements.';
+
+  @override
+  String get ques10 => 'What are sensory sensitivities?';
+
+  @override
+  String get ans10 =>
+      'Some children with autism may be highly sensitive or less responsive to sounds, lights, textures, smells, or touch. These sensitivities differ from child to child.';
+
+  @override
+  String get ques11 => 'Why is positive reinforcement important?';
+
+  @override
+  String get ans11 =>
+      'Positive reinforcement motivates children by rewarding desired behaviors, increasing confidence, and encouraging continued learning.';
+
+  @override
+  String get ques12 => 'Can autism be cured?';
+
+  @override
+  String get ans12 =>
+      'Autism is not a disease and does not have a cure. However, therapy, education, and support can help children develop important life skills and reach their full potential.';
+
+  @override
+  String get ques13 => 'How can technology help children with autism?';
+
+  @override
+  String get ans13 =>
+      'Educational applications provide interactive activities, personalized learning, and engaging experiences that support communication, cognitive development, and independence.';
+
+  @override
+  String get ques14 => 'Why should progress be tracked?';
+
+  @override
+  String get ans14 =>
+      'Tracking progress helps parents and specialists identify strengths, recognize areas that need improvement, and adjust learning plans accordingly.';
+
+  @override
+  String get ques15 =>
+      'What should I do if my child struggles with an activity?';
+
+  @override
+  String get ans15 =>
+      'Stay patient, encourage your child, simplify the task if needed, and allow breaks. Learning happens gradually, and every small achievement is valuable.';
+
+  @override
+  String get ques16 => 'How often should my child use the app?';
+
+  @override
+  String get ans16 =>
+      'Short, regular sessions of 15–30 minutes a day are generally more effective than long sessions, depending on the child\'s attention span and individual needs.';
 }
