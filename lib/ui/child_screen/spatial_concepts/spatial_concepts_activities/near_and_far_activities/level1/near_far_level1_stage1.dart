@@ -28,7 +28,8 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
+  bool _isCompleted = false;
   @override
   void initState() {
     super.initState();
@@ -94,14 +95,34 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
   void repeatSound() => playSound();
 
   void _handleWrongAnswer() {
+    if (_isCompleted) return;
+
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     } else if (_wrongAttempts >= 2) {
       _startAnswerAnimation();
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -144,6 +165,8 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+
+
     final double scale = min(screenWidth / 400, screenHeight / 800);
 
     return Scaffold(
@@ -172,17 +195,26 @@ class NearFarLevel1Stage1State extends State<NearFarLevel1Stage1>
                 return Transform.translate(offset: Offset(offsetX, 0), child: child);
               },
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  if (_isCompleted) return;
+
                   setState(() {
+                    _isCompleted = true;
                     _wrongAttempts = 0;
                     _isAnimatingAnswer = false;
                   });
+
                   _animationController?.stop();
                   _animationController?.value = 0;
 
+                  await _logProgress();
+
                   WellDoneOverlay.show(context);
+
                   Future.delayed(const Duration(seconds: 3), () {
-                    widget.onNextStage?.call();
+                    if (mounted) {
+                      widget.onNextStage?.call();
+                    }
                   });
                 },
                 child: Image.network(

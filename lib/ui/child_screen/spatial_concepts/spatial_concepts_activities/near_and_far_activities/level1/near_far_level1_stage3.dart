@@ -27,7 +27,8 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
+  bool _isCompleted = false;
   @override
   void initState() {
     super.initState();
@@ -97,14 +98,34 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
   void repeatSound() => playSound();
 
   void _handleWrongAnswer() {
+    if (_isCompleted) return;
+
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
-    } else if (_wrongAttempts == 2) {
+    } else if (_wrongAttempts >= 2) {
       _startAnswerAnimation();
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -149,77 +170,86 @@ class NearFarLevel1Stage3State extends State<NearFarLevel1Stage3>
     final lastElement = _activity!.elements!.last;
 
     return LayoutBuilder(
-      builder: (context, constraints) {
-        final double screenWidth = constraints.maxWidth;
-        final double screenHeight = constraints.maxHeight;
+        builder: (context, constraints) {
+          final double screenWidth = constraints.maxWidth;
+          final double screenHeight = constraints.maxHeight;
 
-        final double scale = screenWidth / 400;
+          final double scale = screenWidth / 400;
 
-        final double correctImageWidth = 200 * scale;
-        final double wrongImageWidth = 300 * scale;
-        final double spacingHeight = 30 * scale;
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
-              animation: _animationController!,
-              builder: (context, child) {
-                double shakeValue = 0;
-                if (_isAnimatingAnswer) {
-                  shakeValue = screenWidth * 0.05 * sin(_animationController!.value * pi);
-                }
 
-                return Transform.translate(
-                  offset: Offset(shakeValue, 0),
-                  child: child,
-                );
-              },
-              child: GestureDetector(
+          final double correctImageWidth = 200 * scale;
+          final double wrongImageWidth = 300 * scale;
+          final double spacingHeight = 30 * scale;
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedBuilder(
+                animation: _animationController!,
+                builder: (context, child) {
+                  double shakeValue = 0;
+                  if (_isAnimatingAnswer) {
+                    shakeValue = screenWidth * 0.05 * sin(_animationController!.value * pi);
+                  }
+
+                  return Transform.translate(
+                    offset: Offset(shakeValue, 0),
+                    child: child,
+                  );
+                },
+                child: GestureDetector(
+                  onTap: () async {
+                    if (_isCompleted) return;
+
+                    setState(() {
+                      _isCompleted = true;
+                      _wrongAttempts = 0;
+                      _isAnimatingAnswer = false;
+                    });
+
+                    _animationController?.stop();
+                    _animationController?.value = 0;
+
+                    await _logProgress();
+
+                    WellDoneOverlay.show(context);
+
+                    Future.delayed(const Duration(seconds: 3), () {
+                      if (mounted) {
+                        widget.onNextStage?.call();
+                      }
+                    });
+                  },
+                  child: Container(
+                    width: correctImageWidth,
+                    height: correctImageWidth,
+                    child: Image.network(
+                      lastElement.imageUrl ?? '',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: spacingHeight),
+
+              GestureDetector(
                 onTap: () {
-                  setState(() {
-                    _wrongAttempts = 0;
-                    _isAnimatingAnswer = false;
-                  });
-                  _animationController?.stop();
-                  _animationController?.value = 0;
-
-                  WellDoneOverlay.show(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (mounted) {
-                      widget.onNextStage?.call();
-                    }
-                  });
+                  _handleWrongAnswer();
                 },
                 child: Container(
-                  width: correctImageWidth,
-                  height: correctImageWidth,
+                  width: wrongImageWidth,
+                  height: wrongImageWidth,
                   child: Image.network(
-                    lastElement.imageUrl ?? '',
+                    firstElement.imageUrl ?? '',
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
-            ),
-
-            SizedBox(height: spacingHeight),
-
-            GestureDetector(
-              onTap: () {
-                _handleWrongAnswer();
-              },
-              child: Container(
-                width: wrongImageWidth,
-                height: wrongImageWidth,
-                child: Image.network(
-                  firstElement.imageUrl ?? '',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
     );
   }
 }

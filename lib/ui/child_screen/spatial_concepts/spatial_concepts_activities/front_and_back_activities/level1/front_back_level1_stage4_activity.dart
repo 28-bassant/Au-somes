@@ -30,7 +30,7 @@ class FrontBackLevel1Stage4ActivityState
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -102,12 +102,23 @@ class FrontBackLevel1Stage4ActivityState
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
     } else if (_wrongAttempts == 2) {
       _startAnswerAnimation();
+    }
+  }
+  Future<void> _logProgress() async {
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _usedHint,
+    );
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
     }
   }
 
@@ -163,6 +174,8 @@ class FrontBackLevel1Stage4ActivityState
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -212,7 +225,7 @@ class FrontBackLevel1Stage4ActivityState
                   );
                 },
                 child: GestureDetector(
-                  onTapDown: (details) {
+                  onTapDown: (details) async {
                     final local = details.localPosition;
                     final w = screenWidth * 0.625;
                     final h = screenWidth * 0.625;
@@ -229,15 +242,11 @@ class FrontBackLevel1Stage4ActivityState
                         _wrongAttempts = 0;
                         _isAnimatingAnswer = false;
                       });
+
                       _animationController?.stop();
                       _animationController?.value = 0;
 
-                      ApiManager.logAttemptStatus(
-                        phaseId: _activity!.phaseId!,
-                        userHint: false,
-                      );
-
-                      ApiManager.getProgressSummary();
+                      await _logProgress();
 
                       WellDoneOverlay.show(context);
 

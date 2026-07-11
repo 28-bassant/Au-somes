@@ -57,27 +57,22 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         _answered = true;
         _score++;
 
-        // تشغيل صوت النجاح
-        SoundHelper.playSuccess();
-
         Future.delayed(const Duration(milliseconds: 350), () {
           if (!mounted) return;
 
-          setState(() => _showPopup = true);
+          setState(() {
+            _showPopup = true;
+          });
+        });
+      }
+      else {
+        _wrongAttempts++;
 
-          // لو آخر صفحة يروح للـ Complete
-          if (_isLastPage) {
-            Future.delayed(const Duration(seconds: 3), () {
-              if (mounted) {
-                _goNext();
-              }
-            });
-          } else {
-            Future.delayed(const Duration(seconds: 3), () {
-              if (mounted) {
-                setState(() => _showPopup = false);
-              }
-            });
+        _speakWrongFeedback();
+
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (mounted) {
+            setState(() => _selectedAnswer = null);
           }
         });
       }
@@ -85,8 +80,15 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   }
 
   void _dismissPopup() {
-    setState(() => _showPopup = false);
-    Future.delayed(const Duration(milliseconds: 150), _goNext);
+    if (!mounted) return;
+
+    setState(() {
+      _showPopup = false;
+    });
+
+    if (_isLastPage) {
+      _goNext();
+    }
   }
   Future<void> _speak() async {
     await _tts.setLanguage("en-US"); // أو "ar"
@@ -94,7 +96,18 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
 
     await _tts.speak(_page.narration);
   }
+  Future<void> _speakWrongFeedback() async {
+    final isArabic =
+    RegExp(r'[\u0600-\u06FF]').hasMatch(_page.feedback.wrongFeedback);
 
+    await _tts.stop();
+
+    await _tts.setLanguage(isArabic ? "ar-EG" : "en-US");
+    await _tts.setSpeechRate(0.45);
+    await _tts.setPitch(1.0);
+
+    await _tts.speak(_page.feedback.wrongFeedback);
+  }
   void _goNext() {
     if (_isLastPage) {
       Navigator.pushReplacement(

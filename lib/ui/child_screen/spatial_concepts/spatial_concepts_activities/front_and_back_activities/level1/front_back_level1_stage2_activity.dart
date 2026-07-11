@@ -30,7 +30,7 @@ class FrontBackLevel1Stage2ActivityState
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
   @override
   void initState() {
     super.initState();
@@ -102,6 +102,7 @@ class FrontBackLevel1Stage2ActivityState
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
@@ -130,6 +131,16 @@ class FrontBackLevel1Stage2ActivityState
       });
     }
   }
+  Future<void> _logProgress() async {
+    final result = await ApiManager.logAttemptStatus(
+      phaseId: _activity!.phaseId!,
+      userHint: _usedHint,
+    );
+
+    if (result?.isPassed == true) {
+      await ApiManager.getProgressSummary();
+    }
+  }
 
   @override
   void dispose() {
@@ -155,6 +166,8 @@ class FrontBackLevel1Stage2ActivityState
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+
 
     return Scaffold(
       body: Container(
@@ -214,16 +227,7 @@ class FrontBackLevel1Stage2ActivityState
                     _animationController?.stop();
                     _animationController?.value = 0;
 
-                    /// ===== LOG PROGRESS =====
-                    final result = await ApiManager.logAttemptStatus(
-                      phaseId: _activity!.phaseId!,
-                      userHint: false,
-                    );
-
-                    /// (اختياري) تحديث السجل العام للتقدم
-                    if (result?.isPassed == true) {
-                      await ApiManager.getProgressSummary();
-                    }
+                    await _logProgress();
 
                     WellDoneOverlay.show(context);
 
