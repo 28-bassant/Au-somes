@@ -229,7 +229,7 @@ class ApiManager {
 
   static Future<String> askChatbot(String prompt) async {
     Uri url = Uri.parse(
-      "http://au-somes.runasp.net/api/Chat/ask",
+      "https://au-somes.runasp.net/api/Chat/ask",
     );
 
     try {
@@ -431,90 +431,175 @@ class ApiManager {
 
     return null;
   }
-  static Future<StoryResponse> generateStories({
-    required String childName,
-    required String theme,
-    required List<String> concepts,
-  }) async {
-    try {
-      print("🚀 Starting API call...");
-      print("👶 Child: $childName");
-      print("📚 Theme: $theme");
-      print("📖 Concepts: ${concepts.join(', ')}");
 
-      // 1️⃣ بناء الـ prompt بالتنسيق الصحيح
-      final String userPrompt = """
+
+      static Future<StoryResponse> generateStories({
+        required String childName,
+        required String theme,
+        required List<String> concepts,
+      }) async {
+        try {
+          print("🚀 Starting API call...");
+          print("👶 Child: $childName");
+          print("📚 Theme: $theme");
+          print("📖 Concepts: ${concepts.join(', ')}");
+
+          final String userPrompt = """
 Child name: $childName | Theme: $theme | Concepts: ${concepts.join('، ')}
 """;
 
-      // 2️⃣ إعداد الـ request body
-      var body = jsonEncode({
-        "model": "qwen2.5-3b-lora",
-        "messages": [
-          {
-            "role": "user",
-            "content": userPrompt,
+          final body = jsonEncode({
+            "model": "qwen2.5-3b-lora",
+            "messages": [
+              {
+                "role": "user",
+                "content": userPrompt,
+              }
+            ],
+            "max_new_tokens": 2048,
+            "temperature": 0.05,
+            "top_p": 0.9,
+            "top_k": 50,
+            "repetition_penalty": 1.1,
+          });
+
+          print("📦 Request Body:");
+          print(body);
+
+          final response = await http.post(
+            Uri.parse(
+                ApiConstants.storiesBaseUrl + ApiEndpoints.storiesEndpoint),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: body,
+          );
+
+          print("📩 Response status: ${response.statusCode}");
+          print("📩 Response body:");
+          print(response.body);
+
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+
+            final String content =
+            data["choices"][0]["message"]["content"];
+
+            print("📖 Raw content:");
+            print(content);
+
+            final cleanContent = content
+                .replaceAll(RegExp(r'```json'), '')
+                .replaceAll(RegExp(r'```'), '')
+                .trim();
+
+            final Map<String, dynamic> storyJson =
+            jsonDecode(cleanContent);
+
+            print("✅ Story parsed successfully");
+
+            return StoryResponse.fromJson(storyJson);
+          } else {
+            // للمطور
+            print("══════════════════════════════");
+            print("❌ API ERROR");
+            print("Status Code: ${response.statusCode}");
+            print("Body:");
+            print(response.body);
+            print("══════════════════════════════");
+
+            String userMessage;
+
+            switch (response.statusCode) {
+              case 400:
+                userMessage =
+                "Invalid request. Please try again.";
+                break;
+
+              case 401:
+                userMessage =
+                "Authorization failed. Please try again later.";
+                break;
+
+              case 403:
+                userMessage =
+                "Access denied.";
+                break;
+
+              case 404:
+                userMessage =
+                "The service could not be found.";
+                break;
+
+              case 408:
+                userMessage =
+                "The request timed out. Please check your internet connection.";
+                break;
+
+              case 429:
+                userMessage =
+                "Too many requests. Please wait a moment and try again.";
+                break;
+
+              case 500:
+                userMessage =
+                "Server error. Please try again later.";
+                break;
+
+              case 502:
+              case 503:
+              case 504:
+                userMessage =
+                "The AI service is temporarily unavailable. Please try again later.";
+                break;
+
+              case 530:
+                userMessage =
+                "The AI server is currently offline. Please try again in a few minutes.";
+                break;
+
+              default:
+                userMessage =
+                "Something went wrong. Please try again.";
+            }
+
+            throw Exception(userMessage);
           }
-        ],
-        "max_new_tokens": 2048,
-        "temperature": 0.05,
-        "top_p": 0.9,
-        "top_k": 50,
-        "repetition_penalty": 1.1,
-      });
+        } on SocketException catch (e, stackTrace) {
+          print("══════════════════════════════");
+          print("❌ SOCKET EXCEPTION");
+          print(e);
+          print(stackTrace);
+          print("══════════════════════════════");
 
-      print("📦 Request Body: $body");
+          throw Exception(
+            "No internet connection. Please check your connection and try again.",
+          );
+        } on TimeoutException catch (e, stackTrace) {
+          print("══════════════════════════════");
+          print("❌ TIMEOUT");
+          print(e);
+          print(stackTrace);
+          print("══════════════════════════════");
 
-      // 3️⃣ إرسال الـ request
-      final response = await http.post(
-        Uri.parse(ApiConstants.storiesBaseUrl + ApiEndpoints.storiesEndpoint),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: body,
-      );
+          throw Exception(
+            "The request took too long. Please try again.",
+          );
+        } catch (e, stackTrace) {
+          print("══════════════════════════════");
+          print("❌ UNEXPECTED ERROR");
+          print(e);
+          print(stackTrace);
+          print("══════════════════════════════");
 
-      print("📩 Response status: ${response.statusCode}");
-      print("📩 Response body: ${response.body}");
-
-      // 4️⃣ معالجة الـ response
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        // استخراج المحتوى من الـ response
-        final String content = data["choices"][0]["message"]["content"];
-
-        print("📖 Raw content: $content");
-
-        // تنظيف النص من أي علامات إضافية
-        String cleanContent = content
-            .replaceAll(RegExp(r'```json'), '')
-            .replaceAll(RegExp(r'```'), '')
-            .trim();
-
-        // تحويل النص إلى JSON
-        final Map<String, dynamic> storyJson = jsonDecode(cleanContent);
-
-        print("✅ Story parsed successfully");
-
-        return StoryResponse.fromJson(storyJson);
-      } else {
-        // محاولة قراءة رسالة الخطأ
-        String errorMessage = "Unknown error";
-        try {
-          final errorData = jsonDecode(response.body);
-          if (errorData.containsKey("error")) {
-            errorMessage = errorData["error"]["message"] ?? errorData["error"].toString();
+          if (e is Exception) {
+            rethrow;
           }
-        } catch (_) {
-          errorMessage = response.body;
+
+          throw Exception(
+            "Unexpected error. Please try again.",
+          );
         }
-
-        throw Exception("Failed to generate story: ${response.statusCode}\n$errorMessage");
       }
-    } catch (e) {
-      print("❌ ERROR in generateStories: $e");
-      rethrow;
-    }
-  }
+
 }

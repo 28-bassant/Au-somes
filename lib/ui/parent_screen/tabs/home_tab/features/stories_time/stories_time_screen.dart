@@ -156,7 +156,7 @@ $concepts
 
 
     return Container(
-      height: height * .16,
+      height: height * .18,
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 56, 18, 22),
       decoration: BoxDecoration(

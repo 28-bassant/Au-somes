@@ -37,7 +37,8 @@ class NearFarLevel2Stage4State extends State<NearFarLevel2Stage4>
   late ActivityElement actor;
   late ActivityElement shadow;
   late ActivityElement anchor;
-
+  bool _usedHint = false;
+  bool _progressLocked = false;
   @override
   void initState() {
     super.initState();
@@ -108,11 +109,32 @@ class NearFarLevel2Stage4State extends State<NearFarLevel2Stage4>
   void repeatSound() => playSound();
 
   void _handleWrongDrop() {
-    _wrongAttempts++;
+    setState(() {
+      _wrongAttempts++;
+      _usedHint = true;
+    });
+
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
-    } else if (_wrongAttempts == 2) {
+    } else if (_wrongAttempts >= 2) {
       _startShadowShake();
+    }
+  }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
+
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -146,6 +168,8 @@ class NearFarLevel2Stage4State extends State<NearFarLevel2Stage4>
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_activity == null) return const Center(child: Text('Error loading activity'));
+
+
 
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -190,13 +214,27 @@ class NearFarLevel2Stage4State extends State<NearFarLevel2Stage4>
             },
             child: DragTarget<String>(
               onWillAccept: (data) => data == shadow.id,
-              onAccept: (data) {
+              onAccept: (data) async {
+                if (_progressLocked) return;
+                _progressLocked = true;
+
                 setState(() {
                   isPlacedCorrectly = true;
+                  _wrongAttempts = 0;
+                  _isAnimatingShadow = false;
                 });
+
+                _animationController?.stop();
+                _animationController?.value = 0;
+
+                await _logProgress();
+
                 WellDoneOverlay.show(context);
+
                 Future.delayed(const Duration(seconds: 3), () {
-                  if (mounted) widget.onNextStage?.call();
+                  if (mounted) {
+                    widget.onNextStage?.call();
+                  }
                 });
               },
               builder: (context, candidateData, rejectedData) {

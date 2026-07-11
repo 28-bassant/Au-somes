@@ -31,7 +31,8 @@ class FrontBackLevel1Stage1ActivityState
   int _wrongAttempts = 0;
   bool _isAnimatingAnswer = false;
   AnimationController? _animationController;
-
+  bool _usedHint = false;
+  bool _progressLocked = false;
   @override
   void initState() {
     super.initState();
@@ -103,11 +104,12 @@ class FrontBackLevel1Stage1ActivityState
   void _handleWrongAnswer() {
     setState(() {
       _wrongAttempts++;
+      _usedHint = true;
     });
 
     if (_wrongAttempts == 1) {
       TryAgainSound.play();
-    } else if (_wrongAttempts == 2) {
+    } else if (_wrongAttempts >= 2) {
       _startAnswerAnimation();
     }
   }
@@ -132,13 +134,20 @@ class FrontBackLevel1Stage1ActivityState
     }
   }
   Future<void> _logProgress() async {
-    final result = await ApiManager.logAttemptStatus(
-      phaseId: _activity!.phaseId!,
-      userHint: _wrongAttempts > 0,
-    );
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
-    if (result?.isPassed == true) {
-      await ApiManager.getProgressSummary();
+      print("PhaseId = ${_activity!.phaseId}");
+      print("RESULT = ${result?.isPassed}");
+
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
     }
   }
 
@@ -166,6 +175,8 @@ class FrontBackLevel1Stage1ActivityState
 
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+
 
     return Scaffold(
       body: Container(
@@ -217,6 +228,9 @@ class FrontBackLevel1Stage1ActivityState
                 },
                 child: GestureDetector(
                   onTap: () async {
+                    if (_progressLocked) return;
+                    _progressLocked = true;
+
                     setState(() {
                       _wrongAttempts = 0;
                       _isAnimatingAnswer = false;
@@ -225,7 +239,7 @@ class FrontBackLevel1Stage1ActivityState
                     _animationController?.stop();
                     _animationController?.value = 0;
 
-                    await _logProgress(); // 🔥 هنا الإضافة المهمة
+                    await _logProgress();
 
                     WellDoneOverlay.show(context);
 

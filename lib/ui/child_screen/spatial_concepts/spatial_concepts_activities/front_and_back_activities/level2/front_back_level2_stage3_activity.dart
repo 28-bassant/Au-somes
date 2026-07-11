@@ -151,8 +151,26 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       });
     }
   }
+  Future<void> _logProgress() async {
+    try {
+      final result = await ApiManager.logAttemptStatus(
+        phaseId: _activity!.phaseId!,
+        userHint: _usedHint,
+      );
 
-  void _handleDragEnd(DraggableDetails details, double actorSize) {
+      if (result?.isPassed == true) {
+        await ApiManager.getProgressSummary();
+      }
+    } catch (e) {
+      print("Progress error: $e");
+    }
+  }
+
+
+  Future<void> _handleDragEnd(
+      DraggableDetails details,
+      double actorSize,
+      ) async {
     if (_isPlacedCorrectly) return;
 
     final actorCenter = Offset(
@@ -170,27 +188,25 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       final rect = Rect.fromLTWH(pos.dx, pos.dy, shadowCorrectBox.size.width, shadowCorrectBox.size.height);
 
       if (rect.contains(actorCenter)) {
+        print("👉 RIGHT ANSWER CLICKED");
+
+        _animationController?.stop();
+        _animationController?.value = 0;
+
         setState(() {
           _isPlacedCorrectly = true;
           _wrongAttempts = 0;
           _isAnimatingShadow = false;
         });
 
-        _animationController?.stop();
-        _animationController?.value = 0;
-
-        // ✅ تسجيل الـ Progress هنا
-        ApiManager.logAttemptStatus(
-          phaseId: _activity!.phaseId!,
-          userHint: _usedHint,
-        );
-
-        ApiManager.getProgressSummary();
+        await _logProgress();
 
         WellDoneOverlay.show(context);
 
         Future.delayed(const Duration(seconds: 3), () {
-          if (mounted) widget.onNextStage?.call();
+          if (mounted) {
+            widget.onNextStage?.call();
+          }
         });
 
         return;
@@ -240,25 +256,26 @@ class FrontBackLevel2Stage3ActivityState extends State<FrontBackLevel2Stage3Acti
       body: Stack(
         children: [
 
-          Positioned(
-            left: wrongShadowLeft - 60,
-            top: wrongShadowTop-30,
-            child: Image.network(
-              shadowWrong.imageUrl ?? '',
-              key: _shadowWrongKey,
-              width: wrongShadowSize,
-              height: wrongShadowSize,
-            ),
-          ),
+        Positioned(
+        left: wrongShadowLeft - 60,
+        top: wrongShadowTop-30,
+        child: Image.network(
+          shadowWrong.imageUrl ?? '',
+          key: _shadowWrongKey,
+          width: wrongShadowSize,
+          height: wrongShadowSize,
+        ),
+      ),
 
-          Positioned.fill(
-            child: Center(
-              child: Image.network(
-                anchor.imageUrl ?? '',
-                width: anchorWidth,
-              ),
-            ),
+      Positioned.fill(
+        child: Center(
+          child: Image.network(
+            anchor.imageUrl ?? '',
+            width: anchorWidth,
           ),
+        ),
+      ),
+
 
           Positioned(
             left: correctShadowLeft,

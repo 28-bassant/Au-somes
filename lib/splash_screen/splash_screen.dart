@@ -100,21 +100,8 @@ class _SplashScreenState extends State<SplashScreen>
               child: Image(image: AssetImage(AppAssets.appNameImage)),
             ),
 
-            SizedBox(height: height * .02),
 
-            Text(
-              'تطبيق إلكتروني لتنمية مهارة التصور البصري المكاني',
-              textAlign: TextAlign.center,
-              style: AppStyles.bold16MintGreen,
-            ),
 
-            SizedBox(height: height * .008),
-
-            Text(
-              'للأطفال ذوي اضطراب التوحد البسيط وذوي متلازمة أسبرجر',
-              textAlign: TextAlign.center,
-              style: AppStyles.bold16MintGreen,
-            ),
           ],
         ),
       ),

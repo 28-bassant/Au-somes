@@ -19,7 +19,7 @@ class PercentCircularIndicator extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: height * .35,
+      height: height * .46,
       decoration: BoxDecoration(
         color: AppColors.greyColor.withOpacity(.3),
         borderRadius: BorderRadius.circular(16),
